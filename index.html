@@ -48,12 +48,12 @@
             background: #111;
             border: 2px solid #444;
             padding: 5px;
-            z-index: 2000;
+            z-index: 9999; /* Zorgt dat hij altijd bovenop ligt */
             box-shadow: 0 10px 30px rgba(0,0,0,0.9);
             border-radius: 4px;
         }
         #weather-status-bar:hover .weather-map-popover { display: block; }
-        .weather-map-popover img { width: 100%; border-radius: 2px; display: block; }
+        .weather-map-popover img { width: 100%; border-radius: 2px; display: block; background: #222; }
 
         .clocks { display: flex; gap: 20px; font-family: 'Courier New', monospace; }
         .clock-item { text-align: right; }
@@ -79,7 +79,6 @@
         .cam-selector { background: #111; color: #ccc; border: 1px solid #333; padding: 4px; font-size: 11px; outline: none; border-radius: 2px; }
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; }
         
-        /* GEOPTIMALISEERDE HOOGTES */
         .fleet-card { height: 145px; background: #050505; border: 1px solid #222; border-radius: 4px; }
         .knmi-card { height: 155px; } 
         .radar-card { flex-grow: 1; min-height: 180px; }
@@ -148,7 +147,7 @@
             { name: "P2000.page", url: "https://p2000.page/" },
             { name: "112MELDINGEN.NL", url: "http://112meldingen.nl/index.php" },
             { name: "CAPCode database", url: "http://www.capcode.nl/capsite/index.php" },
-            { name: "Global SAR Hub", url: "https://www.globalsarhub.com/sea-sar.html" },
+            { name: "Global SAR Hub (Sea-SAR)", url: "https://www.globalsarhub.com/sea-sar.html" },
             { name: "International Cospas-Sarsat", url: "https://cospas-sarsat.int/en/" },
             { name: "LADR", url: "https://ladr.eurocontrol.int/ops/frontend" }
         ]},
@@ -160,23 +159,26 @@
             { name: "GIS KNRM", url: "https://www.arcgis.com/apps/mapviewer/index.html?webmap=04162a3c264d462e96e4ec508519ce95" },
             { name: "Portal.lifeguardtracking.nl", url: "https://portal.lifeguardtracking.nl/" }
         ]},
-        { title: "RWS/KNMI", links: [
+        { title: "Overheid", links: [
             { name: "RWsOS Viewer", url: "https://rwsos.rws.nl/viewer/map/noordzee/waterkwantiteit" },
             { name: "Waterberichtgeving KWC", url: "https://waterberichtgeving.rws.nl/owb/home" },
-            { name: "KNMI extranet", url: "https://exons-prd.auth.eu-west-1.amazoncognito.com/login?client_id=1d98t56sjeb23f09mo3oeu4kab" },
+            { name: "KNMI extranet", url: "https://mijn.knmi.nl" },
             { name: "Waddendata.nl", url: "https://waddendata.nl/" },
-            { name: "Rijkswaterstaat Waterinfo", url: "https://waterinfo.rws.nl/" },
+            { name: "Rijkswaterstaat Waterinfo", url: "https://waterinfo.rws.nl/#!/kaart/waterhoogte-t-o-v-nap/" },
             { name: "GeoWeb (betonning)", url: "https://maps.rijkswaterstaat.nl/geoweb55/index.html?viewer=NMA" },
+            { name: "GeoWeb Catalogus", url: "https://maps.rijkswaterstaat.nl/GeoWebPortaal/" },
             { name: "Noordzeeloket", url: "https://www.noordzeeloket.nl/" },
-            { name: "Onderwaterobjecten RWS", url: "https://onderwaterobjecten.rws.nl/" },
-            { name: "Weerdata Kustwacht", url: "https://weerdatakustwacht.wordpress.com/" }
+            { name: "Mijnbouw en WMP GIS", url: "https://experience.arcgis.com/experience/6e637f42374549329c46633afab17f58/" },
+            { name: "Onderwaterobjecten.rws.nl", url: "https://onderwaterobjecten.rws.nl/" },
+            { name: "Weerdatakustwacht.wordpress.com", url: "https://weerdatakustwacht.wordpress.com/" },
+            { name: "KWNL data", url: "https://sites.google.com/view/monitorkwnl/homepage" }
         ]},
         { title: "Scheepvaart", links: [
             { name: "EMSA Portal", url: "https://portal.emsa.europa.eu/home" },
             { name: "ERICards", url: "http://www.ericards.net/" },
             { name: "Rainwat", url: "http://www.rainwat.bipt.be/" },
             { name: "Lloyds Seasearcher", url: "https://www.seasearcher.com/" },
-            { name: "Sign In | NATO ISMERLO", url: "https://ismerlo.org/accounts/login/" },
+            { name: "NATO ISMERLO", url: "https://ismerlo.org/accounts/login/" },
             { name: "Nautical calculator", url: "https://www.madinstro.net/" },
             { name: "Navtex", url: "http://navtex.lv/" },
             { name: "Kabels Noordzee", url: "https://kis-orca.org/map/" }
@@ -188,36 +190,33 @@
             { name: "Maritime Control", url: "https://bfa.kustwacht.nl/" },
             { name: "Madesmart", url: "https://tracker.madesmart.nl/" }
         ]},
-        { title: "Scheepvaart DB", links: [
+        { title: "Database Zee", links: [
             { name: "Sketchy.boats", url: "https://sketchy.boats/" },
             { name: "406 MHz Registration", url: "https://www.406registration.com" },
+            { name: "Inmarsat", url: "https://login.inmarsat.com/" },
             { name: "RescueNET", url: "https://msds.portal.inmarsat.com/msds/" },
             { name: "Beacon Decode", url: "https://cospas-sarsat.int/en/beacons-pro/beacon-message-decode-program-txsep/beacon-message-decode-program" },
-            { name: "Ship Station List (ITU)", url: "https://www.itu.int/mmsapp/ShipStation/list" },
+            { name: "ITU Ship List", url: "https://www.itu.int/mmsapp/ShipStation/list" },
             { name: "MMSI MID Codes", url: "https://www.vtexplorer.com/mmsi-mid-codes-en/" },
             { name: "NOGEPA RAS", url: "http://ras.nogepa.nl/login.php" }
         ]},
         { title: "Plannen", links: [
             { name: "IBP Noordzee", url: "https://noordzeeloket.nl/functies-gebruik/artikel-baseline-0/" },
             { name: "IBP SAMIJ", url: "https://ibpsamij.calamiteiten.online/templates/" },
-            { name: "Handboek incidentbestrijding", url: "https://nipv.nl/wp-content/uploads/2025/12/20251203-NIPV-Handboek-incidentbestrijding-op-het-water.pdf" }
+            { name: "Handboek incident", url: "https://nipv.nl/wp-content/uploads/2025/12/20251203-NIPV-Handboek-incidentbestrijding-op-het-water.pdf" }
         ]},
         { title: "Luchtvaart", links: [
             { name: "LVNL AIS", url: "https://www.lvnl.nl/informatie-voor-luchtvarenden/publicaties-voor-luchtvarenden" },
             { name: "SkyVector", url: "https://skyvector.com/" },
             { name: "Aireon Alert", url: "https://aireonalert.iaa.ie/alert-login" },
             { name: "METAR-TAF.com", url: "https://metar-taf.com/" },
-            { name: "E6BX Calculator", url: "https://e6bx.com/" },
-            { name: "Aviation Glossary", url: "https://www.pilotscafe.com/glossary/" },
-            { name: "EHAMCDM Mobile", url: "https://mobile.ehamcdm.nl/" }
+            { name: "E6BX Calculator", url: "https://e6bx.com/" }
         ]},
-        { title: "Flight Tracking", links: [
+        { title: "Tracking", links: [
             { name: "FlightAware", url: "https://www.flightaware.com/" },
             { name: "Casper Tracking", url: "https://kustwacht-flighttracking.casper.aero/index.php" },
             { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" },
-            { name: "Flightradar24", url: "https://www.flightradar24.com/" },
-            { name: "Luchtballonradar", url: "https://www.luchtballonradar.nl/" },
-            { name: "Bristow Tracking", url: "http://www.bristowgroup.com/globaltracking" }
+            { name: "Flightradar24", url: "https://www.flightradar24.com/" }
         ]},
         { title: "Taal/Rekenen", links: [
             { name: "Spelling.nu", url: "https://www.spelling.nu/" },
@@ -264,7 +263,8 @@
     function updateClocks() {
         const nu = new Date();
         document.getElementById('local-clock').innerText = nu.toLocaleTimeString('nl-NL', { hour12: false });
-        document.getElementById('zulu-clock').innerText = nu.getUTCHours().toString().padStart(2,'0') + ":" + nu.getUTCMinutes().toString().padStart(2,'0') + ":" + nu.getUTCSeconds().toString().padStart(2,'0');
+        const zulu = nu.getUTCHours().toString().padStart(2,'0') + ":" + nu.getUTCMinutes().toString().padStart(2,'0') + ":" + nu.getUTCSeconds().toString().padStart(2,'0');
+        document.getElementById('zulu-clock').innerText = zulu;
     }
 
     async function checkKNMIAlert() {
@@ -298,10 +298,19 @@
             const sel = document.getElementById('sel-' + i);
             sel.innerHTML = ''; 
             const defaultId = defaults[i];
+
             const g1 = document.createElement('optgroup'); g1.label = "Systemen";
-            sourceData.systems.forEach(s => { g1.appendChild(new Option((s.id === defaultId ? "★ " : "") + s.name, s.id)); });
+            sourceData.systems.forEach(s => { 
+                const opt = new Option((s.id === defaultId ? "★ " : "") + s.name, s.id);
+                g1.appendChild(opt); 
+            });
+
             const g2 = document.createElement('optgroup'); g2.label = "Webcams";
-            sourceData.webcams.forEach(w => { g2.appendChild(new Option((w.id === defaultId ? "★ " : "") + w.name, w.id)); });
+            sourceData.webcams.forEach(w => { 
+                const opt = new Option((w.id === defaultId ? "★ " : "") + w.name, w.id);
+                g2.appendChild(opt); 
+            });
+
             sel.add(g1); sel.add(g2);
             sel.value = defaultId;
         }
@@ -340,6 +349,7 @@
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&t=" + t;
+        // Bijgewerkte pop-over URL
         document.getElementById('popover-map').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/waarschuwing_land_0.gif?t=" + t;
         document.getElementById('last-update').innerText = "Fetch: " + new Date().toLocaleTimeString();
         checkKNMIAlert();
