@@ -21,7 +21,6 @@
             padding: 10px 20px;
             background: #050505;
             border-bottom: 1px solid #222;
-            text-align: left;
         }
 
         header h1 {
@@ -70,22 +69,18 @@
             width: 100% !important; 
             height: 100% !important; 
             border: none; 
-            background: #000;
         }
 
         .slot img { 
             width: 100%; 
             height: 100%; 
             object-fit: contain; 
-            background: #000; 
         }
 
         .label { 
             background: rgba(0, 212, 255, 0.85); 
             color: #000; padding: 2px 8px; font-size: 10px; font-weight: bold; 
             z-index: 20; text-transform: uppercase;
-            display: inline-block;
-            width: fit-content;
         }
 
         .cam-selector {
@@ -94,21 +89,7 @@
             border: 1px solid #333;
             padding: 6px;
             font-size: 11px;
-            width: 100%;
-            outline: none;
             border-radius: 2px;
-        }
-
-        optgroup {
-            background: #222;
-            color: #00d4ff;
-            font-style: normal;
-            font-weight: bold;
-        }
-        
-        option {
-            background: #111;
-            color: #ccc;
         }
 
         .info-column {
@@ -125,11 +106,11 @@
             height: 35%; 
             background: #050505;
             padding: 5px;
-            display: block; 
+            border: 1px solid #222;
+            border-radius: 4px;
         }
         
         .fleet-list {
-            list-style: none;
             padding: 10px;
             margin: 0;
             font-size: 12px;
@@ -138,20 +119,14 @@
         .fleet-item {
             display: flex;
             justify-content: space-between;
-            padding: 6px 10px;
+            padding: 6px 0;
             border-bottom: 1px solid #1a1a1a;
             font-family: monospace;
         }
 
-        .status-airborne { color: #ff3e3e; font-weight: bold; animation: pulse 2s infinite; } 
+        .status-airborne { color: #ff3e3e; font-weight: bold; } 
         .status-ground { color: #00ff88; } 
         .status-unknown { color: #444; }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
 
         .timestamp {
             font-size: 10px;
@@ -174,23 +149,16 @@
             padding: 5px 20px;
             background: #222; 
             color: #bbb; 
-            font-weight: bold; 
-            cursor: pointer; 
             border: 1px solid #444;
-            border-radius: 2px;
+            cursor: pointer;
             font-size: 11px;
         }
-
-        button:hover { background: #00d4ff; color: #000; border-color: #00d4ff; }
     </style>
 </head>
 <body>
 
 <div class="main-container">
-    <header>
-        <h1>Kustwacht Dashboard</h1>
-    </header>
-
+    <header><h1>Kustwacht Dashboard</h1></header>
     <div class="monitor-layout">
         <div class="webcam-grid">
             <div class="cam-box">
@@ -217,27 +185,25 @@
                 <img id="knmi-1" src="">
             </div>
             <div class="slot knmi-card">
-                <span class="label">Kust- en ruime binnenwateren</span>
+                <span class="label">Kustwateren</span>
                 <img id="knmi-2" src="">
             </div>
             <div class="slot radar-card">
-                <span class="label">Actuele Buienloop (NL)</span>
-                <img id="radar-img" src="https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350" alt="Radar">
+                <span class="label">Radar</span>
+                <img id="radar-img" src="https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350">
             </div>
             
             <div class="slot fleet-card">
-                <span class="label">Vloot Status (15s update)</span>
-                <div id="fleet-container" class="fleet-list">
-                    Verbinding maken...
-                </div>
+                <span class="label">Vloot Status (1m update)</span>
+                <div id="fleet-container" class="fleet-list">Laden...</div>
             </div>
 
-            <div id="last-update" class="timestamp">Laatste fetch: --:--:--</div>
+            <div id="last-update" class="timestamp">Update: --:--:--</div>
         </div>
     </div>
 
     <div class="controls">
-        <button onclick="hardReset()">HERSTEL ALLE STANDAARDEN</button>
+        <button onclick="hardReset()">HERSTEL DASHBOARD</button>
     </div>
 </div>
 
@@ -250,180 +216,110 @@
         { reg: "C-FCGE", icao: "c005e9" }
     ];
 
-    const sourceData = {
-        systems: [
-            {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange (Luchtvaart)', type: 'web'},
-            {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C12%2C9%2C8%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000', type: 'web'}
-        ],
-        webcams: [
-            {id: 'KjK02QIm4ZI', name: 'Brouwersdam', type: 'yt'},
-            {id: 'mI1Os7TFdGc', name: 'Egmond aan Zee', type: 'yt'},
-            {id: 'jDF264Bg1_c', name: 'Hoek v Holland Blvd', type: 'yt'},
-            {id: 'mnxV4iit7S4', name: 'Kijkduin Blvd', type: 'yt'},
-            {id: 'Ud7I4jprFN0', name: 'Maasvlakte', type: 'yt'},
-            {id: '_pGIJmXxAHk', name: 'Nieuwe Waterweg', type: 'yt'},
-            {id: 'dtFG_mcfWjQ', name: 'Noordwijk Blvd', type: 'yt'},
-            {id: 'L76VKII_Z7k', name: 'Noordwijk Vuurtoren', type: 'yt'},
-            {id: 'csMnwbjV5vg', name: 'Rockanje', type: 'yt'},
-            {id: 'A5kXiKzbBFs', name: 'Scheveningen Blvd', type: 'yt'},
-            {id: 'DaG5JReOYEw', name: 'Scheveningen Noord', type: 'yt'},
-            {id: 'Ud7I4jprFN0', name: 'Ter Heijde', type: 'yt'},
-            {id: 't3qbzZHOTyg', name: 'Wassenaarse Slag', type: 'yt'},
-            {id: 'q0-DDh1zdY4', name: 'Zandvoort Blvd', type: 'yt'}
-        ]
-    };
-
-    const defaults = {
-        1: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C12%2C9%2C8%2C0%2C0%2C0%2C0%2C0%2C0',
-        2: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8',
-        3: 'A5kXiKzbBFs',
-        4: 'q0-DDh1zdY4'
-    };
-
-    document.addEventListener('DOMContentLoaded', () => {
-        setupSelectors();
-        hardReset();
-        // 15 seconden update
-        setInterval(verversData, 15000); 
-    });
-
-    function setupSelectors() {
-        for (let i = 1; i <= 4; i++) {
-            const sel = document.getElementById('sel-' + i);
-            const defaultId = defaults[i];
-
-            const groupSys = document.createElement('optgroup');
-            groupSys.label = "Systeem Bronnen";
-            sourceData.systems.forEach(item => {
-                groupSys.appendChild(createOption(item, defaultId));
-            });
-            sel.appendChild(groupSys);
-
-            const groupCam = document.createElement('optgroup');
-            groupCam.label = "Live Webcams";
-            sourceData.webcams.forEach(item => {
-                groupCam.appendChild(createOption(item, defaultId));
-            });
-            sel.appendChild(groupCam);
-        }
-    }
-
-    function createOption(item, defaultId) {
-        const opt = document.createElement('option');
-        opt.value = item.id;
-        opt.text = (item.id === defaultId) ? "★ " + item.name : item.name;
-        opt.setAttribute('data-type', item.type);
-        return opt;
-    }
-
-    function changeCam(pos) {
-        const sel = document.getElementById('sel-' + pos);
-        const opt = sel.options[sel.selectedIndex];
-        const id = opt.value;
-        const type = opt.getAttribute('data-type');
-        const name = opt.text.replace("★ ", "");
-        setCamera(pos, id, name, type);
-    }
-
-    function setCamera(pos, id, name, type) {
-        const container = document.getElementById('cont-' + pos);
-        document.getElementById('lbl-' + pos).innerText = name;
-        document.getElementById('sel-' + pos).value = id;
-        
-        let url = "";
-        if (type === 'web') {
-            url = id; 
-        } else {
-            url = `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0`;
-        }
-        
-        container.innerHTML = `<iframe src="${url}" allow="autoplay; allowfullscreen"></iframe>`;
-    }
-
-    function hardReset() {
-        const allSources = [...sourceData.systems, ...sourceData.webcams];
-        for (let pos in defaults) {
-            const id = defaults[pos];
-            const obj = allSources.find(c => c.id === id);
-            if (obj) {
-                setCamera(pos, id, obj.name, obj.type);
-            }
-        }
-        verversData();
-    }
-
     async function updateFleetStatus() {
         const fleetContainer = document.getElementById('fleet-container');
+        const t = new Date().getTime();
         
-        // ADSB.fi API is vaak sneller en toleranter
+        // We gebruiken ADSB.fi omdat zij minder streng zijn dan OpenSky
         const targetUrl = `https://opendata.adsb.fi/v2/all`;
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+        // AllOrigins proxy met cache-buster (?t=) om verse data te garanderen
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}&t=${t}`;
 
         try {
             const response = await fetch(proxyUrl);
             const wrapper = await response.json();
             const data = JSON.parse(wrapper.contents);
-            
-            // ADSB.fi structuur: data.aircraft is een array
-            const allAircraft = data.aircraft || [];
+            const aircraft = data.aircraft || [];
 
-            // Map de resultaten naar een dictionary op basis van ICAO hex
-            const activePlanes = {};
-            allAircraft.forEach(ac => {
-                if(ac.hex) {
-                    // ac.alt_baro === 'ground' of ac.gs (groundspeed) is laag
-                    const onGround = ac.alt_baro === 'ground' || (ac.gs < 30 && ac.alt_baro < 500);
-                    activePlanes[ac.hex.toLowerCase()] = !onGround;
+            const activeMap = {};
+            aircraft.forEach(ac => {
+                if (ac.hex) {
+                    // Check of het toestel echt in de lucht is (hoogte boven 100ft of snelheid > 40kts)
+                    const airborne = ac.alt_baro !== 'ground' && (ac.gs > 40 || ac.alt_baro > 100);
+                    activeMap[ac.hex.toLowerCase()] = airborne;
                 }
             });
 
             let html = "";
             aircraftList.forEach(plane => {
                 const icao = plane.icao.toLowerCase();
-                let statusText = "OFFLINE";
-                let statusClass = "status-unknown";
+                let statusTxt = "OFFLINE";
+                let styleCls = "status-unknown";
                 
-                if (icao in activePlanes) {
-                    if (activePlanes[icao]) {
-                        statusText = "AIRBORNE";
-                        statusClass = "status-airborne";
-                    } else {
-                        statusText = "ON GROUND";
-                        statusClass = "status-ground";
-                    }
+                if (icao in activeMap) {
+                    statusTxt = activeMap[icao] ? "AIRBORNE" : "ON GROUND";
+                    styleCls = activeMap[icao] ? "status-airborne" : "status-ground";
                 }
-
-                html += `<div class="fleet-item"><span>${plane.reg}</span><span class="${statusClass}">${statusText}</span></div>`;
+                html += `<div class="fleet-item"><span>${plane.reg}</span><span class="${styleCls}">${statusTxt}</span></div>`;
             });
             fleetContainer.innerHTML = html;
 
         } catch (error) {
-            console.error("Fetch error:", error);
-            // Laat de lijst staan maar toon dat de data oud is
-            if(fleetContainer.innerHTML.includes("Verbinding")) {
-                fleetContainer.innerHTML = aircraftList.map(p => 
-                    `<div class="fleet-item"><span>${p.reg}</span><span class="status-unknown">WAITING</span></div>`
-                ).join('');
-            }
+            console.error("Fout bij ophalen fleet:", error);
         }
     }
 
+    // --- DASHBOARD CORE ---
+    const sourceData = {
+        systems: [
+            {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange', type: 'web'},
+            {id: 'https://m.p2kflex.nl/index.php', name: 'P2000', type: 'web'}
+        ],
+        webcams: [
+            {id: 'A5kXiKzbBFs', name: 'Scheveningen', type: 'yt'},
+            {id: 'q0-DDh1zdY4', name: 'Zandvoort', type: 'yt'}
+        ]
+    };
+
+    const defaults = { 1: sourceData.systems[1].id, 2: sourceData.systems[0].id, 3: 'A5kXiKzbBFs', 4: 'q0-DDh1zdY4' };
+
+    function setCamera(pos, id, name, type) {
+        const container = document.getElementById('cont-' + pos);
+        document.getElementById('lbl-' + pos).innerText = name;
+        document.getElementById('sel-' + pos).value = id;
+        container.innerHTML = `<iframe src="${type==='web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1`}" allow="autoplay; allowfullscreen"></iframe>`;
+    }
+
+    function setupSelectors() {
+        for (let i = 1; i <= 4; i++) {
+            const sel = document.getElementById('sel-' + i);
+            sourceData.systems.concat(sourceData.webcams).forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.id; opt.text = item.name; opt.setAttribute('data-type', item.type);
+                sel.appendChild(opt);
+            });
+        }
+    }
+
+    function changeCam(pos) {
+        const sel = document.getElementById('sel-' + pos);
+        const opt = sel.options[sel.selectedIndex];
+        setCamera(pos, opt.value, opt.text, opt.getAttribute('data-type'));
+    }
+
     function verversData() {
-        const nu = new Date();
-        const t = nu.getTime();
-        
+        const t = new Date().getTime();
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&t=" + t;
-        
         updateFleetStatus();
-
-        const tijdStr = nu.getHours().toString().padStart(2, '0') + ":" + 
-                        nu.getMinutes().toString().padStart(2, '0') + ":" + 
-                        nu.getSeconds().toString().padStart(2, '0');
-        
-        document.getElementById('last-update').innerText = "Update: " + tijdStr;
+        document.getElementById('last-update').innerText = "Update: " + new Date().toLocaleTimeString();
     }
+
+    function hardReset() {
+        const all = sourceData.systems.concat(sourceData.webcams);
+        for(let p in defaults) { 
+            const obj = all.find(x => x.id === defaults[p]);
+            if(obj) setCamera(p, obj.id, obj.name, obj.type);
+        }
+        verversData();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => { 
+        setupSelectors(); 
+        hardReset(); 
+        setInterval(verversData, 60000); // 60 seconden interval
+    });
 </script>
 </body>
 </html>
