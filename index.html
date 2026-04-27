@@ -14,9 +14,47 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
+            height: 50px;
         }
         header h1 { margin: 0; font-size: 18px; color: #00d4ff; text-transform: uppercase; letter-spacing: 2px; }
         
+        /* Weerwaarschuwing styling */
+        #weather-status-bar {
+            position: relative;
+            cursor: help;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 5px 15px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid #333;
+            transition: all 0.5s;
+        }
+
+        .code-groen { color: #00ff00; border-color: #00ff00; box-shadow: inset 0 0 5px rgba(0,255,0,0.2); }
+        .code-geel { color: #ffff00; border-color: #ffff00; text-shadow: 0 0 10px rgba(255,255,0,0.5); }
+        .code-oranje { color: #ff9900; border-color: #ff9900; text-shadow: 0 0 10px rgba(255,153,0,0.5); }
+        .code-rood { color: #ff0000; border-color: #ff0000; text-shadow: 0 0 15px rgba(255,0,0,0.7); animation: pulse 2s infinite; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .weather-map-popover {
+            display: none;
+            position: absolute;
+            top: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 350px;
+            background: #111;
+            border: 2px solid #444;
+            padding: 5px;
+            z-index: 2000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+            border-radius: 4px;
+        }
+        #weather-status-bar:hover .weather-map-popover { display: block; }
+        .weather-map-popover img { width: 100%; border-radius: 2px; display: block; }
+
         .clocks { display: flex; gap: 20px; font-family: 'Courier New', monospace; }
         .clock-item { text-align: right; }
         .clock-label { font-size: 9px; color: #666; text-transform: uppercase; display: block; margin-bottom: -2px; }
@@ -41,6 +79,7 @@
         .cam-selector { background: #111; color: #ccc; border: 1px solid #333; padding: 4px; font-size: 11px; outline: none; border-radius: 2px; }
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; }
         
+        /* GEOPTIMALISEERDE HOOGTES */
         .fleet-card { height: 145px; background: #050505; border: 1px solid #222; border-radius: 4px; }
         .knmi-card { height: 155px; } 
         .radar-card { flex-grow: 1; min-height: 180px; }
@@ -58,6 +97,14 @@
 <div class="main-container">
     <header>
         <h1>Kustwacht Dashboard</h1>
+        
+        <div id="weather-status-bar" class="code-groen">
+            <span id="status-text">STATUS: CODE GROEN</span>
+            <div class="weather-map-popover">
+                <img id="popover-map" src="https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/waarschuwing_land_0.gif" alt="KNMI Waarschuwingen">
+            </div>
+        </div>
+
         <div class="clocks">
             <div class="clock-item"><span class="clock-label">Lokaal (NL)</span><span id="local-clock" class="clock-time">00:00:00</span></div>
             <div class="clock-item"><span class="clock-label">Zulu (UTC)</span><span id="zulu-clock" class="clock-time">00:00:00</span></div>
@@ -101,7 +148,7 @@
             { name: "P2000.page", url: "https://p2000.page/" },
             { name: "112MELDINGEN.NL", url: "http://112meldingen.nl/index.php" },
             { name: "CAPCode database", url: "http://www.capcode.nl/capsite/index.php" },
-            { name: "Global SAR Hub (Sea-SAR)", url: "https://www.globalsarhub.com/sea-sar.html" },
+            { name: "Global SAR Hub", url: "https://www.globalsarhub.com/sea-sar.html" },
             { name: "International Cospas-Sarsat", url: "https://cospas-sarsat.int/en/" },
             { name: "LADR", url: "https://ladr.eurocontrol.int/ops/frontend" }
         ]},
@@ -116,29 +163,22 @@
         { title: "RWS/KNMI", links: [
             { name: "RWsOS Viewer", url: "https://rwsos.rws.nl/viewer/map/noordzee/waterkwantiteit" },
             { name: "Waterberichtgeving KWC", url: "https://waterberichtgeving.rws.nl/owb/home" },
-            { name: "KNMI extranet", url: "https://exons-prd.auth.eu-west-1.amazoncognito.com/login?client_id=1d98t56sjeb23f09mo3oeu4kab&response_type=code&nonce=ab797f47cd56307b0bc826593d55737b&redirect_uri=https%3A%2F%2Fmijn.knmi.nl%2Fapi%2Fv1%2Fauth%2Fcb%2F" },
+            { name: "KNMI extranet", url: "https://exons-prd.auth.eu-west-1.amazoncognito.com/login?client_id=1d98t56sjeb23f09mo3oeu4kab" },
             { name: "Waddendata.nl", url: "https://waddendata.nl/" },
-            { name: "Rijkswaterstaat Waterinfo", url: "https://waterinfo.rws.nl/#!/kaart/waterhoogte-t-o-v-nap/" },
+            { name: "Rijkswaterstaat Waterinfo", url: "https://waterinfo.rws.nl/" },
             { name: "GeoWeb (betonning)", url: "https://maps.rijkswaterstaat.nl/geoweb55/index.html?viewer=NMA" },
-            { name: "GeoWeb Catalogus", url: "https://maps.rijkswaterstaat.nl/GeoWebPortaal/" },
             { name: "Noordzeeloket", url: "https://www.noordzeeloket.nl/" },
-            { name: "Mijnbouw en WMP GIS", url: "https://experience.arcgis.com/experience/6e637f42374549329c46633afab17f58/page/Page/" },
-            { name: "Onderwaterobjecten.rws.nl", url: "https://onderwaterobjecten.rws.nl/" },
-            { name: "Weerdatakustwacht.wordpress.com", url: "https://weerdatakustwacht.wordpress.com/" },
-            { name: "KWNL data", url: "https://sites.google.com/view/monitorkwnl/homepage" },
-            { name: "Kustwacht Dashboard (GH)", url: "https://kwcdata.github.io/Kustwacht_data/" }
+            { name: "Onderwaterobjecten RWS", url: "https://onderwaterobjecten.rws.nl/" },
+            { name: "Weerdata Kustwacht", url: "https://weerdatakustwacht.wordpress.com/" }
         ]},
         { title: "Scheepvaart", links: [
             { name: "EMSA Portal", url: "https://portal.emsa.europa.eu/home" },
             { name: "ERICards", url: "http://www.ericards.net/" },
             { name: "Rainwat", url: "http://www.rainwat.bipt.be/" },
             { name: "Lloyds Seasearcher", url: "https://www.seasearcher.com/" },
-            { name: "Inmarsat directory", url: "http://www.inmarsat.com/ships-directory/" },
-            { name: "NATO ISMERLO", url: "https://ismerlo.org/accounts/login/" },
+            { name: "Sign In | NATO ISMERLO", url: "https://ismerlo.org/accounts/login/" },
             { name: "Nautical calculator", url: "https://www.madinstro.net/" },
             { name: "Navtex", url: "http://navtex.lv/" },
-            { name: "Duitse Navtex", url: "https://www.dwd.de/DE/fachnutzer/schifffahrt/funkausstrahlung/navtex/518_emd.html" },
-            { name: "Egcsafety.net", url: "https://www.egcsafety.net/" },
             { name: "Kabels Noordzee", url: "https://kis-orca.org/map/" }
         ]},
         { title: "AIS", links: [
@@ -148,41 +188,27 @@
             { name: "Maritime Control", url: "https://bfa.kustwacht.nl/" },
             { name: "Madesmart", url: "https://tracker.madesmart.nl/" }
         ]},
-        { title: "Database Zee", links: [
+        { title: "Scheepvaart DB", links: [
             { name: "Sketchy.boats", url: "https://sketchy.boats/" },
             { name: "406 MHz Registration", url: "https://www.406registration.com" },
-            { name: "Inmarsat", url: "https://login.inmarsat.com/" },
             { name: "RescueNET", url: "https://msds.portal.inmarsat.com/msds/" },
-            { name: "ESAS Inmarsat", url: "https://esas.inmarsat.com/Login.aspx" },
             { name: "Beacon Decode", url: "https://cospas-sarsat.int/en/beacons-pro/beacon-message-decode-program-txsep/beacon-message-decode-program" },
-            { name: "ITU (MARS)", url: "https://www.itu.int/en/ITU-R/terrestrial/mars/Pages/default.aspx" },
             { name: "Ship Station List (ITU)", url: "https://www.itu.int/mmsapp/ShipStation/list" },
-            { name: "Radio prefixlijst", url: "https://www.pd3rfr.nl/naslagwerken/prefixlijst" },
             { name: "MMSI MID Codes", url: "https://www.vtexplorer.com/mmsi-mid-codes-en/" },
-            { name: "UN/LO code ports", url: "https://unece.org/trade/cefact/unlocode-code-list-country-and-territory" },
-            { name: "Hns-ms.eu", url: "https://www.hns-ms.eu/" },
-            { name: "Knooppuntenkaart", url: "https://experience.arcgis.com/experience/62c22a8828514de997b70f68005ea665" },
-            { name: "NOGEPA RAS", url: "http://ras.nogepa.nl/login.php" },
-            { name: "Element NL RAS", url: "https://ras.elementnl.nl/" }
+            { name: "NOGEPA RAS", url: "http://ras.nogepa.nl/login.php" }
         ]},
         { title: "Plannen", links: [
             { name: "IBP Noordzee", url: "https://noordzeeloket.nl/functies-gebruik/artikel-baseline-0/" },
             { name: "IBP SAMIJ", url: "https://ibpsamij.calamiteiten.online/templates/" },
-            { name: "IBP Waddenzee", url: "https://ibpwaddenzee.calamiteiten.online/templates/" },
-            { name: "IBP Deltawateren", url: "https://www.veiligheidsregiozeeland.nl/sites/veiligheidsregiozeeland/files/2023-08/2022-12-21%20IBP%20Deltawateren%20versie%202.1.pdf" },
             { name: "Handboek incidentbestrijding", url: "https://nipv.nl/wp-content/uploads/2025/12/20251203-NIPV-Handboek-incidentbestrijding-op-het-water.pdf" }
         ]},
         { title: "Luchtvaart", links: [
             { name: "LVNL AIS", url: "https://www.lvnl.nl/informatie-voor-luchtvarenden/publicaties-voor-luchtvarenden" },
             { name: "SkyVector", url: "https://skyvector.com/" },
             { name: "Aireon Alert", url: "https://aireonalert.iaa.ie/alert-login" },
-            { name: "EAD Pro", url: "https://www.ead.eurocontrol.int/cms-eadbasic/opencms/en/login/ead-pro/" },
-            { name: "Portal.icao.int", url: "https://portal.icao.int" },
             { name: "METAR-TAF.com", url: "https://metar-taf.com/" },
             { name: "E6BX Calculator", url: "https://e6bx.com/" },
-            { name: "ISR Support Manuals", url: "https://isrsupporteurope.webmanuals.aero/login" },
             { name: "Aviation Glossary", url: "https://www.pilotscafe.com/glossary/" },
-            { name: "World Airport Codes", url: "https://www.world-airport-codes.com/" },
             { name: "EHAMCDM Mobile", url: "https://mobile.ehamcdm.nl/" }
         ]},
         { title: "Flight Tracking", links: [
@@ -190,22 +216,12 @@
             { name: "Casper Tracking", url: "https://kustwacht-flighttracking.casper.aero/index.php" },
             { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" },
             { name: "Flightradar24", url: "https://www.flightradar24.com/" },
-            { name: "STANLY_Track3", url: "https://stanlytrack3.dfs.de/st3/STANLY_Track3.html" },
             { name: "Luchtballonradar", url: "https://www.luchtballonradar.nl/" },
-            { name: "Bristow Global Tracking", url: "http://www.bristowgroup.com/globaltracking" },
-            { name: "Dutch Balloonregister", url: "https://www.ballonregister.nl/" },
-            { name: "Airframes.org", url: "http://www.airframes.org/" },
-            { name: "Airlinecodes.info", url: "https://airlinecodes.info/" }
-        ]},
-        { title: "Diversen KW", links: [
-            { name: "E-learning KW", url: "https://leeromgeving.kustwacht.nl/nl/Home/Homepage" },
-            { name: "Lokaal 58", url: "https://lokaal58.anewspring.nl/do?action=home&loggedOut=true" },
-            { name: "Bedrijfskleding", url: "https://www.corpwear.nl/login.aspx?ReturnUrl=%252f" }
+            { name: "Bristow Tracking", url: "http://www.bristowgroup.com/globaltracking" }
         ]},
         { title: "Taal/Rekenen", links: [
             { name: "Spelling.nu", url: "https://www.spelling.nu/" },
             { name: "Vertalen.nu", url: "http://www.vertalen.nu/vervoegen/" },
-            { name: "Google Translate", url: "https://translate.google.nl/#" },
             { name: "NATO Translator", url: "https://cryptii.com/pipes/nato-phonetic-alphabet" },
             { name: "Web 2.0 Calc", url: "https://web2.0calc.com/" }
         ]},
@@ -213,8 +229,6 @@
             { name: "GPS Converter", url: "http://www.gpscoordinaten.nl/converteer-gps-coordinaten.php" },
             { name: "Hectometerpaal", url: "http://www.hmpaal.nl/" },
             { name: "Time Zone Map", url: "https://www.timeanddate.com/time/map/" },
-            { name: "UTM Grid Zones", url: "http://www.dmap.co.uk/utmworld.htm" },
-            { name: "Telefoonnummer info", url: "https://phonenum.info/en/" },
             { name: "Apple Maps Beta", url: "https://beta.maps.apple.com/" },
             { name: "Remove Paywalls", url: "https://removepaywalls.com/" }
         ]},
@@ -240,7 +254,6 @@
             {id: 'csMnwbjV5vg', name: 'Rockanje', type: 'yt'},
             {id: 'A5kXiKzbBFs', name: 'Scheveningen Blvd', type: 'yt'},
             {id: 'DaG5JReOYEw', name: 'Scheveningen Noord', type: 'yt'},
-            {id: 'Ud7I4jprFN0', name: 'Ter Heijde', type: 'yt'},
             {id: 't3qbzZHOTyg', name: 'Wassenaarse Slag', type: 'yt'},
             {id: 'q0-DDh1zdY4', name: 'Zandvoort Blvd', type: 'yt'}
         ]
@@ -251,8 +264,24 @@
     function updateClocks() {
         const nu = new Date();
         document.getElementById('local-clock').innerText = nu.toLocaleTimeString('nl-NL', { hour12: false });
-        const zulu = nu.getUTCHours().toString().padStart(2,'0') + ":" + nu.getUTCMinutes().toString().padStart(2,'0') + ":" + nu.getUTCSeconds().toString().padStart(2,'0');
-        document.getElementById('zulu-clock').innerText = zulu;
+        document.getElementById('zulu-clock').innerText = nu.getUTCHours().toString().padStart(2,'0') + ":" + nu.getUTCMinutes().toString().padStart(2,'0') + ":" + nu.getUTCSeconds().toString().padStart(2,'0');
+    }
+
+    async function checkKNMIAlert() {
+        try {
+            const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://webservice.knmi.nl/cgi-bin/rss_knmi.cgi?tekst=1'));
+            const data = await response.json();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+            const description = xmlDoc.getElementsByTagName("description")[1]?.childNodes[0]?.nodeValue || "";
+            const bar = document.getElementById('weather-status-bar');
+            const txt = document.getElementById('status-text');
+            bar.className = ''; 
+            if (description.includes("ROOD")) { bar.classList.add('code-rood'); txt.innerText = "STATUS: CODE ROOD"; }
+            else if (description.includes("ORANJE")) { bar.classList.add('code-oranje'); txt.innerText = "STATUS: CODE ORANJE"; }
+            else if (description.includes("GEEL")) { bar.classList.add('code-geel'); txt.innerText = "STATUS: CODE GEEL"; }
+            else { bar.classList.add('code-groen'); txt.innerText = "STATUS: CODE GROEN"; }
+        } catch (e) { console.log("KNMI check failed."); }
     }
 
     function initNavBar() {
@@ -269,19 +298,10 @@
             const sel = document.getElementById('sel-' + i);
             sel.innerHTML = ''; 
             const defaultId = defaults[i];
-
             const g1 = document.createElement('optgroup'); g1.label = "Systemen";
-            sourceData.systems.forEach(s => { 
-                const opt = new Option((s.id === defaultId ? "★ " : "") + s.name, s.id);
-                g1.appendChild(opt); 
-            });
-
+            sourceData.systems.forEach(s => { g1.appendChild(new Option((s.id === defaultId ? "★ " : "") + s.name, s.id)); });
             const g2 = document.createElement('optgroup'); g2.label = "Webcams";
-            sourceData.webcams.forEach(w => { 
-                const opt = new Option((w.id === defaultId ? "★ " : "") + w.name, w.id);
-                g2.appendChild(opt); 
-            });
-
+            sourceData.webcams.forEach(w => { g2.appendChild(new Option((w.id === defaultId ? "★ " : "") + w.name, w.id)); });
             sel.add(g1); sel.add(g2);
             sel.value = defaultId;
         }
@@ -320,7 +340,9 @@
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&t=" + t;
+        document.getElementById('popover-map').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/waarschuwing_land_0.gif?t=" + t;
         document.getElementById('last-update').innerText = "Fetch: " + new Date().toLocaleTimeString();
+        checkKNMIAlert();
     }
 
     function hardReset() {
