@@ -109,10 +109,10 @@
         .knmi-card { height: 26%; }
         .radar-card { height: 42%; }
 
-        /* Specifieke stijl voor de radar om hem goed vullend te maken */
+        /* Aangepaste stijl voor de radar: contain ipv cover */
         #radar-img {
-            object-fit: cover;
-            object-position: center;
+            object-fit: contain;
+            background-color: #000;
         }
 
         .timestamp {
@@ -223,7 +223,6 @@
     document.addEventListener('DOMContentLoaded', () => {
         setupSelectors();
         hardReset();
-        // De kaarten verversen elke 5 minuten voor de meest actuele loop
         setInterval(verversKaarten, 300000); 
     });
 
@@ -268,11 +267,10 @@
         const nu = new Date();
         const t = nu.getTime();
         
-        // KNMI Kaarten
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
         
-        // Buienradar Animatie (forceer herladen van de loop)
+        // Buienradar Animatie
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&t=" + t;
         
         const tijdStr = nu.getHours().toString().padStart(2, '0') + ":" + 
