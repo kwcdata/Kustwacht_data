@@ -347,11 +347,15 @@
 
     async function updateFleetStatus() {
         const fleetContainer = document.getElementById('fleet-container');
-        const icaoParams = aircraftList.map(a => a.icao).join('&icao24=');
-        const url = `https://opensky-network.org/api/states/all?icao24=${icaoParams}`;
+        const icaoParams = aircraftList.map(a => a.icao.toLowerCase()).join(',');
+        
+        const targetUrl = `https://opensky-network.org/api/states/all?icao24=${icaoParams}`;
+        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
 
         try {
-            const response = await fetch(url);
+            const response = await fetch(proxyUrl);
+            if (!response.ok) throw new Error('Proxy error');
+            
             const data = await response.json();
             const states = data.states || [];
 
@@ -362,11 +366,12 @@
 
             let html = "";
             aircraftList.forEach(plane => {
+                const icaoLower = plane.icao.toLowerCase();
                 let statusText = "OFFLINE / GROUND";
                 let statusClass = "status-unknown";
                 
-                if (plane.icao in activeMap) {
-                    const onGround = activeMap[plane.icao];
+                if (icaoLower in activeMap) {
+                    const onGround = activeMap[icaoLower];
                     if (!onGround) {
                         statusText = "AIRBORNE";
                         statusClass = "status-airborne";
@@ -386,6 +391,7 @@
 
         } catch (error) {
             console.error("OpenSky Error:", error);
+            fleetContainer.innerHTML = "<div style='color:#555; font-size:10px;'>Status tijdelijk niet beschikbaar...</div>";
         }
     }
 
