@@ -99,7 +99,6 @@
             border-radius: 2px;
         }
 
-        /* Styling voor de categoriekopjes in de dropdown */
         optgroup {
             background: #222;
             color: #00d4ff;
@@ -208,7 +207,6 @@
 </div>
 
 <script>
-    // Bronnenlijst met categorie-informatie
     const sourceData = {
         systems: [
             {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange (Luchtvaart)', type: 'web'},
@@ -232,11 +230,12 @@
         ]
     };
 
+    // Aangepaste standaard indeling
     const defaults = {
-        1: 'A5kXiKzbBFs',
-        2: 'q0-DDh1zdY4',
-        3: 'KjK02QIm4ZI',
-        4: 'mI1Os7TFdGc'
+        1: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C12%2C9%2C8%2C0%2C0%2C0%2C0%2C0%2C0', // P2000
+        2: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', // ADS-B
+        3: 'A5kXiKzbBFs', // Scheveningen Blvd
+        4: 'q0-DDh1zdY4'  // Zandvoort Blvd
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -250,7 +249,6 @@
             const sel = document.getElementById('sel-' + i);
             const defaultId = defaults[i];
 
-            // Groep Systeem Bronnen
             const groupSys = document.createElement('optgroup');
             groupSys.label = "Systeem Bronnen";
             sourceData.systems.forEach(item => {
@@ -258,7 +256,6 @@
             });
             sel.appendChild(groupSys);
 
-            // Groep Webcams
             const groupCam = document.createElement('optgroup');
             groupCam.label = "Live Webcams";
             sourceData.webcams.forEach(item => {
