@@ -4,63 +4,219 @@
     <meta charset="UTF-8">
     <title>Kustwacht Dashboard</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        .main-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
-        header { padding: 10px 20px; background: #050505; border-bottom: 1px solid #222; }
-        header h1 { margin: 0; font-size: 18px; color: #00d4ff; text-transform: uppercase; letter-spacing: 2px; }
-        .monitor-layout { display: grid; grid-template-columns: 1fr 360px; grid-gap: 8px; flex-grow: 1; padding: 8px; overflow: hidden; }
-        .webcam-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; grid-gap: 10px; }
-        .cam-box { display: flex; flex-direction: column; gap: 4px; height: 100%; }
-        .slot { position: relative; background: #0a0a0a; flex-grow: 1; border-radius: 4px; overflow: hidden; border: 1px solid #222; display: flex; flex-direction: column; }
-        .slot iframe { width: 100% !important; height: 100% !important; border: none; }
-        .label { background: rgba(0, 212, 255, 0.85); color: #000; padding: 2px 8px; font-size: 10px; font-weight: bold; z-index: 20; text-transform: uppercase; }
+        body, html { 
+            margin: 0; padding: 0; height: 100vh; width: 100vw;
+            background: #000; color: #fff; font-family: 'Segoe UI', sans-serif;
+            overflow: hidden; 
+        }
+
+        .main-container { 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            width: 100vw; 
+        }
+
+        header {
+            padding: 10px 20px;
+            background: #050505;
+            border-bottom: 1px solid #222;
+            text-align: left;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 18px;
+            color: #00d4ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
         
-        .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+        .monitor-layout { 
+            display: grid; 
+            grid-template-columns: 1fr 360px; 
+            grid-gap: 8px; 
+            flex-grow: 1; 
+            padding: 8px; 
+            overflow: hidden; 
+        }
+
+        .webcam-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            grid-template-rows: 1fr 1fr; 
+            grid-gap: 10px; 
+        }
+
+        .cam-box {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            height: 100%;
+        }
+
+        .slot { 
+            position: relative; 
+            background: #0a0a0a; 
+            flex-grow: 1;
+            border-radius: 4px; 
+            overflow: hidden;
+            border: 1px solid #222;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slot iframe { 
+            width: 100% !important; 
+            height: 100% !important; 
+            border: none; 
+            background: #000;
+        }
+
+        .slot img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            background: #000; 
+        }
+
+        .label { 
+            background: rgba(0, 212, 255, 0.85); 
+            color: #000; padding: 2px 8px; font-size: 10px; font-weight: bold; 
+            z-index: 20; text-transform: uppercase;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .cam-selector {
+            background: #111;
+            color: #ccc;
+            border: 1px solid #333;
+            padding: 6px;
+            font-size: 11px;
+            width: 100%;
+            outline: none;
+            border-radius: 2px;
+        }
+
+        optgroup {
+            background: #222;
+            color: #00d4ff;
+            font-style: normal;
+            font-weight: bold;
+        }
         
-        /* Formaat van de kaarten geoptimaliseerd */
-        .fleet-card { height: 210px; background: #050505; border: 1px solid #222; border-radius: 4px; }
-        .knmi-card { height: 140px; } 
-        .radar-card { flex-grow: 1; min-height: 200px; }
+        option {
+            background: #111;
+            color: #ccc;
+        }
+
+        .info-column {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            height: 100%;
+        }
+
+        /* Formaat aanpassing voor info kolom */
+        .fleet-card { height: 180px; background: #050505; border: 1px solid #222; border-radius: 4px; }
+        .knmi-card { height: 130px; } 
+        .radar-card { flex-grow: 1; min-height: 180px; }
         
         .fleet-list { padding: 5px; }
         .fleet-item { 
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 6px 10px; border-bottom: 1px solid #1a1a1a; font-family: monospace; font-size: 12px;
-            cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 5px 10px; border-bottom: 1px solid #1a1a1a; 
+            font-family: monospace; font-size: 12px; 
         }
-        .fleet-item:hover { background: #111; }
-        .btn-track { background: #00d4ff; color: #000; border: none; padding: 2px 6px; font-size: 9px; font-weight: bold; border-radius: 2px; cursor: pointer; }
-        
-        .timestamp { font-size: 10px; color: #666; text-align: right; padding: 2px 5px; font-family: monospace; background: #050505; }
-        .controls { background: #050505; border-top: 1px solid #222; display: flex; justify-content: center; align-items: center; height: 40px; }
-        button.reset { padding: 5px 20px; background: #222; color: #bbb; border: 1px solid #444; cursor: pointer; font-size: 11px; }
+        .btn-track { 
+            background: #00d4ff; color: #000; border: none; padding: 2px 6px; 
+            font-size: 9px; font-weight: bold; border-radius: 2px; cursor: pointer; 
+        }
+
+        .timestamp {
+            font-size: 10px;
+            color: #666;
+            text-align: right;
+            padding: 4px 5px;
+            font-family: monospace;
+            background: #050505;
+        }
+
+        .controls { 
+            background: #050505; 
+            border-top: 1px solid #222; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            height: 40px; 
+        }
+
+        button.reset-btn { 
+            padding: 5px 20px;
+            background: #222; 
+            color: #bbb; 
+            font-weight: bold; 
+            cursor: pointer; 
+            border: 1px solid #444;
+            border-radius: 2px;
+            font-size: 11px;
+        }
+
+        button.reset-btn:hover { background: #00d4ff; color: #000; border-color: #00d4ff; }
     </style>
 </head>
 <body>
+
 <div class="main-container">
-    <header><h1>Kustwacht Dashboard</h1></header>
+    <header>
+        <h1>Kustwacht Dashboard</h1>
+    </header>
+
     <div class="monitor-layout">
         <div class="webcam-grid">
-            <div class="cam-box"><div class="slot"><span class="label" id="lbl-1">L-Boven</span><div id="cont-1" style="height:100%"></div></div></div>
-            <div class="cam-box"><div class="slot"><span class="label" id="lbl-2">R-Boven</span><div id="cont-2" style="height:100%"></div></div></div>
-            <div class="cam-box"><div class="slot"><span class="label" id="lbl-3">L-Onder</span><div id="cont-3" style="height:100%"></div></div></div>
-            <div class="cam-box"><div class="slot"><span class="label" id="lbl-4">R-Onder</span><div id="cont-4" style="height:100%"></div></div></div>
+            <div class="cam-box">
+                <div class="slot"><span class="label" id="lbl-1">L-Boven</span><div id="cont-1" style="height:100%"></div></div>
+                <select class="cam-selector" id="sel-1" onchange="changeCam(1)"></select>
+            </div>
+            <div class="cam-box">
+                <div class="slot"><span class="label" id="lbl-2">R-Boven</span><div id="cont-2" style="height:100%"></div></div>
+                <select class="cam-selector" id="sel-2" onchange="changeCam(2)"></select>
+            </div>
+            <div class="cam-box">
+                <div class="slot"><span class="label" id="lbl-3">L-Onder</span><div id="cont-3" style="height:100%"></div></div>
+                <select class="cam-selector" id="sel-3" onchange="changeCam(3)"></select>
+            </div>
+            <div class="cam-box">
+                <div class="slot"><span class="label" id="lbl-4">R-Onder</span><div id="cont-4" style="height:100%"></div></div>
+                <select class="cam-selector" id="sel-4" onchange="changeCam(4)"></select>
+            </div>
         </div>
+
         <div class="info-column">
             <div class="slot fleet-card">
                 <span class="label">Vloot</span>
                 <div id="fleet-container" class="fleet-list"></div>
             </div>
-
-            <div class="slot knmi-card"><span class="label">Noordzee</span><img id="knmi-1" style="width:100%; height:100%; object-fit:contain;"></div>
-            <div class="slot knmi-card"><span class="label">Kustwateren</span><img id="knmi-2" style="width:100%; height:100%; object-fit:contain;"></div>
-            
-            <div class="slot radar-card"><span class="label">Radar</span><img id="radar-img" style="width:100%; height:100%; object-fit:contain;"></div>
-            
+            <div class="slot knmi-card">
+                <span class="label">Noordzee</span>
+                <img id="knmi-1" style="width:100%; height:100%; object-fit:contain;">
+            </div>
+            <div class="slot knmi-card">
+                <span class="label">Kustwateren</span>
+                <img id="knmi-2" style="width:100%; height:100%; object-fit:contain;">
+            </div>
+            <div class="slot radar-card">
+                <span class="label">Radar</span>
+                <img id="radar-img" style="width:100%; height:100%; object-fit:contain;">
+            </div>
             <div id="last-update" class="timestamp">Laatste fetch: --:--:--</div>
         </div>
     </div>
-    <div class="controls"><button class="reset" onclick="hardReset()">HERSTEL STANDAARD</button></div>
+
+    <div class="controls">
+        <button class="reset-btn" onclick="hardReset()">HERSTEL ALLE STANDAARDEN</button>
+    </div>
 </div>
 
 <script>
@@ -72,65 +228,136 @@
         { reg: "C-FCGE", icao: "C005E9" }
     ];
 
+    const sourceData = {
+        systems: [
+            {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange (Luchtvaart)', type: 'web'},
+            {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C12%2C9%2C8%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000', type: 'web'}
+        ],
+        webcams: [
+            {id: 'KjK02QIm4ZI', name: 'Brouwersdam', type: 'yt'},
+            {id: 'mI1Os7TFdGc', name: 'Egmond aan Zee', type: 'yt'},
+            {id: 'jDF264Bg1_c', name: 'Hoek v Holland Blvd', type: 'yt'},
+            {id: 'mnxV4iit7S4', name: 'Kijkduin Blvd', type: 'yt'},
+            {id: 'Ud7I4jprFN0', name: 'Maasvlakte', type: 'yt'},
+            {id: '_pGIJmXxAHk', name: 'Nieuwe Waterweg', type: 'yt'},
+            {id: 'dtFG_mcfWjQ', name: 'Noordwijk Blvd', type: 'yt'},
+            {id: 'L76VKII_Z7k', name: 'Noordwijk Vuurtoren', type: 'yt'},
+            {id: 'csMnwbjV5vg', name: 'Rockanje', type: 'yt'},
+            {id: 'A5kXiKzbBFs', name: 'Scheveningen Blvd', type: 'yt'},
+            {id: 'DaG5JReOYEw', name: 'Scheveningen Noord', type: 'yt'},
+            {id: 'Ud7I4jprFN0', name: 'Ter Heijde', type: 'yt'},
+            {id: 't3qbzZHOTyg', name: 'Wassenaarse Slag', type: 'yt'},
+            {id: 'q0-DDh1zdY4', name: 'Zandvoort Blvd', type: 'yt'}
+        ]
+    };
+
+    const defaults = {
+        1: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C12%2C9%2C8%2C0%2C0%2C0%2C0%2C0%2C0',
+        2: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8',
+        3: 'A5kXiKzbBFs',
+        4: 'q0-DDh1zdY4'
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setupSelectors();
+        initFleet();
+        hardReset();
+        setInterval(verversKaarten, 300000); 
+    });
+
+    function setupSelectors() {
+        for (let i = 1; i <= 4; i++) {
+            const sel = document.getElementById('sel-' + i);
+            const defaultId = defaults[i];
+            sel.innerHTML = ''; 
+
+            const groupSys = document.createElement('optgroup');
+            groupSys.label = "Systeem Bronnen";
+            sourceData.systems.forEach(item => {
+                groupSys.appendChild(createOption(item, defaultId));
+            });
+            sel.appendChild(groupSys);
+
+            const groupCam = document.createElement('optgroup');
+            groupCam.label = "Live Webcams";
+            sourceData.webcams.forEach(item => {
+                groupCam.appendChild(createOption(item, defaultId));
+            });
+            sel.appendChild(groupCam);
+        }
+    }
+
+    function createOption(item, defaultId) {
+        const opt = document.createElement('option');
+        opt.value = item.id;
+        opt.text = (item.id === defaultId) ? "★ " + item.name : item.name;
+        opt.setAttribute('data-type', item.type);
+        return opt;
+    }
+
     function initFleet() {
-        const container = document.getElementById('fleet-container');
-        container.innerHTML = aircraft.map(p => `
-            <div class="fleet-item" onclick="trackPlane('${p.icao}', '${p.reg}')">
+        document.getElementById('fleet-container').innerHTML = aircraft.map(p => `
+            <div class="fleet-item">
                 <strong style="color:#00d4ff">${p.reg}</strong>
-                <button class="btn-track">TRACK</button>
+                <button class="btn-track" onclick="trackPlane('${p.icao}', '${p.reg}')">TRACK</button>
             </div>
         `).join('');
     }
 
     function trackPlane(icao, reg) {
         const url = `https://globe.adsbexchange.com/?icao=${icao}&zoom=11`;
-        setCamera(2, url, `Tracking: ${reg}`);
+        setCamera(2, url, `Tracking: ${reg}`, 'web');
     }
 
-    const defaults = {
-        1: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&include=water%3Blvo%3Bredding%3Bscheepvaart',
-        2: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8',
-        3: 'https://www.youtube.com/embed/A5kXiKzbBFs?autoplay=1&mute=1',
-        4: 'https://www.youtube.com/embed/q0-DDh1zdY4?autoplay=1&mute=1'
-    };
+    function changeCam(pos) {
+        const sel = document.getElementById('sel-' + pos);
+        const opt = sel.options[sel.selectedIndex];
+        const id = opt.value;
+        const type = opt.getAttribute('data-type');
+        const name = opt.text.replace("★ ", "");
+        setCamera(pos, id, name, type);
+    }
 
-    function setCamera(pos, url, name) {
+    function setCamera(pos, id, name, type) {
         const container = document.getElementById('cont-' + pos);
         document.getElementById('lbl-' + pos).innerText = name;
+        document.getElementById('sel-' + pos).value = id;
+        
+        let url = "";
+        if (type === 'web') {
+            url = id; 
+        } else {
+            url = `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0`;
+        }
+        
         container.innerHTML = `<iframe src="${url}" allow="autoplay; allowfullscreen"></iframe>`;
     }
 
-    // De functie die alles ververst zonder de pagina te herladen
-    function verversData() {
-        const t = new Date().getTime();
+    function hardReset() {
+        const allSources = [...sourceData.systems, ...sourceData.webcams];
+        for (let pos in defaults) {
+            const id = defaults[pos];
+            const obj = allSources.find(c => c.id === id);
+            if (obj) {
+                const type = sourceData.systems.find(s => s.id === id) ? 'web' : 'yt';
+                setCamera(pos, id, obj.name, type);
+            }
+        }
+        verversKaarten();
+    }
+
+    function verversKaarten() {
         const nu = new Date();
-        
-        // Update de afbeeldingen met een timestamp om caching te voorkomen
+        const t = nu.getTime();
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&t=" + t;
         
-        // Update de fetch-tijd onderin
         const tijdStr = nu.getHours().toString().padStart(2, '0') + ":" + 
                         nu.getMinutes().toString().padStart(2, '0') + ":" + 
                         nu.getSeconds().toString().padStart(2, '0');
         document.getElementById('last-update').innerText = "Laatste fetch: " + tijdStr;
     }
-
-    function hardReset() {
-        setCamera(1, defaults[1], 'P2000 (Kustwacht)');
-        setCamera(2, defaults[2], 'ADS-B Exchange');
-        setCamera(3, defaults[3], 'Scheveningen Blvd');
-        setCamera(4, defaults[4], 'Zandvoort Blvd');
-        verversData();
-    }
-
-    document.addEventListener('DOMContentLoaded', () => { 
-        initFleet();
-        hardReset(); 
-        // Interval op 5 minuten (300.000 ms)
-        setInterval(verversData, 300000); 
-    });
 </script>
 </body>
 </html>
