@@ -143,9 +143,15 @@
             font-family: monospace;
         }
 
-        .status-airborne { color: #ff3e3e; font-weight: bold; } 
+        .status-airborne { color: #ff3e3e; font-weight: bold; animation: pulse 2s infinite; } 
         .status-ground { color: #00ff88; } 
         .status-unknown { color: #444; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
 
         .timestamp {
             font-size: 10px;
@@ -220,9 +226,9 @@
             </div>
             
             <div class="slot fleet-card">
-                <span class="label">Vloot Status (Live via OSN)</span>
+                <span class="label">Vloot Status (15s update)</span>
                 <div id="fleet-container" class="fleet-list">
-                    Data ophalen...
+                    Verbinding maken...
                 </div>
             </div>
 
@@ -277,8 +283,8 @@
     document.addEventListener('DOMContentLoaded', () => {
         setupSelectors();
         hardReset();
-        // Om limieten te voorkomen: ververs elke 3 minuten
-        setInterval(verversData, 180000); 
+        // 15 seconden update
+        setInterval(verversData, 15000); 
     });
 
     function setupSelectors() {
@@ -348,33 +354,37 @@
 
     async function updateFleetStatus() {
         const fleetContainer = document.getElementById('fleet-container');
-        const icaoParams = aircraftList.map(a => a.icao.toLowerCase()).join(',');
         
-        // We proberen het nu met een andere proxy (Cloudflare Worker stijl)
-        const targetUrl = `https://opensky-network.org/api/states/all?icao24=${icaoParams}`;
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+        // ADSB.fi API is vaak sneller en toleranter
+        const targetUrl = `https://opendata.adsb.fi/v2/all`;
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
 
         try {
             const response = await fetch(proxyUrl);
-            if (!response.ok) throw new Error('API/Proxy Limit');
+            const wrapper = await response.json();
+            const data = JSON.parse(wrapper.contents);
             
-            const data = await response.json();
-            const states = data.states || [];
+            // ADSB.fi structuur: data.aircraft is een array
+            const allAircraft = data.aircraft || [];
 
-            const activeMap = {};
-            states.forEach(s => {
-                activeMap[s[0].toLowerCase()] = s[8]; // s[8] is on_ground
+            // Map de resultaten naar een dictionary op basis van ICAO hex
+            const activePlanes = {};
+            allAircraft.forEach(ac => {
+                if(ac.hex) {
+                    // ac.alt_baro === 'ground' of ac.gs (groundspeed) is laag
+                    const onGround = ac.alt_baro === 'ground' || (ac.gs < 30 && ac.alt_baro < 500);
+                    activePlanes[ac.hex.toLowerCase()] = !onGround;
+                }
             });
 
             let html = "";
             aircraftList.forEach(plane => {
-                const icaoLower = plane.icao.toLowerCase();
+                const icao = plane.icao.toLowerCase();
                 let statusText = "OFFLINE";
                 let statusClass = "status-unknown";
                 
-                if (icaoLower in activeMap) {
-                    const onGround = activeMap[icaoLower];
-                    if (!onGround) {
+                if (icao in activePlanes) {
+                    if (activePlanes[icao]) {
                         statusText = "AIRBORNE";
                         statusClass = "status-airborne";
                     } else {
@@ -388,13 +398,13 @@
             fleetContainer.innerHTML = html;
 
         } catch (error) {
-            console.warn("Status fetch failed, displaying last known or offline.");
-            // Toon de lijst met 'Check Manual' als de API weigert
-            let html = "";
-            aircraftList.forEach(plane => {
-                html += `<div class="fleet-item"><span>${plane.reg}</span><span class="status-unknown">NO DATA</span></div>`;
-            });
-            fleetContainer.innerHTML = html + "<div style='font-size:9px; color:#444; padding:5px;'>API limiet bereikt. Probeer over 15 min opnieuw.</div>";
+            console.error("Fetch error:", error);
+            // Laat de lijst staan maar toon dat de data oud is
+            if(fleetContainer.innerHTML.includes("Verbinding")) {
+                fleetContainer.innerHTML = aircraftList.map(p => 
+                    `<div class="fleet-item"><span>${p.reg}</span><span class="status-unknown">WAITING</span></div>`
+                ).join('');
+            }
         }
     }
 
@@ -412,7 +422,7 @@
                         nu.getMinutes().toString().padStart(2, '0') + ":" + 
                         nu.getSeconds().toString().padStart(2, '0');
         
-        document.getElementById('last-update').innerText = "Laatste fetch: " + tijdStr;
+        document.getElementById('last-update').innerText = "Update: " + tijdStr;
     }
 </script>
 </body>
