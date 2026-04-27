@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Kustwacht Dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/kwcdata/Kustwacht_data/refs/heads/main/kustwacht-logo.svg">
+    
     <style>
         body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         .main-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
         
-        /* HEADER COMPACT GEMAAKT */
+        /* HEADER COMPACT */
         header { 
             padding: 5px 20px; 
             background: #050505; 
@@ -17,6 +19,9 @@
             align-items: center; 
             height: 35px; 
         }
+        .header-title-area { display: flex; align-items: center; gap: 12px; }
+        .header-logo { height: 28px; width: auto; }
+        
         header h1 { margin: 0; font-size: 16px; color: #00d4ff; text-transform: uppercase; letter-spacing: 2px; }
         
         .clocks { display: flex; gap: 20px; font-family: 'Courier New', monospace; }
@@ -24,7 +29,7 @@
         .clock-label { font-size: 8px; color: #666; text-transform: uppercase; display: block; margin-bottom: -2px; }
         .clock-time { font-size: 14px; color: #00d4ff; font-weight: bold; }
 
-        /* NAVIGATIEBALK COMPACT GEMAAKT */
+        /* NAVIGATIEBALK */
         .nav-bar { background: #111; border-bottom: 1px solid #222; display: flex; padding: 0 10px; z-index: 1000; flex-wrap: wrap; }
         .nav-group { 
             position: relative; 
@@ -69,7 +74,10 @@
 <body>
 <div class="main-container">
     <header>
-        <h1>Kustwacht Dashboard</h1>
+        <div class="header-title-area">
+            <img src="https://raw.githubusercontent.com/kwcdata/Kustwacht_data/refs/heads/main/kustwacht-logo.svg" alt="Kustwacht Logo" class="header-logo">
+            <h1>Kustwacht Dashboard</h1>
+        </div>
         <div class="clocks">
             <div class="clock-item"><span class="clock-label">Lokaal (NL)</span><span id="local-clock" class="clock-time">00:00:00</span></div>
             <div class="clock-item"><span class="clock-label">Zulu (UTC)</span><span id="zulu-clock" class="clock-time">00:00:00</span></div>
