@@ -7,61 +7,35 @@
         body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         .main-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
         
+        /* HEADER COMPACT GEMAAKT */
         header { 
-            padding: 10px 20px; 
+            padding: 5px 20px; 
             background: #050505; 
             border-bottom: 1px solid #222; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            height: 50px;
+            height: 35px; /* Verlaagd van 50px */
         }
-        header h1 { margin: 0; font-size: 18px; color: #00d4ff; text-transform: uppercase; letter-spacing: 2px; }
+        header h1 { margin: 0; font-size: 16px; color: #00d4ff; text-transform: uppercase; letter-spacing: 2px; }
         
-        /* Weerwaarschuwing styling */
-        #weather-status-bar {
-            position: relative;
-            cursor: help;
-            font-weight: bold;
-            font-size: 14px;
-            padding: 5px 15px;
-            border-radius: 4px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid #333;
-            transition: all 0.5s;
-        }
-
-        .code-groen { color: #00ff00; border-color: #00ff00; box-shadow: inset 0 0 5px rgba(0,255,0,0.2); }
-        .code-geel { color: #ffff00; border-color: #ffff00; text-shadow: 0 0 10px rgba(255,255,0,0.5); }
-        .code-oranje { color: #ff9900; border-color: #ff9900; text-shadow: 0 0 10px rgba(255,153,0,0.5); }
-        .code-rood { color: #ff0000; border-color: #ff0000; text-shadow: 0 0 15px rgba(255,0,0,0.7); animation: pulse 2s infinite; }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-        .weather-map-popover {
-            display: none;
-            position: absolute;
-            top: 45px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 350px;
-            background: #111;
-            border: 2px solid #444;
-            padding: 5px;
-            z-index: 9999; /* Zorgt dat hij altijd bovenop ligt */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
-            border-radius: 4px;
-        }
-        #weather-status-bar:hover .weather-map-popover { display: block; }
-        .weather-map-popover img { width: 100%; border-radius: 2px; display: block; background: #222; }
-
         .clocks { display: flex; gap: 20px; font-family: 'Courier New', monospace; }
         .clock-item { text-align: right; }
-        .clock-label { font-size: 9px; color: #666; text-transform: uppercase; display: block; margin-bottom: -2px; }
-        .clock-time { font-size: 16px; color: #00d4ff; font-weight: bold; }
+        .clock-label { font-size: 8px; color: #666; text-transform: uppercase; display: block; margin-bottom: -2px; }
+        .clock-time { font-size: 14px; color: #00d4ff; font-weight: bold; }
 
+        /* NAVIGATIEBALK COMPACT GEMAAKT */
         .nav-bar { background: #111; border-bottom: 1px solid #222; display: flex; padding: 0 10px; z-index: 1000; flex-wrap: wrap; }
-        .nav-group { position: relative; padding: 8px 12px; cursor: pointer; font-size: 11px; font-weight: bold; color: #ccc; text-transform: uppercase; white-space: nowrap; }
+        .nav-group { 
+            position: relative; 
+            padding: 5px 12px; /* Verlaagd van 8px */
+            cursor: pointer; 
+            font-size: 10px; 
+            font-weight: bold; 
+            color: #ccc; 
+            text-transform: uppercase; 
+            white-space: nowrap; 
+        }
         .nav-group:hover { background: #222; color: #00d4ff; }
         .dropdown { display: none; position: absolute; top: 100%; left: 0; background: #1a1a1a; border: 1px solid #333; min-width: 240px; box-shadow: 0 8px 16px rgba(0,0,0,0.8); max-height: 70vh; overflow-y: auto; }
         .nav-group:hover .dropdown { display: block; }
@@ -96,14 +70,6 @@
 <div class="main-container">
     <header>
         <h1>Kustwacht Dashboard</h1>
-        
-        <div id="weather-status-bar" class="code-groen">
-            <span id="status-text">STATUS: CODE GROEN</span>
-            <div class="weather-map-popover">
-                <img id="popover-map" src="https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/waarschuwing_land_0.gif" alt="KNMI Waarschuwingen">
-            </div>
-        </div>
-
         <div class="clocks">
             <div class="clock-item"><span class="clock-label">Lokaal (NL)</span><span id="local-clock" class="clock-time">00:00:00</span></div>
             <div class="clock-item"><span class="clock-label">Zulu (UTC)</span><span id="zulu-clock" class="clock-time">00:00:00</span></div>
@@ -166,19 +132,16 @@
             { name: "Waddendata.nl", url: "https://waddendata.nl/" },
             { name: "Rijkswaterstaat Waterinfo", url: "https://waterinfo.rws.nl/#!/kaart/waterhoogte-t-o-v-nap/" },
             { name: "GeoWeb (betonning)", url: "https://maps.rijkswaterstaat.nl/geoweb55/index.html?viewer=NMA" },
-            { name: "GeoWeb Catalogus", url: "https://maps.rijkswaterstaat.nl/GeoWebPortaal/" },
             { name: "Noordzeeloket", url: "https://www.noordzeeloket.nl/" },
-            { name: "Mijnbouw en WMP GIS", url: "https://experience.arcgis.com/experience/6e637f42374549329c46633afab17f58/" },
-            { name: "Onderwaterobjecten.rws.nl", url: "https://onderwaterobjecten.rws.nl/" },
-            { name: "Weerdatakustwacht.wordpress.com", url: "https://weerdatakustwacht.wordpress.com/" },
-            { name: "KWNL data", url: "https://sites.google.com/view/monitorkwnl/homepage" }
+            { name: "Onderwaterobjecten RWS", url: "https://onderwaterobjecten.rws.nl/" },
+            { name: "Weerdata Kustwacht", url: "https://weerdatakustwacht.wordpress.com/" }
         ]},
         { title: "Scheepvaart", links: [
             { name: "EMSA Portal", url: "https://portal.emsa.europa.eu/home" },
             { name: "ERICards", url: "http://www.ericards.net/" },
             { name: "Rainwat", url: "http://www.rainwat.bipt.be/" },
             { name: "Lloyds Seasearcher", url: "https://www.seasearcher.com/" },
-            { name: "NATO ISMERLO", url: "https://ismerlo.org/accounts/login/" },
+            { name: "Sign In | NATO ISMERLO", url: "https://ismerlo.org/accounts/login/" },
             { name: "Nautical calculator", url: "https://www.madinstro.net/" },
             { name: "Navtex", url: "http://navtex.lv/" },
             { name: "Kabels Noordzee", url: "https://kis-orca.org/map/" }
@@ -190,13 +153,12 @@
             { name: "Maritime Control", url: "https://bfa.kustwacht.nl/" },
             { name: "Madesmart", url: "https://tracker.madesmart.nl/" }
         ]},
-        { title: "Database Zee", links: [
+        { title: "Zee DB", links: [
             { name: "Sketchy.boats", url: "https://sketchy.boats/" },
             { name: "406 MHz Registration", url: "https://www.406registration.com" },
-            { name: "Inmarsat", url: "https://login.inmarsat.com/" },
             { name: "RescueNET", url: "https://msds.portal.inmarsat.com/msds/" },
             { name: "Beacon Decode", url: "https://cospas-sarsat.int/en/beacons-pro/beacon-message-decode-program-txsep/beacon-message-decode-program" },
-            { name: "ITU Ship List", url: "https://www.itu.int/mmsapp/ShipStation/list" },
+            { name: "Ship Station List (ITU)", url: "https://www.itu.int/mmsapp/ShipStation/list" },
             { name: "MMSI MID Codes", url: "https://www.vtexplorer.com/mmsi-mid-codes-en/" },
             { name: "NOGEPA RAS", url: "http://ras.nogepa.nl/login.php" }
         ]},
@@ -210,7 +172,9 @@
             { name: "SkyVector", url: "https://skyvector.com/" },
             { name: "Aireon Alert", url: "https://aireonalert.iaa.ie/alert-login" },
             { name: "METAR-TAF.com", url: "https://metar-taf.com/" },
-            { name: "E6BX Calculator", url: "https://e6bx.com/" }
+            { name: "E6BX Calculator", url: "https://e6bx.com/" },
+            { name: "Aviation Glossary", url: "https://www.pilotscafe.com/glossary/" },
+            { name: "EHAMCDM Mobile", url: "https://mobile.ehamcdm.nl/" }
         ]},
         { title: "Tracking", links: [
             { name: "FlightAware", url: "https://www.flightaware.com/" },
@@ -265,23 +229,6 @@
         document.getElementById('local-clock').innerText = nu.toLocaleTimeString('nl-NL', { hour12: false });
         const zulu = nu.getUTCHours().toString().padStart(2,'0') + ":" + nu.getUTCMinutes().toString().padStart(2,'0') + ":" + nu.getUTCSeconds().toString().padStart(2,'0');
         document.getElementById('zulu-clock').innerText = zulu;
-    }
-
-    async function checkKNMIAlert() {
-        try {
-            const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://webservice.knmi.nl/cgi-bin/rss_knmi.cgi?tekst=1'));
-            const data = await response.json();
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(data.contents, "text/xml");
-            const description = xmlDoc.getElementsByTagName("description")[1]?.childNodes[0]?.nodeValue || "";
-            const bar = document.getElementById('weather-status-bar');
-            const txt = document.getElementById('status-text');
-            bar.className = ''; 
-            if (description.includes("ROOD")) { bar.classList.add('code-rood'); txt.innerText = "STATUS: CODE ROOD"; }
-            else if (description.includes("ORANJE")) { bar.classList.add('code-oranje'); txt.innerText = "STATUS: CODE ORANJE"; }
-            else if (description.includes("GEEL")) { bar.classList.add('code-geel'); txt.innerText = "STATUS: CODE GEEL"; }
-            else { bar.classList.add('code-groen'); txt.innerText = "STATUS: CODE GROEN"; }
-        } catch (e) { console.log("KNMI check failed."); }
     }
 
     function initNavBar() {
@@ -349,10 +296,7 @@
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&t=" + t;
-        // Bijgewerkte pop-over URL
-        document.getElementById('popover-map').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/waarschuwing_land_0.gif?t=" + t;
         document.getElementById('last-update').innerText = "Fetch: " + new Date().toLocaleTimeString();
-        checkKNMIAlert();
     }
 
     function hardReset() {
