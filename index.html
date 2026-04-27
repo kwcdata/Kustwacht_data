@@ -70,7 +70,7 @@
             width: 100% !important; 
             height: 100% !important; 
             border: none; 
-            object-fit: cover; 
+            background: #000;
         }
 
         .slot img { 
@@ -109,7 +109,6 @@
         .knmi-card { height: 26%; }
         .radar-card { height: 42%; }
 
-        /* Aangepaste stijl voor de radar: contain ipv cover */
         #radar-img {
             object-fit: contain;
             background-color: #000;
@@ -197,20 +196,25 @@
 
 <script>
     const camList = [
-        {id: 'KjK02QIm4ZI', name: 'Brouwersdam'},
-        {id: 'mI1Os7TFdGc', name: 'Egmond aan Zee'},
-        {id: 'jDF264Bg1_c', name: 'Hoek v Holland Blvd'},
-        {id: 'mnxV4iit7S4', name: 'Kijkduin Blvd'},
-        {id: 'Ud7I4jprFN0', name: 'Maasvlakte'},
-        {id: '_pGIJmXxAHk', name: 'Nieuwe Waterweg'},
-        {id: 'dtFG_mcfWjQ', name: 'Noordwijk Blvd'},
-        {id: 'L76VKII_Z7k', name: 'Noordwijk Vuurtoren'},
-        {id: 'csMnwbjV5vg', name: 'Rockanje'},
-        {id: 'A5kXiKzbBFs', name: 'Scheveningen Blvd'},
-        {id: 'DaG5JReOYEw', name: 'Scheveningen Noord'},
-        {id: 'Ud7I4jprFN0', name: 'Ter Heijde'},
-        {id: 't3qbzZHOTyg', name: 'Wassenaarse Slag'},
-        {id: 'q0-DDh1zdY4', name: 'Zandvoort Blvd'}
+        // Speciale Bronnen (type: 'web')
+        {id: 'https://globe.adsbexchange.com/', name: 'ADS-B Exchange (Luchtvaart)', type: 'web'},
+        {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C12%2C9%2C8%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2KFlex Waterweg Monitor', type: 'web'},
+        
+        // YouTube Webcams (type: 'yt' of default)
+        {id: 'KjK02QIm4ZI', name: 'Brouwersdam', type: 'yt'},
+        {id: 'mI1Os7TFdGc', name: 'Egmond aan Zee', type: 'yt'},
+        {id: 'jDF264Bg1_c', name: 'Hoek v Holland Blvd', type: 'yt'},
+        {id: 'mnxV4iit7S4', name: 'Kijkduin Blvd', type: 'yt'},
+        {id: 'Ud7I4jprFN0', name: 'Maasvlakte', type: 'yt'},
+        {id: '_pGIJmXxAHk', name: 'Nieuwe Waterweg', type: 'yt'},
+        {id: 'dtFG_mcfWjQ', name: 'Noordwijk Blvd', type: 'yt'},
+        {id: 'L76VKII_Z7k', name: 'Noordwijk Vuurtoren', type: 'yt'},
+        {id: 'csMnwbjV5vg', name: 'Rockanje', type: 'yt'},
+        {id: 'A5kXiKzbBFs', name: 'Scheveningen Blvd', type: 'yt'},
+        {id: 'DaG5JReOYEw', name: 'Scheveningen Noord', type: 'yt'},
+        {id: 'Ud7I4jprFN0', name: 'Ter Heijde', type: 'yt'},
+        {id: 't3qbzZHOTyg', name: 'Wassenaarse Slag', type: 'yt'},
+        {id: 'q0-DDh1zdY4', name: 'Zandvoort Blvd', type: 'yt'}
     ];
 
     const defaults = {
@@ -235,6 +239,8 @@
                 const opt = document.createElement('option');
                 opt.value = cam.id;
                 opt.text = (cam.id === defaultId) ? "★ " + cam.name : cam.name;
+                // Sla het type op in een data-attribuut voor later gebruik
+                opt.setAttribute('data-type', cam.type || 'yt');
                 sel.add(opt);
             });
         }
@@ -242,23 +248,35 @@
 
     function changeCam(pos) {
         const sel = document.getElementById('sel-' + pos);
-        const id = sel.value;
-        const name = sel.options[sel.selectedIndex].text.replace("★ ", "");
-        setCamera(pos, id, name);
+        const opt = sel.options[sel.selectedIndex];
+        const id = opt.value;
+        const type = opt.getAttribute('data-type');
+        const name = opt.text.replace("★ ", "");
+        setCamera(pos, id, name, type);
     }
 
-    function setCamera(pos, id, name) {
+    function setCamera(pos, id, name, type = 'yt') {
         const container = document.getElementById('cont-' + pos);
         document.getElementById('lbl-' + pos).innerText = name;
         document.getElementById('sel-' + pos).value = id;
-        container.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0" allow="autoplay; allowfullscreen"></iframe>`;
+        
+        let url = "";
+        if (type === 'web') {
+            url = id; // De volledige link
+        } else {
+            url = `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0`;
+        }
+        
+        container.innerHTML = `<iframe src="${url}" allow="autoplay; allowfullscreen"></iframe>`;
     }
 
     function hardReset() {
         for (let pos in defaults) {
             const id = defaults[pos];
             const camObj = camList.find(c => c.id === id);
-            setCamera(pos, id, camObj ? camObj.name : "Camera");
+            if (camObj) {
+                setCamera(pos, id, camObj.name, camObj.type);
+            }
         }
         verversKaarten();
     }
@@ -269,8 +287,6 @@
         
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
-        
-        // Buienradar Animatie
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&t=" + t;
         
         const tijdStr = nu.getHours().toString().padStart(2, '0') + ":" + 
