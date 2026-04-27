@@ -350,13 +350,15 @@
         const icaoParams = aircraftList.map(a => a.icao.toLowerCase()).join(',');
         
         const targetUrl = `https://opensky-network.org/api/states/all?icao24=${icaoParams}`;
-        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+        // Nieuwe proxy URL
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
 
         try {
             const response = await fetch(proxyUrl);
             if (!response.ok) throw new Error('Proxy error');
             
-            const data = await response.json();
+            const wrapper = await response.json();
+            const data = JSON.parse(wrapper.contents); // AllOrigins verpakt de data in een 'contents' string
             const states = data.states || [];
 
             const activeMap = {};
@@ -391,7 +393,7 @@
 
         } catch (error) {
             console.error("OpenSky Error:", error);
-            fleetContainer.innerHTML = "<div style='color:#555; font-size:10px;'>Status tijdelijk niet beschikbaar...</div>";
+            fleetContainer.innerHTML = "<div style='color:#555; font-size:10px;'>Status tijdelijk niet beschikbaar (API limit)...</div>";
         }
     }
 
