@@ -222,7 +222,7 @@
             <div class="slot fleet-card">
                 <span class="label">Vloot Status (Live)</span>
                 <div id="fleet-container" class="fleet-list">
-                    Laden van vliegtuig data...
+                    Initialiseren...
                 </div>
             </div>
 
@@ -236,6 +236,7 @@
 </div>
 
 <script>
+    // Vliegtuig configuratie
     const aircraftList = [
         { reg: "PH-SAR", icao: "486449" },
         { reg: "PH-RSQ", icao: "48644a" },
@@ -277,6 +278,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         setupSelectors();
         hardReset();
+        // Elke 2 minuten verversen
         setInterval(verversData, 120000); 
     });
 
@@ -349,16 +351,17 @@
         const fleetContainer = document.getElementById('fleet-container');
         const icaoParams = aircraftList.map(a => a.icao.toLowerCase()).join(',');
         
+        // Gebruik AllOrigins proxy (vaak stabieler voor JSON)
         const targetUrl = `https://opensky-network.org/api/states/all?icao24=${icaoParams}`;
-        // Nieuwe proxy URL
         const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
 
         try {
             const response = await fetch(proxyUrl);
-            if (!response.ok) throw new Error('Proxy error');
-            
             const wrapper = await response.json();
-            const data = JSON.parse(wrapper.contents); // AllOrigins verpakt de data in een 'contents' string
+            
+            if (!wrapper.contents) throw new Error("Geen data");
+            
+            const data = JSON.parse(wrapper.contents);
             const states = data.states || [];
 
             const activeMap = {};
@@ -392,8 +395,9 @@
             fleetContainer.innerHTML = html;
 
         } catch (error) {
-            console.error("OpenSky Error:", error);
-            fleetContainer.innerHTML = "<div style='color:#555; font-size:10px;'>Status tijdelijk niet beschikbaar (API limit)...</div>";
+            console.error("OpenSky/Proxy Error:", error);
+            // Als het misgaat (zoals de 522 of 429 error), laat dan een duidelijke melding zien
+            fleetContainer.innerHTML = "<div style='color:#777; font-size:10px; padding:10px;'>Status tijdelijk niet beschikbaar (API limiet). Wacht 2 min...</div>";
         }
     }
 
