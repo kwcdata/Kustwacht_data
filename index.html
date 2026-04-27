@@ -99,6 +99,19 @@
             border-radius: 2px;
         }
 
+        /* Styling voor de categoriekopjes in de dropdown */
+        optgroup {
+            background: #222;
+            color: #00d4ff;
+            font-style: normal;
+            font-weight: bold;
+        }
+        
+        option {
+            background: #111;
+            color: #ccc;
+        }
+
         .info-column {
             display: flex;
             flex-direction: column;
@@ -195,27 +208,29 @@
 </div>
 
 <script>
-    const camList = [
-        // Externe Webtools
-        {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange (Luchtvaart)', type: 'web'},
-        {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C12%2C9%2C8%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2KFlex Waterweg Monitor', type: 'web'},
-        
-        // YouTube Webcams
-        {id: 'KjK02QIm4ZI', name: 'Brouwersdam', type: 'yt'},
-        {id: 'mI1Os7TFdGc', name: 'Egmond aan Zee', type: 'yt'},
-        {id: 'jDF264Bg1_c', name: 'Hoek v Holland Blvd', type: 'yt'},
-        {id: 'mnxV4iit7S4', name: 'Kijkduin Blvd', type: 'yt'},
-        {id: 'Ud7I4jprFN0', name: 'Maasvlakte', type: 'yt'},
-        {id: '_pGIJmXxAHk', name: 'Nieuwe Waterweg', type: 'yt'},
-        {id: 'dtFG_mcfWjQ', name: 'Noordwijk Blvd', type: 'yt'},
-        {id: 'L76VKII_Z7k', name: 'Noordwijk Vuurtoren', type: 'yt'},
-        {id: 'csMnwbjV5vg', name: 'Rockanje', type: 'yt'},
-        {id: 'A5kXiKzbBFs', name: 'Scheveningen Blvd', type: 'yt'},
-        {id: 'DaG5JReOYEw', name: 'Scheveningen Noord', type: 'yt'},
-        {id: 'Ud7I4jprFN0', name: 'Ter Heijde', type: 'yt'},
-        {id: 't3qbzZHOTyg', name: 'Wassenaarse Slag', type: 'yt'},
-        {id: 'q0-DDh1zdY4', name: 'Zandvoort Blvd', type: 'yt'}
-    ];
+    // Bronnenlijst met categorie-informatie
+    const sourceData = {
+        systems: [
+            {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange (Luchtvaart)', type: 'web'},
+            {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C12%2C9%2C8%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000', type: 'web'}
+        ],
+        webcams: [
+            {id: 'KjK02QIm4ZI', name: 'Brouwersdam', type: 'yt'},
+            {id: 'mI1Os7TFdGc', name: 'Egmond aan Zee', type: 'yt'},
+            {id: 'jDF264Bg1_c', name: 'Hoek v Holland Blvd', type: 'yt'},
+            {id: 'mnxV4iit7S4', name: 'Kijkduin Blvd', type: 'yt'},
+            {id: 'Ud7I4jprFN0', name: 'Maasvlakte', type: 'yt'},
+            {id: '_pGIJmXxAHk', name: 'Nieuwe Waterweg', type: 'yt'},
+            {id: 'dtFG_mcfWjQ', name: 'Noordwijk Blvd', type: 'yt'},
+            {id: 'L76VKII_Z7k', name: 'Noordwijk Vuurtoren', type: 'yt'},
+            {id: 'csMnwbjV5vg', name: 'Rockanje', type: 'yt'},
+            {id: 'A5kXiKzbBFs', name: 'Scheveningen Blvd', type: 'yt'},
+            {id: 'DaG5JReOYEw', name: 'Scheveningen Noord', type: 'yt'},
+            {id: 'Ud7I4jprFN0', name: 'Ter Heijde', type: 'yt'},
+            {id: 't3qbzZHOTyg', name: 'Wassenaarse Slag', type: 'yt'},
+            {id: 'q0-DDh1zdY4', name: 'Zandvoort Blvd', type: 'yt'}
+        ]
+    };
 
     const defaults = {
         1: 'A5kXiKzbBFs',
@@ -235,14 +250,30 @@
             const sel = document.getElementById('sel-' + i);
             const defaultId = defaults[i];
 
-            camList.forEach(cam => {
-                const opt = document.createElement('option');
-                opt.value = cam.id;
-                opt.text = (cam.id === defaultId) ? "★ " + cam.name : cam.name;
-                opt.setAttribute('data-type', cam.type || 'yt');
-                sel.add(opt);
+            // Groep Systeem Bronnen
+            const groupSys = document.createElement('optgroup');
+            groupSys.label = "Systeem Bronnen";
+            sourceData.systems.forEach(item => {
+                groupSys.appendChild(createOption(item, defaultId));
             });
+            sel.appendChild(groupSys);
+
+            // Groep Webcams
+            const groupCam = document.createElement('optgroup');
+            groupCam.label = "Live Webcams";
+            sourceData.webcams.forEach(item => {
+                groupCam.appendChild(createOption(item, defaultId));
+            });
+            sel.appendChild(groupCam);
         }
+    }
+
+    function createOption(item, defaultId) {
+        const opt = document.createElement('option');
+        opt.value = item.id;
+        opt.text = (item.id === defaultId) ? "★ " + item.name : item.name;
+        opt.setAttribute('data-type', item.type);
+        return opt;
     }
 
     function changeCam(pos) {
@@ -254,7 +285,7 @@
         setCamera(pos, id, name, type);
     }
 
-    function setCamera(pos, id, name, type = 'yt') {
+    function setCamera(pos, id, name, type) {
         const container = document.getElementById('cont-' + pos);
         document.getElementById('lbl-' + pos).innerText = name;
         document.getElementById('sel-' + pos).value = id;
@@ -270,11 +301,12 @@
     }
 
     function hardReset() {
+        const allSources = [...sourceData.systems, ...sourceData.webcams];
         for (let pos in defaults) {
             const id = defaults[pos];
-            const camObj = camList.find(c => c.id === id);
-            if (camObj) {
-                setCamera(pos, id, camObj.name, camObj.type);
+            const obj = allSources.find(c => c.id === id);
+            if (obj) {
+                setCamera(pos, id, obj.name, obj.type);
             }
         }
         verversKaarten();
