@@ -196,11 +196,11 @@
 
 <script>
     const camList = [
-        // Speciale Bronnen (type: 'web')
-        {id: 'https://globe.adsbexchange.com/', name: 'ADS-B Exchange (Luchtvaart)', type: 'web'},
+        // Externe Webtools
+        {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange (Luchtvaart)', type: 'web'},
         {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C12%2C9%2C8%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2KFlex Waterweg Monitor', type: 'web'},
         
-        // YouTube Webcams (type: 'yt' of default)
+        // YouTube Webcams
         {id: 'KjK02QIm4ZI', name: 'Brouwersdam', type: 'yt'},
         {id: 'mI1Os7TFdGc', name: 'Egmond aan Zee', type: 'yt'},
         {id: 'jDF264Bg1_c', name: 'Hoek v Holland Blvd', type: 'yt'},
@@ -239,7 +239,6 @@
                 const opt = document.createElement('option');
                 opt.value = cam.id;
                 opt.text = (cam.id === defaultId) ? "★ " + cam.name : cam.name;
-                // Sla het type op in een data-attribuut voor later gebruik
                 opt.setAttribute('data-type', cam.type || 'yt');
                 sel.add(opt);
             });
@@ -262,7 +261,7 @@
         
         let url = "";
         if (type === 'web') {
-            url = id; // De volledige link
+            url = id; 
         } else {
             url = `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0`;
         }
