@@ -15,7 +15,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            height: 35px; /* Verlaagd van 50px */
+            height: 35px; 
         }
         header h1 { margin: 0; font-size: 16px; color: #00d4ff; text-transform: uppercase; letter-spacing: 2px; }
         
@@ -28,7 +28,7 @@
         .nav-bar { background: #111; border-bottom: 1px solid #222; display: flex; padding: 0 10px; z-index: 1000; flex-wrap: wrap; }
         .nav-group { 
             position: relative; 
-            padding: 5px 12px; /* Verlaagd van 8px */
+            padding: 5px 12px; 
             cursor: pointer; 
             font-size: 10px; 
             font-weight: bold; 
@@ -88,7 +88,7 @@
         <div class="info-column">
             <div class="slot fleet-card"><span class="label">Vloot</span><div id="fleet-container" class="list-container"></div></div>
             <div class="slot knmi-card"><span class="label">Noordzee</span><img id="knmi-1" style="width:100%; height:100%; object-fit:contain;"></div>
-            <div class="slot knmi-card"><span class="label">Kustwateren</span><img id="knmi-2" style="width:100%; height:100%; object-fit:contain;"></div>
+            <div class="slot knmi-card"><span class="label">Kust- en ruime binnenwateren</span><img id="knmi-2" style="width:100%; height:100%; object-fit:contain;"></div>
             <div class="slot radar-card"><span class="label">Radar</span><img id="radar-img" style="width:100%; height:100%; object-fit:contain;"></div>
             <div id="last-update" class="timestamp">Laatste fetch: --:--:--</div>
         </div>
@@ -310,7 +310,13 @@
 
     document.addEventListener('DOMContentLoaded', () => { 
         setupSelectors(); initFleet(); initNavBar(); hardReset(); updateClocks();
-        setInterval(updateClocks, 1000); setInterval(verversData, 300000); 
+        setInterval(updateClocks, 1000); 
+        setInterval(verversData, 300000); 
+        
+        // Pagina verversen elke 30 minuten
+        setTimeout(() => {
+            window.location.reload();
+        }, 1800000);
     });
 </script>
 </body>
