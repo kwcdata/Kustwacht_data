@@ -138,14 +138,14 @@
         .fleet-item {
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
+            padding: 6px 10px;
             border-bottom: 1px solid #1a1a1a;
             font-family: monospace;
         }
 
         .status-airborne { color: #ff3e3e; font-weight: bold; } 
         .status-ground { color: #00ff88; } 
-        .status-unknown { color: #555; }
+        .status-unknown { color: #444; }
 
         .timestamp {
             font-size: 10px;
@@ -220,9 +220,9 @@
             </div>
             
             <div class="slot fleet-card">
-                <span class="label">Vloot Status (Live)</span>
+                <span class="label">Vloot Status (Live via OSN)</span>
                 <div id="fleet-container" class="fleet-list">
-                    Initialiseren...
+                    Data ophalen...
                 </div>
             </div>
 
@@ -236,7 +236,6 @@
 </div>
 
 <script>
-    // Vliegtuig configuratie
     const aircraftList = [
         { reg: "PH-SAR", icao: "486449" },
         { reg: "PH-RSQ", icao: "48644a" },
@@ -278,8 +277,8 @@
     document.addEventListener('DOMContentLoaded', () => {
         setupSelectors();
         hardReset();
-        // Elke 2 minuten verversen
-        setInterval(verversData, 120000); 
+        // Om limieten te voorkomen: ververs elke 3 minuten
+        setInterval(verversData, 180000); 
     });
 
     function setupSelectors() {
@@ -351,28 +350,26 @@
         const fleetContainer = document.getElementById('fleet-container');
         const icaoParams = aircraftList.map(a => a.icao.toLowerCase()).join(',');
         
-        // Gebruik AllOrigins proxy (vaak stabieler voor JSON)
+        // We proberen het nu met een andere proxy (Cloudflare Worker stijl)
         const targetUrl = `https://opensky-network.org/api/states/all?icao24=${icaoParams}`;
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
 
         try {
             const response = await fetch(proxyUrl);
-            const wrapper = await response.json();
+            if (!response.ok) throw new Error('API/Proxy Limit');
             
-            if (!wrapper.contents) throw new Error("Geen data");
-            
-            const data = JSON.parse(wrapper.contents);
+            const data = await response.json();
             const states = data.states || [];
 
             const activeMap = {};
             states.forEach(s => {
-                activeMap[s[0].toLowerCase()] = s[8]; 
+                activeMap[s[0].toLowerCase()] = s[8]; // s[8] is on_ground
             });
 
             let html = "";
             aircraftList.forEach(plane => {
                 const icaoLower = plane.icao.toLowerCase();
-                let statusText = "OFFLINE / GROUND";
+                let statusText = "OFFLINE";
                 let statusClass = "status-unknown";
                 
                 if (icaoLower in activeMap) {
@@ -386,18 +383,18 @@
                     }
                 }
 
-                html += `
-                    <div class="fleet-item">
-                        <span>${plane.reg}</span>
-                        <span class="${statusClass}">${statusText}</span>
-                    </div>`;
+                html += `<div class="fleet-item"><span>${plane.reg}</span><span class="${statusClass}">${statusText}</span></div>`;
             });
             fleetContainer.innerHTML = html;
 
         } catch (error) {
-            console.error("OpenSky/Proxy Error:", error);
-            // Als het misgaat (zoals de 522 of 429 error), laat dan een duidelijke melding zien
-            fleetContainer.innerHTML = "<div style='color:#777; font-size:10px; padding:10px;'>Status tijdelijk niet beschikbaar (API limiet). Wacht 2 min...</div>";
+            console.warn("Status fetch failed, displaying last known or offline.");
+            // Toon de lijst met 'Check Manual' als de API weigert
+            let html = "";
+            aircraftList.forEach(plane => {
+                html += `<div class="fleet-item"><span>${plane.reg}</span><span class="status-unknown">NO DATA</span></div>`;
+            });
+            fleetContainer.innerHTML = html + "<div style='font-size:9px; color:#444; padding:5px;'>API limiet bereikt. Probeer over 15 min opnieuw.</div>";
         }
     }
 
