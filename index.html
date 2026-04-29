@@ -231,8 +231,6 @@
     };
 
     const defaults = { 1: sourceData.systems[0].id, 2: sourceData.systems[1].id, 3: 'A5kXiKzbBFs', 4: 'q0-DDh1zdY4' };
-    
-    // Bijhouden van actieve streams voor resync
     let activeStreams = { 1: null, 2: null, 3: null, 4: null };
 
     function updateClocks() {
@@ -276,13 +274,9 @@
 
     function setCamera(pos, id, name, type) {
         const container = document.getElementById('cont-' + pos);
-        // Cache de stream info voor resync
         activeStreams[pos] = { id, name, type };
-        
-        // Voeg een tijdstempel toe aan YT URL's om caching te voorkomen en herladen te forceren
         const ts = new Date().getTime();
         const url = type === 'web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0&t=${ts}`;
-        
         container.innerHTML = `<iframe id="frame-${pos}" src="${url}" allow="autoplay; allowfullscreen"></iframe>`;
         document.getElementById('lbl-' + pos).innerText = name.replace("★ ", "");
     }
@@ -295,16 +289,13 @@
         setCamera(pos, id, name, type);
     }
 
-    // Nieuwe functie om YouTube streams te synchroniseren naar "Live"
     function syncLiveStreams() {
-        console.log("Resyncing live streams...");
         for (let pos = 1; pos <= 4; pos++) {
             const stream = activeStreams[pos];
             if (stream && stream.type === 'yt') {
                 const frame = document.getElementById('frame-' + pos);
                 if (frame) {
                     const ts = new Date().getTime();
-                    // Herlaad alleen de src van de iframe om terug naar live te springen
                     frame.src = `https://www.youtube.com/embed/${stream.id}?autoplay=1&mute=1&rel=0&showinfo=0&t=${ts}`;
                 }
             }
@@ -326,9 +317,11 @@
 
     function verversData() {
         const t = new Date().getTime();
+        // KNMI en Buienradar verversen nu beide op hetzelfde interval (300.000 ms)
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
-        document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&t=" + t;
+        document.getElementById('radar-img').src = "https://image.buienradar.nl/2.0/image/single/RadarMapNL?height=350&width=350&renderBackground=True&renderBranding=False&renderText=True&t=" + t;
+        
         document.getElementById('last-update').innerText = "Fetch: " + new Date().toLocaleTimeString();
     }
 
@@ -344,12 +337,14 @@
     document.addEventListener('DOMContentLoaded', () => { 
         setupSelectors(); initFleet(); initNavBar(); hardReset(); updateClocks();
         setInterval(updateClocks, 1000); 
-        setInterval(verversData, 300000); // 5 min
         
-        // Resync YouTube streams elke 5 minuten om achterstand te voorkomen
+        // Ververs data (KNMI & Radar) elke 300 seconden (5 minuten)
+        setInterval(verversData, 300000); 
+        
+        // Sync YouTube streams elke 5 minuten
         setInterval(syncLiveStreams, 300000); 
         
-        // Pagina verversen elke 30 minuten
+        // Pagina herladen elke 30 minuten
         setTimeout(() => {
             window.location.reload();
         }, 1800000);
