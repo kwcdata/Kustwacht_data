@@ -317,10 +317,12 @@
 
     function verversData() {
         const t = new Date().getTime();
-        // KNMI en Buienradar verversen nu beide op hetzelfde interval (300.000 ms)
+        // KNMI (5 min)
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
-        document.getElementById('radar-img').src = "https://image.buienradar.nl/2.0/image/single/RadarMapNL?height=350&width=350&renderBackground=True&renderBranding=False&renderText=True&t=" + t;
+        
+        // Buienradar (Terug naar stabiele API met extra cache-buster)
+        document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&random=" + t;
         
         document.getElementById('last-update').innerText = "Fetch: " + new Date().toLocaleTimeString();
     }
