@@ -231,6 +231,9 @@
     };
 
     const defaults = { 1: sourceData.systems[0].id, 2: sourceData.systems[1].id, 3: 'A5kXiKzbBFs', 4: 'q0-DDh1zdY4' };
+    
+    // Bijhouden van actieve streams voor resync
+    let activeStreams = { 1: null, 2: null, 3: null, 4: null };
 
     function updateClocks() {
         const nu = new Date();
@@ -273,8 +276,14 @@
 
     function setCamera(pos, id, name, type) {
         const container = document.getElementById('cont-' + pos);
-        const url = type === 'web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1`;
-        container.innerHTML = `<iframe src="${url}" allow="autoplay; allowfullscreen"></iframe>`;
+        // Cache de stream info voor resync
+        activeStreams[pos] = { id, name, type };
+        
+        // Voeg een tijdstempel toe aan YT URL's om caching te voorkomen en herladen te forceren
+        const ts = new Date().getTime();
+        const url = type === 'web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0&t=${ts}`;
+        
+        container.innerHTML = `<iframe id="frame-${pos}" src="${url}" allow="autoplay; allowfullscreen"></iframe>`;
         document.getElementById('lbl-' + pos).innerText = name.replace("★ ", "");
     }
 
@@ -284,6 +293,22 @@
         const name = sel.options[sel.selectedIndex].text;
         const type = sourceData.systems.find(s => s.id === id) ? 'web' : 'yt';
         setCamera(pos, id, name, type);
+    }
+
+    // Nieuwe functie om YouTube streams te synchroniseren naar "Live"
+    function syncLiveStreams() {
+        console.log("Resyncing live streams...");
+        for (let pos = 1; pos <= 4; pos++) {
+            const stream = activeStreams[pos];
+            if (stream && stream.type === 'yt') {
+                const frame = document.getElementById('frame-' + pos);
+                if (frame) {
+                    const ts = new Date().getTime();
+                    // Herlaad alleen de src van de iframe om terug naar live te springen
+                    frame.src = `https://www.youtube.com/embed/${stream.id}?autoplay=1&mute=1&rel=0&showinfo=0&t=${ts}`;
+                }
+            }
+        }
     }
 
     function initFleet() {
@@ -311,7 +336,7 @@
         for(let p in defaults) {
             const id = defaults[p];
             const item = [...sourceData.systems, ...sourceData.webcams].find(x => x.id === id);
-            setCamera(p, id, (item.id === id ? "★ " : "") + item.name, sourceData.systems.includes(item) ? 'web' : 'yt');
+            setCamera(p, id, item.name, sourceData.systems.includes(item) ? 'web' : 'yt');
         }
         verversData();
     }
@@ -319,7 +344,10 @@
     document.addEventListener('DOMContentLoaded', () => { 
         setupSelectors(); initFleet(); initNavBar(); hardReset(); updateClocks();
         setInterval(updateClocks, 1000); 
-        setInterval(verversData, 300000); 
+        setInterval(verversData, 300000); // 5 min
+        
+        // Resync YouTube streams elke 5 minuten om achterstand te voorkomen
+        setInterval(syncLiveStreams, 300000); 
         
         // Pagina verversen elke 30 minuten
         setTimeout(() => {
