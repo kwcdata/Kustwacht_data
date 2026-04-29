@@ -67,11 +67,47 @@
         .btn-track { background: #00d4ff; color: #000; border: none; padding: 2px 6px; font-size: 9px; font-weight: bold; border-radius: 2px; cursor: pointer; }
         
         .timestamp { font-size: 10px; color: #444; text-align: right; padding: 4px 5px; font-family: monospace; }
-        .controls { background: #050505; border-top: 1px solid #222; display: flex; justify-content: center; align-items: center; height: 40px; }
+        .controls { background: #050505; border-top: 1px solid #222; display: flex; justify-content: center; align-items: center; height: 40px; gap: 15px; }
         button.reset { padding: 5px 20px; background: #222; color: #bbb; border: 1px solid #444; cursor: pointer; font-size: 11px; }
+
+        /* NOTIFICATIE POPUP STIJL */
+        #p2k-notification-container {
+            position: fixed;
+            bottom: 60px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .p2k-toast {
+            background: rgba(0, 40, 60, 0.95);
+            border-left: 4px solid #00d4ff;
+            color: white;
+            padding: 12px;
+            border-radius: 4px;
+            width: 300px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            animation: slideIn 0.5s ease-out;
+            pointer-events: auto;
+            cursor: pointer;
+            border: 1px solid #333;
+        }
+        .p2k-toast.urgency { border-left-color: #ff4444; background: rgba(60, 0, 0, 0.95); }
+        .p2k-toast-header { font-size: 10px; color: #00d4ff; font-weight: bold; margin-bottom: 5px; display: flex; justify-content: space-between; }
+        .p2k-toast-body { font-size: 12px; line-height: 1.4; }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
+
+<div id="p2k-notification-container"></div>
+
 <div class="main-container">
     <header>
         <div class="header-title-area">
@@ -101,7 +137,10 @@
             <div id="last-update" class="timestamp">Laatste fetch: --:--:--</div>
         </div>
     </div>
-    <div class="controls"><button class="reset" onclick="hardReset()">HERSTEL STANDAARD</button></div>
+    <div class="controls">
+        <button class="reset" onclick="hardReset()">HERSTEL STANDAARD</button>
+        <span id="p2k-status" style="font-size: 10px; color: #444;">P2K Monitor: Actief</span>
+    </div>
 </div>
 
 <script>
@@ -232,6 +271,7 @@
 
     const defaults = { 1: sourceData.systems[0].id, 2: sourceData.systems[1].id, 3: 'A5kXiKzbBFs', 4: 'q0-DDh1zdY4' };
     let activeStreams = { 1: null, 2: null, 3: null, 4: null };
+    let lastP2kId = null;
 
     function updateClocks() {
         const nu = new Date();
@@ -317,14 +357,72 @@
 
     function verversData() {
         const t = new Date().getTime();
-        // KNMI (5 min)
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
-        
-        // Buienradar (Terug naar stabiele API met extra cache-buster)
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&random=" + t;
-        
         document.getElementById('last-update').innerText = "Fetch: " + new Date().toLocaleTimeString();
+    }
+
+    // P2000 MONITOR FUNCTIE
+    async function checkP2000() {
+        try {
+            // Gebruik een openbare RSS naar JSON proxy om CORS te omzeilen
+            const rssUrl = encodeURIComponent('https://p2000.net/rss/index.php?regio=403,404');
+            const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
+            const data = await response.json();
+            
+            if (data.status === 'ok' && data.items.length > 0) {
+                const latest = data.items[0];
+                const latestId = latest.guid || latest.link;
+
+                // Als dit een nieuwe melding is
+                if (lastP2kId && latestId !== lastP2kId) {
+                    showNotification(latest);
+                }
+                lastP2kId = latestId;
+                document.getElementById('p2k-status').style.color = '#00ff00';
+            }
+        } catch (e) {
+            console.error("P2K monitor fout:", e);
+            document.getElementById('p2k-status').style.color = '#ff4444';
+        }
+    }
+
+    function showNotification(item) {
+        const container = document.getElementById('p2k-notification-container');
+        const toast = document.createElement('div');
+        const isUrgent = item.title.toLowerCase().includes('prio 1') || item.title.toLowerCase().includes('grip');
+        
+        toast.className = `p2k-toast ${isUrgent ? 'urgency' : ''}`;
+        toast.innerHTML = `
+            <div class="p2k-toast-header">
+                <span>NIEUWE MELDING</span>
+                <span>${new Date().toLocaleTimeString()}</span>
+            </div>
+            <div class="p2k-toast-body">${item.title}</div>
+        `;
+
+        // Klik om P2000 bron direct te openen in slot 1
+        toast.onclick = () => {
+            setCamera(1, sourceData.systems[0].id, sourceData.systems[0].name, 'web');
+            document.getElementById('sel-1').value = sourceData.systems[0].id;
+            toast.remove();
+        };
+
+        container.appendChild(toast);
+        
+        // Verwijder na 15 seconden
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s';
+                setTimeout(() => toast.remove(), 500);
+            }
+        }, 15000);
+
+        // Audio alert (optioneel)
+        const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+        audio.play().catch(e => {});
     }
 
     function hardReset() {
@@ -338,15 +436,15 @@
 
     document.addEventListener('DOMContentLoaded', () => { 
         setupSelectors(); initFleet(); initNavBar(); hardReset(); updateClocks();
+        
         setInterval(updateClocks, 1000); 
-        
-        // Ververs data (KNMI & Radar) elke 300 seconden (5 minuten)
         setInterval(verversData, 300000); 
-        
-        // Sync YouTube streams elke 5 minuten
         setInterval(syncLiveStreams, 300000); 
         
-        // Pagina herladen elke 30 minuten
+        // Check P2000 elke 30 seconden
+        setInterval(checkP2000, 300000); // 30 seconden voor achtergrond check
+        checkP2000(); // Eerste check bij laden
+
         setTimeout(() => {
             window.location.reload();
         }, 1800000);
