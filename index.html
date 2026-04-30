@@ -21,7 +21,6 @@
         }
         .header-title-area { display: flex; align-items: center; gap: 12px; }
         .header-logo { height: 28px; width: auto; }
-        
         header h1 { margin: 0; font-size: 16px; color: #00d4ff; text-transform: uppercase; letter-spacing: 2px; }
         
         .clocks { display: flex; gap: 20px; font-family: 'Courier New', monospace; }
@@ -29,8 +28,17 @@
         .clock-label { font-size: 8px; color: #666; text-transform: uppercase; display: block; margin-bottom: -2px; }
         .clock-time { font-size: 14px; color: #00d4ff; font-weight: bold; }
 
-        /* NAVIGATIEBALK */
-        .nav-bar { background: #111; border-bottom: 1px solid #222; display: flex; padding: 0 10px; z-index: 1000; flex-wrap: wrap; }
+        /* NAVIGATIEBALK MET RESET KNOP */
+        .nav-bar { 
+            background: #111; 
+            border-bottom: 1px solid #222; 
+            display: flex; 
+            padding: 0 10px; 
+            z-index: 1000; 
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nav-links-wrapper { display: flex; flex-wrap: wrap; }
         .nav-group { 
             position: relative; 
             padding: 5px 12px; 
@@ -48,70 +56,56 @@
         .dropdown a { color: #ccc; padding: 8px 12px; text-decoration: none; display: block; font-size: 11px; border-bottom: 1px solid #222; }
         .dropdown a:hover { background: #00d4ff; color: #000; }
 
+        .nav-controls { display: flex; align-items: center; gap: 15px; padding-right: 10px; }
+        button.reset-nav { 
+            padding: 2px 10px; 
+            background: #222; 
+            color: #bbb; 
+            border: 1px solid #444; 
+            cursor: pointer; 
+            font-size: 9px; 
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        button.reset-nav:hover { background: #333; color: #fff; }
+
+        /* LAYOUT - Pakt nu alle resterende ruimte onder de nav-bar */
         .monitor-layout { display: grid; grid-template-columns: 1fr 360px; grid-gap: 8px; flex-grow: 1; padding: 8px; overflow: hidden; }
         .webcam-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; grid-gap: 10px; position: relative; }
-        .cam-box { display: flex; flex-direction: column; gap: 4px; height: 100%; transition: all 0.2s; }
         
-        /* FULLSCREEN MODUS */
-        .cam-box.full-slot { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 500; background: #000; }
+        .cam-box { display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 0; }
+        .cam-box.full-slot { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 500; background: #000; padding: 8px; box-sizing: border-box; }
 
         .slot { position: relative; background: #0a0a0a; flex-grow: 1; border-radius: 4px; overflow: hidden; border: 1px solid #222; display: flex; flex-direction: column; }
-        .slot iframe { width: 100% !important; height: 100% !important; border: none; background: #000; }
-        .label { background: rgba(0, 212, 255, 0.85); color: #000; padding: 2px 8px; font-size: 10px; font-weight: bold; z-index: 20; text-transform: uppercase; }
+        .slot iframe { flex-grow: 1; width: 100%; border: none; background: #000; }
+        
+        .label { background: rgba(0, 212, 255, 0.85); color: #000; padding: 2px 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; display: block; }
         
         /* FOOTER CONTROLS */
-        .cam-footer { display: flex; gap: 4px; align-items: center; }
+        .cam-footer { display: flex; gap: 4px; align-items: center; height: 26px; flex-shrink: 0; }
         .cam-selector { background: #111; color: #ccc; border: 1px solid #333; padding: 4px; font-size: 11px; outline: none; border-radius: 2px; flex-grow: 1; }
         .expand-btn { background: #111; color: #00d4ff; border: 1px solid #333; padding: 0 8px; cursor: pointer; font-size: 14px; border-radius: 2px; height: 26px; display: flex; align-items: center; justify-content: center; }
         .expand-btn:hover { background: #222; }
 
+        /* RECHTER KOLOM - Hoogtes aangepast */
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+        .fleet-card { height: 115px; background: #050505; border: 1px solid #222; border-radius: 4px; flex-shrink: 0; }
+        .knmi-card { height: 185px; flex-shrink: 0; } 
+        .radar-card { flex-grow: 1; min-height: 180px; }
         
-        /* VERHOUDINGEN RECHTER KOLOM */
-        .fleet-card { height: 120px; background: #050505; border: 1px solid #222; border-radius: 4px; flex-shrink: 0; }
-        .knmi-card { flex-grow: 1; min-height: 50px; } 
-        .radar-card { height: 300px; flex-shrink: 0; }
-        
-        .list-container { padding: 2px 5px; }
-        .fleet-item { display: flex; justify-content: space-between; align-items: center; padding: 2px 10px; border-bottom: 1px solid #1a1a1a; font-family: monospace; font-size: 12px; }
-        .btn-track { background: #00d4ff; color: #000; border: none; padding: 2px 6px; font-size: 9px; font-weight: bold; border-radius: 2px; cursor: pointer; }
+        .list-container { padding: 1px 5px; }
+        .fleet-item { display: flex; justify-content: space-between; align-items: center; padding: 2px 10px; border-bottom: 1px solid #1a1a1a; font-family: monospace; font-size: 11px; }
+        .btn-track { background: #00d4ff; color: #000; border: none; padding: 1px 5px; font-size: 8px; font-weight: bold; border-radius: 2px; cursor: pointer; }
         
         .timestamp { font-size: 10px; color: #444; text-align: right; padding: 4px 5px; font-family: monospace; }
-        .controls { background: #050505; border-top: 1px solid #222; display: flex; justify-content: center; align-items: center; height: 40px; gap: 15px; }
-        button.reset { padding: 5px 20px; background: #222; color: #bbb; border: 1px solid #444; cursor: pointer; font-size: 11px; }
 
-        /* NOTIFICATIE POPUP STIJL */
-        #p2k-notification-container {
-            position: fixed;
-            bottom: 60px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
-        }
-        .p2k-toast {
-            background: rgba(0, 40, 60, 0.95);
-            border-left: 4px solid #00d4ff;
-            color: white;
-            padding: 12px;
-            border-radius: 4px;
-            width: 300px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            animation: slideIn 0.5s ease-out;
-            pointer-events: auto;
-            cursor: pointer;
-            border: 1px solid #333;
-        }
+        #p2k-notification-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .p2k-toast { background: rgba(0, 40, 60, 0.95); border-left: 4px solid #00d4ff; color: white; padding: 12px; border-radius: 4px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); animation: slideIn 0.5s ease-out; pointer-events: auto; cursor: pointer; border: 1px solid #333; }
         .p2k-toast.urgency { border-left-color: #ff4444; background: rgba(60, 0, 0, 0.95); }
         .p2k-toast-header { font-size: 10px; color: #00d4ff; font-weight: bold; margin-bottom: 5px; display: flex; justify-content: space-between; }
         .p2k-toast-body { font-size: 12px; line-height: 1.4; }
         
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -130,33 +124,39 @@
         </div>
     </header>
 
-    <nav class="nav-bar" id="nav-bar"></nav>
+    <nav class="nav-bar">
+        <div class="nav-links-wrapper" id="nav-bar"></div>
+        <div class="nav-controls">
+            <span id="p2k-status" style="font-size: 9px; color: #444; text-transform: uppercase;">Monitor: Actief</span>
+            <button class="reset-nav" onclick="hardReset()">Herstel Standaard</button>
+        </div>
+    </nav>
 
     <div class="monitor-layout">
         <div class="webcam-grid">
             <div class="cam-box" id="box-1">
-                <div class="slot"><span class="label" id="lbl-1">L-Boven</span><div id="cont-1" style="height:100%"></div></div>
+                <div class="slot"><span class="label" id="lbl-1">L-Boven</span><div id="cont-1" style="height:100%; display:flex; flex-direction:column;"></div></div>
                 <div class="cam-footer">
                     <select class="cam-selector" id="sel-1" onchange="changeCam(1)"></select>
                     <button class="expand-btn" onclick="toggleFullscreen(1)">⛶</button>
                 </div>
             </div>
             <div class="cam-box" id="box-2">
-                <div class="slot"><span class="label" id="lbl-2">R-Boven</span><div id="cont-2" style="height:100%"></div></div>
+                <div class="slot"><span class="label" id="lbl-2">R-Boven</span><div id="cont-2" style="height:100%; display:flex; flex-direction:column;"></div></div>
                 <div class="cam-footer">
                     <select class="cam-selector" id="sel-2" onchange="changeCam(2)"></select>
                     <button class="expand-btn" onclick="toggleFullscreen(2)">⛶</button>
                 </div>
             </div>
             <div class="cam-box" id="box-3">
-                <div class="slot"><span class="label" id="lbl-3">L-Onder</span><div id="cont-3" style="height:100%"></div></div>
+                <div class="slot"><span class="label" id="lbl-3">L-Onder</span><div id="cont-3" style="height:100%; display:flex; flex-direction:column;"></div></div>
                 <div class="cam-footer">
                     <select class="cam-selector" id="sel-3" onchange="changeCam(3)"></select>
                     <button class="expand-btn" onclick="toggleFullscreen(3)">⛶</button>
                 </div>
             </div>
             <div class="cam-box" id="box-4">
-                <div class="slot"><span class="label" id="lbl-4">R-Onder</span><div id="cont-4" style="height:100%"></div></div>
+                <div class="slot"><span class="label" id="lbl-4">R-Onder</span><div id="cont-4" style="height:100%; display:flex; flex-direction:column;"></div></div>
                 <div class="cam-footer">
                     <select class="cam-selector" id="sel-4" onchange="changeCam(4)"></select>
                     <button class="expand-btn" onclick="toggleFullscreen(4)">⛶</button>
@@ -170,10 +170,6 @@
             <div class="slot radar-card"><span class="label">Radar</span><img id="radar-img" style="width:100%; height:100%; object-fit:contain;"></div>
             <div id="last-update" class="timestamp">Laatste fetch: --:--:--</div>
         </div>
-    </div>
-    <div class="controls">
-        <button class="reset" onclick="hardReset()">HERSTEL STANDAARD</button>
-        <span id="p2k-status" style="font-size: 10px; color: #444;">P2K Monitor: Actief</span>
     </div>
 </div>
 
@@ -425,7 +421,6 @@
                 document.getElementById('p2k-status').style.color = '#00ff00';
             }
         } catch (e) {
-            console.error("P2K monitor fout:", e);
             document.getElementById('p2k-status').style.color = '#ff4444';
         }
     }
@@ -477,9 +472,7 @@
         setInterval(syncLiveStreams, 300000); 
         setInterval(checkP2000, 300000); 
         checkP2000(); 
-        setTimeout(() => {
-            window.location.reload();
-        }, 1800000);
+        setTimeout(() => { window.location.reload(); }, 1800000);
     });
 </script>
 </body>
