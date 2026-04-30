@@ -67,13 +67,14 @@
 
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; }
         
-        .fleet-card { height: 145px; background: #050505; border: 1px solid #222; border-radius: 4px; }
-        .knmi-card { height: 155px; } 
-        .radar-card { flex-grow: 1; min-height: 180px; }
+        /* RECHTER KOLOM: RADAR DOMINANT GEMAAKT */
+        .fleet-card { height: 120px; background: #050505; border: 1px solid #222; border-radius: 4px; flex-shrink: 0; }
+        .knmi-card { flex-grow: 1; min-height: 50px; } 
+        .radar-card { height: 300px; flex-shrink: 0; }
         
         .list-container { padding: 2px 5px; }
-        .fleet-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 10px; border-bottom: 1px solid #1a1a1a; font-family: monospace; font-size: 12px; }
-        .btn-track { background: #00d4ff; color: #000; border: none; padding: 2px 6px; font-size: 9px; font-weight: bold; border-radius: 2px; cursor: pointer; }
+        .fleet-item { display: flex; justify-content: space-between; align-items: center; padding: 2px 10px; border-bottom: 1px solid #1a1a1a; font-family: monospace; font-size: 11px; }
+        .btn-track { background: #00d4ff; color: #000; border: none; padding: 1px 4px; font-size: 8px; font-weight: bold; border-radius: 2px; cursor: pointer; }
         
         .timestamp { font-size: 10px; color: #444; text-align: right; padding: 4px 5px; font-family: monospace; }
         .controls { background: #050505; border-top: 1px solid #222; display: flex; justify-content: center; align-items: center; height: 40px; gap: 15px; }
@@ -226,14 +227,7 @@
             { name: "Navtex", url: "http://navtex.lv/" },
             { name: "Kabels Noordzee", url: "https://kis-orca.org/map/" }
         ]},
-        { title: "AIS", links: [
-            { name: "VIIA", url: "https://viia-p.kustwacht.nl/" },
-            { name: "Waterkaart.net", url: "https://waterkaart.net/" },
-            { name: "AMS (AIS RWS)", url: "https://ais-ams.rws.rijksweb.nl/ams/" },
-            { name: "Maritime Control", url: "https://bfa.kustwacht.nl/" },
-            { name: "Madesmart", url: "https://tracker.madesmart.nl/" }
-        ]},
-        { title: "Zee DB", links: [
+        { title: "Scheepvaart DB", links: [
             { name: "Sketchy.boats", url: "https://sketchy.boats/" },
             { name: "406 MHz Registration", url: "https://www.406registration.com" },
             { name: "RescueNET", url: "https://msds.portal.inmarsat.com/msds/" },
@@ -241,6 +235,13 @@
             { name: "Ship Station List (ITU)", url: "https://www.itu.int/mmsapp/ShipStation/list" },
             { name: "MMSI MID Codes", url: "https://www.vtexplorer.com/mmsi-mid-codes-en/" },
             { name: "NOGEPA RAS", url: "http://ras.nogepa.nl/login.php" }
+        ]},
+        { title: "AIS", links: [
+            { name: "VIIA", url: "https://viia-p.kustwacht.nl/" },
+            { name: "Waterkaart.net", url: "https://waterkaart.net/" },
+            { name: "AMS (AIS RWS)", url: "https://ais-ams.rws.rijksweb.nl/ams/" },
+            { name: "Maritime Control", url: "https://bfa.kustwacht.nl/" },
+            { name: "Madesmart", url: "https://tracker.madesmart.nl/" }
         ]},
         { title: "Plannen", links: [
             { name: "IBP Noordzee", url: "https://noordzeeloket.nl/functies-gebruik/artikel-baseline-0/" },
@@ -256,11 +257,18 @@
             { name: "Aviation Glossary", url: "https://www.pilotscafe.com/glossary/" },
             { name: "EHAMCDM Mobile", url: "https://mobile.ehamcdm.nl/" }
         ]},
+        { title: "Luchtvaart DB", links: [
+            { name: "406 MHz Registration", url: "https://www.406registration.com" },
+            { name: "Beacon Decode", url: "https://cospas-sarsat.int/en/beacons-pro/beacon-message-decode-program-txsep/beacon-message-decode-program" },
+            { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" },
+            { name: "Flightradar24", url: "https://www.flightradar24.com/" }
+            ]},
         { title: "Tracking", links: [
             { name: "FlightAware", url: "https://www.flightaware.com/" },
             { name: "Casper Tracking", url: "https://kustwacht-flighttracking.casper.aero/index.php" },
-            { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" },
-            { name: "Flightradar24", url: "https://www.flightradar24.com/" }
+            { name: "Ballonregister", url: "https://www.ballonregister.nl/" },
+            { name: "Airframes", url: "https://www.airframes.org/" }
+            { name: "Airline codes", url: "https://airlinecodes.info/" }
         ]},
         { title: "Taal/Rekenen", links: [
             { name: "Spelling.nu", url: "https://www.spelling.nu/" },
