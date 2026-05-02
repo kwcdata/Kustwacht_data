@@ -87,7 +87,6 @@
         .expand-btn { background: #111; color: #00d4ff; border: 1px solid #333; padding: 0 8px; cursor: pointer; font-size: 14px; border-radius: 2px; height: 26px; display: flex; align-items: center; justify-content: center; }
         .expand-btn:hover { background: #222; }
 
-        /* Aangepaste Info Kolom voor gelijke verdeling */
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; overflow: hidden; }
         .info-column .slot { flex: 1; min-height: 0; display: flex; flex-direction: column; }
         .img-container { flex: 1; position: relative; overflow: hidden; background: #000; }
@@ -97,7 +96,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Gebruik 'cover' als je de box volledig wilt vullen zonder zwarte randen */
+            object-fit: contain;
             background: #000;
         }
 
@@ -331,9 +330,26 @@
 
     function updateClocks() {
         const nu = new Date();
-        document.getElementById('local-clock').innerText = nu.toLocaleTimeString('nl-NL', { hour12: false });
-        const zulu = nu.getUTCHours().toString().padStart(2,'0') + ":" + nu.getUTCMinutes().toString().padStart(2,'0') + ":" + nu.getUTCSeconds().toString().padStart(2,'0');
-        document.getElementById('zulu-clock').innerText = zulu;
+        
+        // NL Tijd (altijd Europe/Amsterdam, 24-uurs)
+        const nlTime = nu.toLocaleTimeString('nl-NL', { 
+            timeZone: 'Europe/Amsterdam', 
+            hour12: false, 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit' 
+        });
+        document.getElementById('local-clock').innerText = nlTime;
+
+        // Zulu Tijd (UTC, 24-uurs)
+        const zuluTime = nu.toLocaleTimeString('nl-NL', { 
+            timeZone: 'UTC', 
+            hour12: false, 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit' 
+        });
+        document.getElementById('zulu-clock').innerText = zuluTime;
     }
 
     function initFleetMenu() {
@@ -409,7 +425,7 @@
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&random=" + t;
-        document.getElementById('last-update').innerText = new Date().toLocaleTimeString();
+        document.getElementById('last-update').innerText = new Date().toLocaleTimeString('nl-NL', { hour12: false });
     }
 
     async function checkP2000() {
@@ -432,7 +448,7 @@
         const toast = document.createElement('div');
         const isUrgent = item.title.toLowerCase().includes('prio 1') || item.title.toLowerCase().includes('grip');
         toast.className = `p2k-toast ${isUrgent ? 'urgency' : ''}`;
-        toast.innerHTML = `<div class="p2k-toast-header"><span>NIEUWE MELDING</span><span>${new Date().toLocaleTimeString()}</span></div><div class="p2k-toast-body">${item.title}</div>`;
+        toast.innerHTML = `<div class="p2k-toast-header"><span>NIEUWE MELDING</span><span>${new Date().toLocaleTimeString('nl-NL', { hour12: false })}</span></div><div class="p2k-toast-body">${item.title}</div>`;
         toast.onclick = () => {
             setCamera(1, sourceData.systems[0].id, sourceData.systems[0].name, 'web');
             document.getElementById('sel-1').value = sourceData.systems[0].id;
