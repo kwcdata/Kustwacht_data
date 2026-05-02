@@ -80,18 +80,26 @@
         .webcam-grid .slot { flex-grow: 1; }
         .slot iframe { flex-grow: 1; width: 100%; border: none; background: #000; }
         
-        .label { background: rgba(0, 212, 255, 0.85); color: #000; padding: 2px 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; display: block; flex-shrink: 0; }
+        .label { background: rgba(0, 212, 255, 0.85); color: #000; padding: 2px 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; display: block; flex-shrink: 0; z-index: 10; }
         
         .cam-footer { display: flex; gap: 4px; align-items: center; height: 26px; flex-shrink: 0; }
         .cam-selector { background: #111; color: #ccc; border: 1px solid #333; padding: 4px; font-size: 11px; outline: none; border-radius: 2px; flex-grow: 1; }
         .expand-btn { background: #111; color: #00d4ff; border: 1px solid #333; padding: 0 8px; cursor: pointer; font-size: 14px; border-radius: 2px; height: 26px; display: flex; align-items: center; justify-content: center; }
         .expand-btn:hover { background: #222; }
 
+        /* Aangepaste Info Kolom voor gelijke verdeling */
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; overflow: hidden; }
-        .knmi-card { flex-shrink: 0; height: auto; } 
-        .radar-card { flex-shrink: 0; height: auto; }
-        .knmi-img { width: 100%; height: auto; display: block; background: #000; }
-        .radar-img { width: 100%; height: auto; display: block; }
+        .info-column .slot { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+        .img-container { flex: 1; position: relative; overflow: hidden; background: #000; }
+        .info-column img { 
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Gebruik 'cover' als je de box volledig wilt vullen zonder zwarte randen */
+            background: #000;
+        }
 
         #p2k-notification-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .p2k-toast { background: rgba(0, 40, 60, 0.95); border-left: 4px solid #00d4ff; color: white; padding: 12px; border-radius: 4px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); animation: slideIn 0.5s ease-out; pointer-events: auto; cursor: pointer; border: 1px solid #333; }
@@ -167,9 +175,18 @@
             </div>
         </div>
         <div class="info-column">
-            <div class="slot knmi-card"><span class="label">Noordzee</span><img id="knmi-1" class="knmi-img"></div>
-            <div class="slot knmi-card"><span class="label">Kust- en ruime binnenwateren</span><img id="knmi-2" class="knmi-img"></div>
-            <div class="slot radar-card"><span class="label">Radar</span><img id="radar-img" class="radar-img"></div>
+            <div class="slot">
+                <span class="label">Noordzee</span>
+                <div class="img-container"><img id="knmi-1"></div>
+            </div>
+            <div class="slot">
+                <span class="label">Kust- en binnenwateren</span>
+                <div class="img-container"><img id="knmi-2"></div>
+            </div>
+            <div class="slot">
+                <span class="label">Radar</span>
+                <div class="img-container"><img id="radar-img"></div>
+            </div>
         </div>
     </div>
 </div>
