@@ -6,13 +6,22 @@
     <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/kwcdata/Kustwacht_data/refs/heads/main/kustwacht-logo.svg">
     
     <style>
-        body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        /* Kleurenpalet op basis van afbeelding */
+        :root {
+            --brand-color: #4df2ff; /* De cyan kleur uit de knop */
+            --bg-dark: #1e252b;    /* De donkere achtergrond van de balk */
+            --bg-black: #0d1117;   /* Diepere achtergrond voor contrast */
+            --text-main: #ffffff;
+            --border-color: #30363d;
+        }
+
+        body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; background: var(--bg-black); color: var(--text-main); font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         .main-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
         
         header { 
             padding: 5px 20px; 
-            background: #050505; 
-            border-bottom: 1px solid #222; 
+            background: var(--bg-dark); 
+            border-bottom: 1px solid var(--border-color); 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
@@ -21,21 +30,21 @@
         }
         .header-title-area { display: flex; align-items: center; gap: 12px; }
         .header-logo { height: 28px; width: auto; }
-        header h1 { margin: 0; font-size: 16px; color: #00d4ff; text-transform: uppercase; letter-spacing: 2px; }
+        header h1 { margin: 0; font-size: 16px; color: var(--brand-color); text-transform: uppercase; letter-spacing: 2px; }
         
         .header-info-area { display: flex; align-items: center; gap: 25px; }
         .clocks { display: flex; gap: 20px; font-family: 'Courier New', monospace; }
         .clock-item { text-align: right; }
-        .clock-label { font-size: 8px; color: #666; text-transform: uppercase; display: block; margin-bottom: -2px; }
-        .clock-time { font-size: 14px; color: #00d4ff; font-weight: bold; }
+        .clock-label { font-size: 8px; color: #8b949e; text-transform: uppercase; display: block; margin-bottom: -2px; }
+        .clock-time { font-size: 14px; color: var(--brand-color); font-weight: bold; }
         
-        .fetch-display { font-family: 'Courier New', monospace; text-align: right; border-left: 1px solid #222; padding-left: 20px; }
-        .fetch-label { font-size: 8px; color: #444; text-transform: uppercase; display: block; margin-bottom: -2px; }
-        .fetch-time { font-size: 12px; color: #555; font-weight: bold; }
+        .fetch-display { font-family: 'Courier New', monospace; text-align: right; border-left: 1px solid var(--border-color); padding-left: 20px; }
+        .fetch-label { font-size: 8px; color: #8b949e; text-transform: uppercase; display: block; margin-bottom: -2px; }
+        .fetch-time { font-size: 12px; color: #c9d1d9; font-weight: bold; }
 
         .nav-bar { 
-            background: #111; 
-            border-bottom: 1px solid #222; 
+            background: var(--bg-dark); 
+            border-bottom: 1px solid var(--border-color); 
             display: flex; 
             padding: 0 10px; 
             z-index: 1000; 
@@ -51,41 +60,41 @@
             cursor: pointer; 
             font-size: 10px; 
             font-weight: bold; 
-            color: #ccc; 
+            color: #c9d1d9; 
             text-transform: uppercase; 
             white-space: nowrap; 
         }
-        .nav-group:hover { background: #222; color: #00d4ff; }
+        .nav-group:hover { background: #30363d; color: var(--brand-color); }
         
-        .dropdown { display: none; position: absolute; top: 100%; left: 0; background: #1a1a1a; border: 1px solid #333; min-width: 220px; box-shadow: 0 8px 16px rgba(0,0,0,0.8); max-height: 75vh; overflow-y: auto; overflow-x: hidden; }
+        .dropdown { display: none; position: absolute; top: 100%; left: 0; background: #161b22; border: 1px solid var(--border-color); min-width: 220px; box-shadow: 0 8px 16px rgba(0,0,0,0.8); max-height: 75vh; overflow-y: auto; overflow-x: hidden; }
         .nav-group:hover .dropdown { display: block; }
         
         .dropdown a, .dropdown button { 
-            color: #ccc; padding: 8px 12px; text-decoration: none; display: block; font-size: 11px; border-bottom: 1px solid #222; width: 100%; text-align: left; background: none; border: none; cursor: pointer; font-family: inherit;
+            color: #c9d1d9; padding: 8px 12px; text-decoration: none; display: block; font-size: 11px; border-bottom: 1px solid var(--border-color); width: 100%; text-align: left; background: none; border: none; cursor: pointer; font-family: inherit;
         }
-        .dropdown a:hover, .dropdown button:hover { background: #00d4ff; color: #000; }
+        .dropdown a:hover, .dropdown button:hover { background: var(--brand-color); color: #000; }
 
         .nav-controls { display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding: 2px 0; }
-        .vloot-btn-group { border-left: 1px solid #333; color: #00d4ff; margin-left: 5px; }
-        button.reset-nav { padding: 2px 8px; background: #222; color: #bbb; border: 1px solid #444; cursor: pointer; font-size: 9px; font-weight: bold; text-transform: uppercase; }
-        button.reset-nav:hover { background: #333; color: #fff; }
+        .vloot-btn-group { border-left: 1px solid var(--border-color); color: var(--brand-color); margin-left: 5px; }
+        button.reset-nav { padding: 2px 8px; background: #21262d; color: #c9d1d9; border: 1px solid var(--border-color); cursor: pointer; font-size: 9px; font-weight: bold; text-transform: uppercase; border-radius: 3px; }
+        button.reset-nav:hover { background: #30363d; color: #fff; }
 
         .monitor-layout { display: grid; grid-template-columns: 1fr 360px; grid-gap: 8px; flex-grow: 1; padding: 8px; overflow: hidden; }
         .webcam-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; grid-gap: 10px; position: relative; }
         
         .cam-box { display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 0; }
-        .cam-box.full-slot { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 500; background: #000; padding: 8px; box-sizing: border-box; }
+        .cam-box.full-slot { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 500; background: var(--bg-black); padding: 8px; box-sizing: border-box; }
 
-        .slot { position: relative; background: #0a0a0a; border-radius: 4px; overflow: hidden; border: 1px solid #222; display: flex; flex-direction: column; }
+        .slot { position: relative; background: #0d1117; border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
         .webcam-grid .slot { flex-grow: 1; }
         .slot iframe { flex-grow: 1; width: 100%; border: none; background: #000; }
         
-        .label { background: rgba(0, 212, 255, 0.85); color: #000; padding: 2px 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; display: block; flex-shrink: 0; z-index: 10; }
+        .label { background: var(--brand-color); color: #000; padding: 2px 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; display: block; flex-shrink: 0; z-index: 10; }
         
         .cam-footer { display: flex; gap: 4px; align-items: center; height: 26px; flex-shrink: 0; }
-        .cam-selector { background: #111; color: #ccc; border: 1px solid #333; padding: 4px; font-size: 11px; outline: none; border-radius: 2px; flex-grow: 1; }
-        .expand-btn { background: #111; color: #00d4ff; border: 1px solid #333; padding: 0 8px; cursor: pointer; font-size: 14px; border-radius: 2px; height: 26px; display: flex; align-items: center; justify-content: center; }
-        .expand-btn:hover { background: #222; }
+        .cam-selector { background: #161b22; color: #c9d1d9; border: 1px solid var(--border-color); padding: 4px; font-size: 11px; outline: none; border-radius: 2px; flex-grow: 1; }
+        .expand-btn { background: #161b22; color: var(--brand-color); border: 1px solid var(--border-color); padding: 0 8px; cursor: pointer; font-size: 14px; border-radius: 2px; height: 26px; display: flex; align-items: center; justify-content: center; }
+        .expand-btn:hover { background: #30363d; }
 
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; overflow: hidden; }
         .info-column .slot { flex: 1; min-height: 0; display: flex; flex-direction: column; }
@@ -101,9 +110,9 @@
         }
 
         #p2k-notification-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .p2k-toast { background: rgba(0, 40, 60, 0.95); border-left: 4px solid #00d4ff; color: white; padding: 12px; border-radius: 4px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); animation: slideIn 0.5s ease-out; pointer-events: auto; cursor: pointer; border: 1px solid #333; }
+        .p2k-toast { background: rgba(22, 27, 34, 0.95); border-left: 4px solid var(--brand-color); color: white; padding: 12px; border-radius: 4px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); animation: slideIn 0.5s ease-out; pointer-events: auto; cursor: pointer; border: 1px solid var(--border-color); }
         .p2k-toast.urgency { border-left-color: #ff4444; background: rgba(60, 0, 0, 0.95); }
-        .p2k-toast-header { font-size: 10px; color: #00d4ff; font-weight: bold; margin-bottom: 5px; display: flex; justify-content: space-between; }
+        .p2k-toast-header { font-size: 10px; color: var(--brand-color); font-weight: bold; margin-bottom: 5px; display: flex; justify-content: space-between; }
         .p2k-toast-body { font-size: 12px; line-height: 1.4; }
         
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -331,7 +340,6 @@
     function updateClocks() {
         const nu = new Date();
         
-        // NL Tijd (altijd Europe/Amsterdam, 24-uurs)
         const nlTime = nu.toLocaleTimeString('nl-NL', { 
             timeZone: 'Europe/Amsterdam', 
             hour12: false, 
@@ -341,7 +349,6 @@
         });
         document.getElementById('local-clock').innerText = nlTime;
 
-        // Zulu Tijd (UTC, 24-uurs)
         const zuluTime = nu.toLocaleTimeString('nl-NL', { 
             timeZone: 'UTC', 
             hour12: false, 
