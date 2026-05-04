@@ -4,120 +4,56 @@
     <meta charset="UTF-8">
     <title>Kustwacht Dashboard</title>
     <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/kwcdata/Kustwacht_data/refs/heads/main/kustwacht-logo.svg">
-    
     <style>
-        :root {
-            --brand-color: #4df2ff;
-            --bg-dark: #1e252b;
-            --bg-black: #0d1117;
-            --text-main: #ffffff;
-            --border-color: #30363d;
-        }
-
+        :root { --brand-color: #4df2ff; --bg-dark: #1e252b; --bg-black: #0d1117; --text-main: #ffffff; --border-color: #30363d; }
         body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; background: var(--bg-black); color: var(--text-main); font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         .main-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
-        
-        header { 
-            padding: 0 20px; 
-            background: var(--bg-dark); 
-            border-bottom: 1px solid var(--border-color); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            height: 50px; 
-            flex-shrink: 0;
-        }
+        header { padding: 0 20px; background: var(--bg-dark); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; height: 50px; flex-shrink: 0; }
         .header-title-area { display: flex; align-items: center; gap: 12px; }
         .header-logo { height: 35px; width: auto; }
         header h1 { margin: 0; font-size: 16px; color: var(--brand-color); text-transform: uppercase; letter-spacing: 2px; }
-        
         .header-info-area { display: flex; align-items: center; gap: 30px; }
         .clocks { display: flex; gap: 30px; font-family: 'Courier New', monospace; align-items: center; }
         .clock-item { display: flex; align-items: baseline; gap: 10px; }
         .clock-label { font-size: 11px; color: #8b949e; text-transform: uppercase; font-weight: bold; }
         .clock-time { font-size: 32px; color: var(--brand-color); font-weight: bold; line-height: 1; }
-        
-        .fetch-display { 
-            font-family: 'Courier New', monospace; 
-            border-left: 1px solid var(--border-color); 
-            padding-left: 20px; 
-            display: flex; 
-            align-items: baseline; 
-            gap: 8px;
-        }
+        .fetch-display { font-family: 'Courier New', monospace; border-left: 1px solid var(--border-color); padding-left: 20px; display: flex; align-items: baseline; gap: 8px; }
         .fetch-label { font-size: 9px; color: #8b949e; text-transform: uppercase; font-weight: bold; }
         .fetch-time { font-size: 20px; color: #c9d1d9; font-weight: bold; line-height: 1; }
-
-        .nav-bar { 
-            background: var(--bg-dark); 
-            border-bottom: 1px solid var(--border-color); 
-            display: flex; 
-            padding: 0 10px; 
-            z-index: 1000; 
-            align-items: center;
-            justify-content: space-between;
-            flex-shrink: 0;
-            min-height: 28px;
-        }
+        .nav-bar { background: var(--bg-dark); border-bottom: 1px solid var(--border-color); display: flex; padding: 0 10px; z-index: 1000; align-items: center; justify-content: space-between; flex-shrink: 0; min-height: 28px; }
         .nav-links-wrapper { display: flex; flex-wrap: wrap; align-items: center; flex-grow: 1; }
-        .nav-group { 
-            position: relative; 
-            padding: 5px 10px; 
-            cursor: pointer; 
-            font-size: 10px; 
-            font-weight: bold; 
-            color: #c9d1d9; 
-            text-transform: uppercase; 
-            white-space: nowrap; 
-        }
+        .nav-group { position: relative; padding: 5px 10px; cursor: pointer; font-size: 10px; font-weight: bold; color: #c9d1d9; text-transform: uppercase; white-space: nowrap; }
         .nav-group:hover { background: #30363d; color: var(--brand-color); }
-        
         .dropdown { display: none; position: absolute; top: 100%; left: 0; background: #161b22; border: 1px solid var(--border-color); min-width: 220px; box-shadow: 0 8px 16px rgba(0,0,0,0.8); max-height: 75vh; overflow-y: auto; overflow-x: hidden; }
         .nav-group:hover .dropdown { display: block; }
-        
-        .dropdown a, .dropdown button { 
-            color: #c9d1d9; padding: 8px 12px; text-decoration: none; display: block; font-size: 11px; border-bottom: 1px solid var(--border-color); width: 100%; text-align: left; background: none; border: none; cursor: pointer; font-family: inherit;
-        }
+        .dropdown a, .dropdown button { color: #c9d1d9; padding: 8px 12px; text-decoration: none; display: block; font-size: 11px; border-bottom: 1px solid var(--border-color); width: 100%; text-align: left; background: none; border: none; cursor: pointer; font-family: inherit; }
         .dropdown a:hover, .dropdown button:hover { background: var(--brand-color); color: #000; }
-
         .nav-controls { display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding: 2px 0; }
         .vloot-btn-group { border-left: 1px solid var(--border-color); color: var(--brand-color); margin-left: 5px; }
         button.reset-nav { padding: 2px 8px; background: #21262d; color: #c9d1d9; border: 1px solid var(--border-color); cursor: pointer; font-size: 9px; font-weight: bold; text-transform: uppercase; border-radius: 3px; }
         button.reset-nav:hover { background: #30363d; color: #fff; }
-
         .monitor-layout { display: grid; grid-template-columns: 1fr 360px; grid-gap: 8px; flex-grow: 1; padding: 8px; overflow: hidden; }
         .webcam-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; grid-gap: 10px; position: relative; }
-        
         .cam-box { display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 0; }
         .cam-box.full-slot { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 500; background: var(--bg-black); padding: 8px; box-sizing: border-box; }
-
         .slot { position: relative; background: #0d1117; border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
         .webcam-grid .slot { flex-grow: 1; }
         .slot iframe { flex-grow: 1; width: 100%; border: none; background: #000; }
-        
         .label { background: var(--brand-color); color: #000; padding: 2px 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; display: block; flex-shrink: 0; z-index: 10; }
-        
+        .news-container { flex: 1; overflow-y: auto; background: #0d1117; padding: 10px; }
+        .news-article { border-bottom: 1px solid var(--border-color); padding: 10px 0; }
+        .news-article a { color: var(--brand-color); text-decoration: none; font-size: 13px; font-weight: bold; display: block; margin-bottom: 3px; }
+        .news-article .date { color: #8b949e; font-size: 10px; text-transform: uppercase; }
         .cam-footer { display: flex; gap: 4px; align-items: center; height: 26px; flex-shrink: 0; }
         .cam-selector { background: #161b22; color: #c9d1d9; border: 1px solid var(--border-color); padding: 4px; font-size: 11px; outline: none; border-radius: 2px; flex-grow: 1; }
         .expand-btn { background: #161b22; color: var(--brand-color); border: 1px solid var(--border-color); padding: 0 8px; cursor: pointer; font-size: 14px; border-radius: 2px; height: 26px; display: flex; align-items: center; justify-content: center; }
-        .expand-btn:hover { background: #30363d; }
-
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; overflow: hidden; }
         .info-column .slot { flex: 1; min-height: 0; display: flex; flex-direction: column; }
         .img-container { flex: 1; position: relative; overflow: hidden; background: #000; }
-        .info-column img { 
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            background: #000;
-        }
+        .info-column img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
     </style>
 </head>
 <body>
-
 <div class="main-container">
     <header>
         <div class="header-title-area">
@@ -126,80 +62,45 @@
         </div>
         <div class="header-info-area">
             <div class="clocks">
-                <div class="clock-item">
-                    <span class="clock-label">Lokaal</span>
-                    <span id="local-clock" class="clock-time">00:00:00</span>
-                </div>
-                <div class="clock-item">
-                    <span class="clock-label">Zulu</span>
-                    <span id="zulu-clock" class="clock-time">00:00:00</span>
-                </div>
+                <div class="clock-item"><span class="clock-label">Lokaal</span><span id="local-clock" class="clock-time">00:00:00</span></div>
+                <div class="clock-item"><span class="clock-label">Zulu</span><span id="zulu-clock" class="clock-time">00:00:00</span></div>
             </div>
-            <div class="fetch-display">
-                <span class="fetch-label">Update</span>
-                <span id="last-update" class="fetch-time">--:--:--</span>
-            </div>
+            <div class="fetch-display"><span class="fetch-label">Update</span><span id="last-update" class="fetch-time">--:--:--</span></div>
         </div>
     </header>
-
     <nav class="nav-bar">
         <div class="nav-links-wrapper" id="nav-bar-links"></div>
         <div class="nav-controls">
-            <div class="nav-group vloot-btn-group">VLOOT TRACKING ▾
-                <div class="dropdown" id="fleet-dropdown"></div>
-            </div>
+            <div class="nav-group vloot-btn-group">VLOOT TRACKING ▾<div class="dropdown" id="fleet-dropdown"></div></div>
             <button class="reset-nav" onclick="hardReset()">Herstel Standaard</button>
         </div>
     </nav>
-
     <div class="monitor-layout">
         <div class="webcam-grid">
             <div class="cam-box" id="box-1">
-                <div class="slot"><span class="label" id="lbl-1">L-Boven</span><div id="cont-1" style="height:100%; display:flex; flex-direction:column;"></div></div>
-                <div class="cam-footer">
-                    <select class="cam-selector" id="sel-1" onchange="changeCam(1)"></select>
-                    <button class="expand-btn" onclick="toggleFullscreen(1)">⛶</button>
-                </div>
+                <div class="slot"><span class="label" id="lbl-1">Slot 1</span><div id="cont-1" style="height:100%;"></div></div>
+                <div class="cam-footer"><select class="cam-selector" id="sel-1" onchange="changeCam(1)"></select><button class="expand-btn" onclick="toggleFullscreen(1)">⛶</button></div>
             </div>
             <div class="cam-box" id="box-2">
-                <div class="slot"><span class="label" id="lbl-2">R-Boven</span><div id="cont-2" style="height:100%; display:flex; flex-direction:column;"></div></div>
-                <div class="cam-footer">
-                    <select class="cam-selector" id="sel-2" onchange="changeCam(2)"></select>
-                    <button class="expand-btn" onclick="toggleFullscreen(2)">⛶</button>
-                </div>
+                <div class="slot"><span class="label" id="lbl-2">Slot 2</span><div id="cont-2" style="height:100%;"></div></div>
+                <div class="cam-footer"><select class="cam-selector" id="sel-2" onchange="changeCam(2)"></select><button class="expand-btn" onclick="toggleFullscreen(2)">⛶</button></div>
             </div>
             <div class="cam-box" id="box-3">
-                <div class="slot"><span class="label" id="lbl-3">L-Onder</span><div id="cont-3" style="height:100%; display:flex; flex-direction:column;"></div></div>
-                <div class="cam-footer">
-                    <select class="cam-selector" id="sel-3" onchange="changeCam(3)"></select>
-                    <button class="expand-btn" onclick="toggleFullscreen(3)">⛶</button>
-                </div>
+                <div class="slot"><span class="label" id="lbl-3">Slot 3</span><div id="cont-3" style="height:100%;"></div></div>
+                <div class="cam-footer"><select class="cam-selector" id="sel-3" onchange="changeCam(3)"></select><button class="expand-btn" onclick="toggleFullscreen(3)">⛶</button></div>
             </div>
             <div class="cam-box" id="box-4">
-                <div class="slot"><span class="label" id="lbl-4">R-Onder</span><div id="cont-4" style="height:100%; display:flex; flex-direction:column;"></div></div>
-                <div class="cam-footer">
-                    <select class="cam-selector" id="sel-4" onchange="changeCam(4)"></select>
-                    <button class="expand-btn" onclick="toggleFullscreen(4)">⛶</button>
-                </div>
+                <div class="slot"><span class="label" id="lbl-4">Slot 4</span><div id="cont-4" style="height:100%;"></div></div>
+                <div class="cam-footer"><select class="cam-selector" id="sel-4" onchange="changeCam(4)"></select><button class="expand-btn" onclick="toggleFullscreen(4)">⛶</button></div>
             </div>
         </div>
         <div class="info-column">
-            <div class="slot">
-                <span class="label">Noordzee</span>
-                <div class="img-container"><img id="knmi-1"></div>
-            </div>
-            <div class="slot">
-                <span class="label">Kust- en binnenwateren</span>
-                <div class="img-container"><img id="knmi-2"></div>
-            </div>
-            <div class="slot">
-                <span class="label">Radar</span>
-                <div class="img-container"><img id="radar-img"></div>
-            </div>
+            <div class="slot"><span class="label">Noordzee</span><div class="img-container"><img id="knmi-1"></div></div>
+            <div class="slot"><span class="label">Kust- en binnenwateren</span><div class="img-container"><img id="knmi-2"></div></div>
+            <div class="slot"><span class="label">Radar</span><div class="img-container"><img id="radar-img"></div></div>
         </div>
     </div>
 </div>
-
 <script>
     const aircraft = [
         { reg: "PH-SAR", icao: "486449" }, { reg: "PH-RSQ", icao: "48644A" },
@@ -211,14 +112,14 @@
             { name: "Amver (surpic)", url: "http://www.amver.com/Forms/SurpicRequest" },
             { name: "LCMS", url: "https://mijn.lcms.nl/gebruikersbeheer/#/login" },
             { name: "ISAR Bristow", url: "https://isar.im/" },
-            { name: "CECIS Marine Pollution Log In", url: "https://webgate.ec.europa.eu/CECIS/login.jsp" },
+            { name: "CECIS", url: "https://webgate.ec.europa.eu/CECIS/login.jsp" },
             { name: "P2kflex", url: "https://expert.p2kflex.nl/index.php?regio=403%3B404%3B&audio=&volume=75&include=knrm%3Bkustwacht%3Bredding%3Bwater%3Bgrip" },
-            { name: "Winnies.livep2000.nl", url: "https://winnies.livep2000.nl/" },
+            { name: "Winnies P2000", url: "https://winnies.livep2000.nl/" },
             { name: "P2000.page", url: "https://p2000.page/" },
             { name: "112MELDINGEN.NL", url: "http://112meldingen.nl/index.php" },
             { name: "CAPCode database", url: "http://www.capcode.nl/capsite/index.php" },
-            { name: "Global SAR Hub (Sea-SAR)", url: "https://www.globalsarhub.com/sea-sar.html" },
-            { name: "International Cospas-Sarsat", url: "https://cospas-sarsat.int/en/" },
+            { name: "Global SAR Hub", url: "https://www.globalsarhub.com/sea-sar.html" },
+            { name: "Cospas-Sarsat", url: "https://cospas-sarsat.int/en/" },
             { name: "LADR", url: "https://ladr.eurocontrol.int/ops/frontend" }
         ]},
         { title: "KNRM/KNBRD", links: [
@@ -227,25 +128,21 @@
             { name: "Radio Medische Dienst", url: "https://rmd.businessfundamentals.nl/auth/signin?ReturnUrl=%2fdossiers" },
             { name: "Pre-Com", url: "https://www.pre-com.nl/PreCom/Account/Login" },
             { name: "GIS KNRM", url: "https://www.arcgis.com/apps/mapviewer/index.html?webmap=04162a3c264d462e96e4ec508519ce95" },
-            { name: "Portal.lifeguardtracking.nl", url: "https://portal.lifeguardtracking.nl/" }
+            { name: "Portal Lifeguard", url: "https://portal.lifeguardtracking.nl/" }
         ]},
         { title: "Overheid", links: [
             { name: "RWsOS Viewer", url: "https://rwsos.rws.nl/viewer/map/noordzee/waterkwantiteit" },
-            { name: "Waterberichtgeving KWC", url: "https://waterberichtgeving.rws.nl/owb/home" },
+            { name: "Waterberichtgeving", url: "https://waterberichtgeving.rws.nl/owb/home" },
             { name: "KNMI extranet", url: "https://mijn.knmi.nl" },
             { name: "Waddendata.nl", url: "https://waddendata.nl/" },
-            { name: "Rijkswaterstaat Waterinfo", url: "https://waterinfo.rws.nl/#!/kaart/waterhoogte-t-o-v-nap/" },
+            { name: "RWS Waterinfo", url: "https://waterinfo.rws.nl/#!/kaart/waterhoogte-t-o-v-nap/" },
             { name: "GeoWeb (betonning)", url: "https://maps.rijkswaterstaat.nl/geoweb55/index.html?viewer=NMA" },
-            { name: "Noordzeeloket", url: "https://www.noordzeeloket.nl/" },
-            { name: "Onderwaterobjecten RWS", url: "https://onderwaterobjecten.rws.nl/" },
-            { name: "Weerdata Kustwacht", url: "https://weerdatakustwacht.wordpress.com/" }
+            { name: "Noordzeeloket", url: "https://www.noordzeeloket.nl/" }
         ]},
         { title: "Scheepvaart", links: [
             { name: "EMSA Portal", url: "https://portal.emsa.europa.eu/home" },
             { name: "ERICards", url: "http://www.ericards.net/" },
-            { name: "Rainwat", url: "http://www.rainwat.bipt.be/" },
             { name: "Lloyds Seasearcher", url: "https://www.seasearcher.com/" },
-            { name: "Sign In | NATO ISMERLO", url: "https://ismerlo.org/accounts/login/" },
             { name: "Nautical calculator", url: "https://www.madinstro.net/" },
             { name: "Navtex", url: "http://navtex.lv/" },
             { name: "Kabels Noordzee", url: "https://kis-orca.org/map/" }
@@ -253,58 +150,24 @@
         { title: "Scheepvaart DB", links: [
             { name: "Sketchy.boats", url: "https://sketchy.boats/" },
             { name: "406 MHz Registration", url: "https://www.406registration.com" },
-            { name: "RescueNET", url: "https://msds.portal.inmarsat.com/msds/" },
-            { name: "Beacon Decode", url: "https://cospas-sarsat.int/en/beacons-pro/beacon-message-decode-program-txsep/beacon-message-decode-program" },
             { name: "Ship Station List (ITU)", url: "https://www.itu.int/mmsapp/ShipStation/list" },
-            { name: "MMSI MID Codes", url: "https://www.vtexplorer.com/mmsi-mid-codes-en/" },
-            { name: "NOGEPA RAS", url: "http://ras.nogepa.nl/login.php" }
+            { name: "MMSI MID Codes", url: "https://www.vtexplorer.com/mmsi-mid-codes-en/" }
         ]},
         { title: "AIS", links: [
             { name: "VIIA", url: "https://viia-p.kustwacht.nl/" },
             { name: "Waterkaart.net", url: "https://waterkaart.net/" },
             { name: "AMS (AIS RWS)", url: "https://ais-ams.rws.rijksweb.nl/ams/" },
-            { name: "Maritime Control", url: "https://bfa.kustwacht.nl/" },
-            { name: "Madesmart", url: "https://tracker.madesmart.nl/" }
-        ]},
-        { title: "Plannen", links: [
-            { name: "IBP Noordzee", url: "https://noordzeeloket.nl/functies-gebruik/artikel-baseline-0/" },
-            { name: "IBP SAMIJ", url: "https://ibpsamij.calamiteiten.online/templates/" },
-            { name: "Handboek incident", url: "https://nipv.nl/wp-content/uploads/2025/12/20251203-NIPV-Handboek-incidentbestrijding-op-het-water.pdf" }
+            { name: "Maritime Control", url: "https://bfa.kustwacht.nl/" }
         ]},
         { title: "Luchtvaart", links: [
             { name: "LVNL AIS", url: "https://www.lvnl.nl/informatie-voor-luchtvarenden/publicaties-voor-luchtvarenden" },
             { name: "SkyVector", url: "https://skyvector.com/" },
-            { name: "Aireon Alert", url: "https://aireonalert.iaa.ie/alert-login" },
-            { name: "METAR-TAF.com", url: "https://metar-taf.com/" },
-            { name: "E6BX Calculator", url: "https://e6bx.com/" },
-            { name: "Aviation Glossary", url: "https://www.pilotscafe.com/glossary/" },
-            { name: "EHAMCDM Mobile", url: "https://mobile.ehamcdm.nl/" }
-        ]},
-        { title: "Luchtvaart DB", links: [
-            { name: "406 MHz Registration", url: "https://www.406registration.com/" },
-            { name: "Beacon Decode", url: "https://cospas-sarsat.int/en/beacons-pro/beacon-message-decode-program-txsep/beacon-message-decode-program" },
-            { name: "Ballonregister", url: "https://www.ballonregister.nl/" },
-            { name: "Airframes", url: "https://www.airframes.org/" },
-            { name: "Airline Codes", url: "https://airlinecodes.info/" }
-        ]},
-        { title: "Tracking", links: [
-            { name: "FlightAware", url: "https://www.flightaware.com/" },
-            { name: "Casper Tracking", url: "https://kustwacht-flighttracking.casper.aero/index.php" },
-            { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" },
-            { name: "Flightradar24", url: "https://www.flightradar24.com/" }
-        ]},
-        { title: "Taal/Rekenen", links: [
-            { name: "Spelling.nu", url: "https://www.spelling.nu/" },
-            { name: "Vertalen.nu", url: "http://www.vertalen.nu/vervoegen/" },
-            { name: "NATO Translator", url: "https://cryptii.com/pipes/nato-phonetic-alphabet" },
-            { name: "Web 2.0 Calc", url: "https://web2.0calc.com/" }
+            { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" }
         ]},
         { title: "Navigatie", links: [
             { name: "GPS Converter", url: "http://www.gpscoordinaten.nl/converteer-gps-coordinaten.php" },
-            { name: "Hectometerpaal", url: "http://www.hmpaal.nl/" },
             { name: "Time Zone Map", url: "https://www.timeanddate.com/time/map/" },
-            { name: "Apple Maps Beta", url: "https://beta.maps.apple.com/" },
-            { name: "Remove Paywalls", url: "https://removepaywalls.com/" }
+            { name: "Apple Maps Beta", url: "https://beta.maps.apple.com/" }
         ]},
         { title: "Beheer", links: [
             { name: "GitHub Edit", url: "https://github.com/kwcdata/Kustwacht_data/edit/main/index.html" }
@@ -315,7 +178,8 @@
         systems: [
             {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000 (Kustwacht)', type: 'web'},
             {id: 'https://m.p2kflex.nl/index.php?regio=none%3B&audio=&volume=75&include=&exclude=&capcode=&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000 (Basis)', type: 'web'},
-            {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange', type: 'web'}
+            {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange', type: 'web'},
+            {id: 'news_file', name: 'LIVE NIEUWSFEED', type: 'rss'}
         ],
         webcams: [
             {id: 'KjK02QIm4ZI', name: 'Brouwersdam', type: 'yt'},
@@ -334,15 +198,29 @@
         ]
     };
 
-    const defaults = { 1: sourceData.systems[0].id, 2: sourceData.systems[2].id, 3: 'A5kXiKzbBFs', 4: 'q0-DDh1zdY4' };
+    const defaults = { 1: sourceData.systems[0].id, 2: sourceData.systems[2].id, 3: 'A5kXiKzbBFs', 4: 'news_file' };
     let activeStreams = { 1: null, 2: null, 3: null, 4: null };
 
     function updateClocks() {
         const nu = new Date();
         const opts = { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        
         document.getElementById('local-clock').innerText = nu.toLocaleTimeString('nl-NL', { ...opts, timeZone: 'Europe/Amsterdam' });
         document.getElementById('zulu-clock').innerText = nu.toLocaleTimeString('nl-NL', { ...opts, timeZone: 'UTC' });
+    }
+
+    async function fetchRSS(pos) {
+        const container = document.getElementById('cont-' + pos);
+        container.innerHTML = '<div style="padding:20px; color:#8b949e;">Nieuws laden uit GitHub...</div>';
+        try {
+            const response = await fetch('news.json?t=' + new Date().getTime());
+            const items = await response.json();
+            let html = '<div class="news-container">';
+            items.forEach(item => {
+                html += `<div class="news-article"><a href="${item.link}" target="_blank">${item.title}</a><span class="date">${item.pubDate}</span></div>`;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        } catch (e) { container.innerHTML = '<div style="padding:20px; color:#ff4444;">Nieuws-bestand (news.json) nog niet beschikbaar.</div>'; }
     }
 
     function initFleetMenu() {
@@ -352,66 +230,45 @@
 
     function initNavBar() {
         const nav = document.getElementById('nav-bar-links');
-        nav.innerHTML = bookmarkGroups.map(g => `
-            <div class="nav-group">${g.title} ▾
-                <div class="dropdown">${g.links.map(l => `<a href="${l.url}" target="_blank">${l.name}</a>`).join('')}</div>
-            </div>
-        `).join('');
+        nav.innerHTML = bookmarkGroups.map(g => `<div class="nav-group">${g.title} ▾<div class="dropdown">${g.links.map(l => `<a href="${l.url}" target="_blank">${l.name}</a>`).join('')}</div></div>`).join('');
     }
 
     function trackPlane(icao, reg) {
-        const url = `https://globe.adsbexchange.com/?icao=${icao}&zoom=11`;
-        setCamera(2, url, `Tracking: ${reg}`, 'web');
-        document.getElementById('sel-2').value = sourceData.systems[2].id; 
+        setCamera(2, `https://globe.adsbexchange.com/?icao=${icao}&zoom=11`, `Tracking: ${reg}`, 'web');
+        document.getElementById('sel-2').value = sourceData.systems[2].id;
     }
 
     function setupSelectors() {
         for (let i = 1; i <= 4; i++) {
             const sel = document.getElementById('sel-' + i);
-            sel.innerHTML = ''; 
-            const defaultId = defaults[i];
-
+            sel.innerHTML = '';
             const g1 = document.createElement('optgroup'); g1.label = "SYSTEMEN";
-            sourceData.systems.forEach(s => { 
-                const opt = new Option((s.id === defaultId ? "★ " : "") + s.name, s.id);
-                g1.appendChild(opt); 
-            });
-
+            sourceData.systems.forEach(s => g1.appendChild(new Option(s.name, s.id)));
             const g2 = document.createElement('optgroup'); g2.label = "WEBCAMS";
-            sourceData.webcams.forEach(w => { 
-                const opt = new Option((w.id === defaultId ? "★ " : "") + w.name, w.id);
-                g2.appendChild(opt); 
-            });
-
-            sel.appendChild(g1);
-            sel.appendChild(g2);
-            sel.value = defaultId;
+            sourceData.webcams.forEach(w => g2.appendChild(new Option(w.name, w.id)));
+            sel.appendChild(g1); sel.appendChild(g2);
+            sel.value = defaults[i];
         }
     }
 
     function setCamera(pos, id, name, type) {
         const container = document.getElementById('cont-' + pos);
-        activeStreams[pos] = { id, name, type };
-        const ts = new Date().getTime();
-        const url = type === 'web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0&t=${ts}`;
-        container.innerHTML = `<iframe id="frame-${pos}" src="${url}" allow="autoplay; allowfullscreen"></iframe>`;
-        document.getElementById('lbl-' + pos).innerText = name.replace("★ ", "");
+        activeStreams[pos] = { id, type };
+        if (type === 'rss') { fetchRSS(pos); } 
+        else {
+            const url = type === 'web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0`;
+            container.innerHTML = `<iframe id="frame-${pos}" src="${url}" allow="autoplay; allowfullscreen" style="width:100%; height:100%; border:none;"></iframe>`;
+        }
+        document.getElementById('lbl-' + pos).innerText = name;
     }
 
     function changeCam(pos) {
         const sel = document.getElementById('sel-' + pos);
-        const id = sel.value;
-        const name = sel.options[sel.selectedIndex].text;
-        const type = sourceData.systems.find(s => s.id === id) ? 'web' : 'yt';
-        setCamera(pos, id, name, type);
+        const item = [...sourceData.systems, ...sourceData.webcams].find(x => x.id === sel.value);
+        setCamera(pos, sel.value, item.name, item.type);
     }
 
-    function toggleFullscreen(pos) {
-        const box = document.getElementById('box-' + pos);
-        const isFull = box.classList.contains('full-slot');
-        document.querySelectorAll('.cam-box').forEach(b => b.classList.remove('full-slot'));
-        if (!isFull) box.classList.add('full-slot');
-    }
+    function toggleFullscreen(pos) { document.getElementById('box-' + pos).classList.toggle('full-slot'); }
 
     function verversData() {
         const t = new Date().getTime();
@@ -419,6 +276,7 @@
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&random=" + t;
         document.getElementById('last-update').innerText = new Date().toLocaleTimeString('nl-NL', { hour12: false });
+        for(let p in activeStreams) { if(activeStreams[p].type === 'rss') fetchRSS(p); }
     }
 
     function hardReset() {
@@ -426,7 +284,7 @@
         for(let p in defaults) {
             const id = defaults[p];
             const item = [...sourceData.systems, ...sourceData.webcams].find(x => x.id === id);
-            setCamera(p, id, item.name, sourceData.systems.find(s => s.id === id) ? 'web' : 'yt');
+            setCamera(p, id, item.name, item.type);
             document.getElementById('sel-'+p).value = id;
         }
         verversData();
@@ -434,8 +292,7 @@
 
     document.addEventListener('DOMContentLoaded', () => { 
         setupSelectors(); initFleetMenu(); initNavBar(); hardReset(); updateClocks();
-        setInterval(updateClocks, 1000); 
-        setInterval(verversData, 300000); 
+        setInterval(updateClocks, 1000); setInterval(verversData, 60000); // Ververs elke 60 seconden
     });
 </script>
 </body>
