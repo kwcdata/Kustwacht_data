@@ -162,7 +162,19 @@
         { title: "Luchtvaart", links: [
             { name: "LVNL AIS", url: "https://www.lvnl.nl/informatie-voor-luchtvarenden/publicaties-voor-luchtvarenden" },
             { name: "SkyVector", url: "https://skyvector.com/" },
-            { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" }
+            { name: "Aireon Alert", url: "https://aireonalert.iaa.ie/alert-login" },
+            { name: "METAR-TAF.com", url: "https://metar-taf.com/" }
+        ]},
+        { title: "Tracking", links: [
+            { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" },
+            { name: "Flightradar24", url: "https://www.flightradar24.com/" },
+            { name: "FlightAware", url: "https://www.flightaware.com/" },
+            { name: "Casper Tracking", url: "https://kustwacht-flighttracking.casper.aero/index.php" }
+        ]},
+        { title: "Taal/Rekenen", links: [
+            { name: "Spelling.nu", url: "https://www.spelling.nu/" },
+            { name: "Vertalen.nu", url: "http://www.vertalen.nu/vervoegen/" },
+            { name: "Web 2.0 Calc", url: "https://web2.0calc.com/" }
         ]},
         { title: "Navigatie", links: [
             { name: "GPS Converter", url: "http://www.gpscoordinaten.nl/converteer-gps-coordinaten.php" },
@@ -198,7 +210,7 @@
         ]
     };
 
-    const defaults = { 1: sourceData.systems[0].id, 2: sourceData.systems[2].id, 3: 'A5kXiKzbBFs', 4: 'news_file' };
+    const defaults = { 1: sourceData.systems[0].id, 2: 'news_file', 3: sourceData.systems[2].id, 4: 'A5kXiKzbBFs' };
     let activeStreams = { 1: null, 2: null, 3: null, 4: null };
 
     function updateClocks() {
@@ -234,20 +246,30 @@
     }
 
     function trackPlane(icao, reg) {
-        setCamera(2, `https://globe.adsbexchange.com/?icao=${icao}&zoom=11`, `Tracking: ${reg}`, 'web');
-        document.getElementById('sel-2').value = sourceData.systems[2].id;
+        setCamera(3, `https://globe.adsbexchange.com/?icao=${icao}&zoom=11`, `Tracking: ${reg}`, 'web');
+        document.getElementById('sel-3').value = sourceData.systems[2].id;
     }
 
     function setupSelectors() {
         for (let i = 1; i <= 4; i++) {
             const sel = document.getElementById('sel-' + i);
             sel.innerHTML = '';
+            const defaultId = defaults[i];
+
             const g1 = document.createElement('optgroup'); g1.label = "SYSTEMEN";
-            sourceData.systems.forEach(s => g1.appendChild(new Option(s.name, s.id)));
+            sourceData.systems.forEach(s => {
+                const opt = new Option((s.id === defaultId ? "★ " : "") + s.name, s.id);
+                g1.appendChild(opt);
+            });
+
             const g2 = document.createElement('optgroup'); g2.label = "WEBCAMS";
-            sourceData.webcams.forEach(w => g2.appendChild(new Option(w.name, w.id)));
+            sourceData.webcams.forEach(w => {
+                const opt = new Option((w.id === defaultId ? "★ " : "") + w.name, w.id);
+                g2.appendChild(opt);
+            });
+
             sel.appendChild(g1); sel.appendChild(g2);
-            sel.value = defaults[i];
+            sel.value = defaultId;
         }
     }
 
@@ -259,7 +281,7 @@
             const url = type === 'web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0`;
             container.innerHTML = `<iframe id="frame-${pos}" src="${url}" allow="autoplay; allowfullscreen" style="width:100%; height:100%; border:none;"></iframe>`;
         }
-        document.getElementById('lbl-' + pos).innerText = name;
+        document.getElementById('lbl-' + pos).innerText = name.replace("★ ", "");
     }
 
     function changeCam(pos) {
@@ -292,7 +314,7 @@
 
     document.addEventListener('DOMContentLoaded', () => { 
         setupSelectors(); initFleetMenu(); initNavBar(); hardReset(); updateClocks();
-        setInterval(updateClocks, 1000); setInterval(verversData, 60000); // Ververs elke 60 seconden
+        setInterval(updateClocks, 1000); setInterval(verversData, 60000); 
     });
 </script>
 </body>
