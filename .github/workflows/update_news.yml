@@ -1,0 +1,34 @@
+name: Update News
+on:
+  schedule:
+    - cron: '* * * * *' # Elke minuut
+  workflow_dispatch: 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Fetch RSS and convert to JSON
+        run: |
+          curl -s https://rss.nos.nl/nosnieuwsalgemeen | grep -oP '(?<=<item>).*?(?=</item>)' | sed 's/&lt;/</g; s/&gt;/>/g' | python3 -c "
+          import sys, re, json
+          items = []
+          for entry in sys.stdin:
+              try:
+                  title = re.search(r'<title>(.*?)</title>', entry).group(1)
+                  link = re.search(r'<link>(.*?)</link>', entry).group(1)
+                  pubDate = re.search(r'<pubDate>(.*?)</pubDate>', entry).group(1)
+                  items.append({'title': title, 'link': link, 'pubDate': pubDate})
+              except:
+                  continue
+          print(json.dumps(items[:25]))
+          " > news.json
+      - name: Commit and push
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add news.json
+          git commit -m "Update news.json" || exit 0
+          git push
