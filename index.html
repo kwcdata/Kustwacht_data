@@ -93,7 +93,6 @@
         .webcam-grid .slot { flex-grow: 1; }
         .slot iframe { flex-grow: 1; width: 100%; border: none; }
         
-        /* Grotere tekst in blauwe balkjes */
         .label { background: var(--brand-color); color: #000; padding: 2px 8px; font-size: 11px; font-weight: 900; text-transform: uppercase; display: block; flex-shrink: 0; z-index: 10; letter-spacing: 0.5px; }
         
         .cam-footer { display: flex; gap: 2px; align-items: center; height: 22px; flex-shrink: 0; }
@@ -290,7 +289,7 @@
         systems: [
             {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: '★ P2000 (Kustwacht)', type: 'web'},
             {id: 'https://nos.nl/teletekst/101', name: '★ Teletekst 101', type: 'web'},
-            {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: '★ ADS-B Exchange', type: 'web'},
+            {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange', type: 'web'},
             {id: 'https://m.p2kflex.nl/index.php?regio=none%3B&audio=&volume=75&include=&exclude=&capcode=&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000 (Basis)', type: 'web'}
         ],
         webcams: [
@@ -310,9 +309,8 @@
         ]
     };
 
-    // Standaard posities: Pos 2 nu NOS Teletekst
+    // Standaard indeling: LB: P2000, RB: Teletekst, LO: Scheveningen, RO: Zandvoort
     const defaults = { 1: sourceData.systems[0].id, 2: sourceData.systems[1].id, 3: 'A5kXiKzbBFs', 4: 'q0-DDh1zdY4' };
-    let activeStreams = { 1: null, 2: null, 3: null, 4: null };
 
     function updateClocks() {
         const nu = new Date();
