@@ -1,72 +1,33 @@
-name: Update News
+name: Update NOS News
+
 on:
   schedule:
+    # Dit voert het script elke 5 minuten uit
     - cron: '*/5 * * * *'
-  workflow_dispatch: 
-
-permissions:
-  contents: write
+  workflow_dispatch: # Hiermee kun je het handmatig starten in het 'Actions' tabblad
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Fetch and Process RSS
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install feedparser
+
+      - name: Fetch news
+        run: python fetch_news.py
+
+      - name: Commit and Push changes
         run: |
-          python3 -c "
-          import urllib.request
-          import xml.etree.ElementTree as ET
-          import json
-          import os
-
-          # Gebruik de nieuwe NOS Feed URL
-          url = 'https://feeds.nos.nl/nosnieuwsalgemeen'
-          headers = {'User-Agent': 'Mozilla/5.0'}
-
-          try:
-              req = urllib.request.Request(url, headers=headers)
-              with urllib.request.urlopen(req, timeout=20) as response:
-                  xml_data = response.read()
-              
-              root = ET.fromstring(xml_data)
-              items = []
-              
-              # De nieuwe feed-structuur van de NOS parsen
-              for item in root.findall('.//item'):
-                  title = item.find('title').text if item.find('title') is not None else 'Geen titel'
-                  link = item.find('link').text if item.find('link') is not None else '#'
-                  pubDate = item.find('pubDate').text if item.find('pubDate') is not None else ''
-                  
-                  # HH:MM extractie
-                  time_part = ''
-                  if pubDate and len(pubDate.split(' ')) > 4:
-                      time_part = pubDate.split(' ')[4][:5]
-
-                  items.append({
-                      'title': title,
-                      'link': link,
-                      'pubDate': time_part if time_part else pubDate
-                  })
-              
-              with open('news.json', 'w', encoding='utf-8') as f:
-                  json.dump(items[:25], f, indent=2, ensure_ascii=False)
-              print(f'Succesvol {len(items)} items verwerkt van nieuwe feed.')
-
-          except Exception as e:
-              print(f'Fout: {e}')
-          "
-          
-      - name: Commit and push
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
           git add news.json
-          if git diff --staged --quiet; then
-            echo 'Geen wijzigingen'
-          else
-            git commit -m "Update news via nieuwe NOS feed"
-            git push
-          fi
+          # Alleen commiten als er echt iets veranderd is
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update news.json" && git push)
