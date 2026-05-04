@@ -21,31 +21,26 @@ jobs:
           import xml.etree.ElementTree as ET
           import json
           import os
-          import datetime
 
-          url = 'https://rss.nos.nl/nosnieuwsalgemeen'
-          headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+          # Gebruik de nieuwe NOS Feed URL
+          url = 'https://feeds.nos.nl/nosnieuwsalgemeen'
+          headers = {'User-Agent': 'Mozilla/5.0'}
 
           try:
-              print(f'Start download van {url}...')
               req = urllib.request.Request(url, headers=headers)
-              with urllib.request.urlopen(req, timeout=15) as response:
+              with urllib.request.urlopen(req, timeout=20) as response:
                   xml_data = response.read()
               
-              print('XML gedownload. Start parsing...')
               root = ET.fromstring(xml_data)
               items = []
               
-              # De NOS gebruikt soms namespaces of specifieke paden, we zoeken breed naar 'item'
+              # De nieuwe feed-structuur van de NOS parsen
               for item in root.findall('.//item'):
-                  title_el = item.find('title')
-                  link_el = item.find('link')
-                  pub_el = item.find('pubDate')
-
-                  title = title_el.text if title_el is not None else 'Geen titel'
-                  link = link_el.text if link_el is not None else '#'
-                  pubDate = pub_el.text if pub_el is not None else ''
+                  title = item.find('title').text if item.find('title') is not None else 'Geen titel'
+                  link = item.find('link').text if item.find('link') is not None else '#'
+                  pubDate = item.find('pubDate').text if item.find('pubDate') is not None else ''
                   
+                  # HH:MM extractie
                   time_part = ''
                   if pubDate and len(pubDate.split(' ')) > 4:
                       time_part = pubDate.split(' ')[4][:5]
@@ -56,31 +51,22 @@ jobs:
                       'pubDate': time_part if time_part else pubDate
                   })
               
-              if not items:
-                  print('WAARSCHUWING: Geen items gevonden in de XML!')
-                  items = [{'title': 'Geen nieuws gevonden in feed', 'link': '#', 'pubDate': ''}]
-
               with open('news.json', 'w', encoding='utf-8') as f:
                   json.dump(items[:25], f, indent=2, ensure_ascii=False)
-              
-              print(f'Succes: news.json geschreven met {len(items)} items.')
+              print(f'Succesvol {len(items)} items verwerkt van nieuwe feed.')
 
           except Exception as e:
-              print(f'CRITIEKE FOUT: {e}')
-              with open('news.json', 'w', encoding='utf-8') as f:
-                  json.dump([{'title': f'Fout bij ophalen: {str(e)}', 'link': '#', 'pubDate': ''}], f)
+              print(f'Fout: {e}')
           "
           
       - name: Commit and push
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          # Forceer add zodat we zeker weten dat het bestand meegaat
           git add news.json
-          # Alleen committen als er echt wijzigingen zijn
           if git diff --staged --quiet; then
-            print 'Geen wijzigingen in news.json'
+            echo 'Geen wijzigingen'
           else
-            git commit -m "Update news.json: $(date)"
-            git push origin main
+            git commit -m "Update news via nieuwe NOS feed"
+            git push
           fi
