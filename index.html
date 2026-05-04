@@ -91,8 +91,14 @@
 
         .slot { position: relative; background: #000; border-radius: 2px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
         .webcam-grid .slot { flex-grow: 1; }
-        .slot iframe { flex-grow: 1; width: 100%; border: none; height: 100%; background: #000; }
+        .slot iframe, .slot .tt-wrapper { flex-grow: 1; width: 100%; border: none; height: 100%; background: #000; }
         
+        /* Teletekst specifieke styling */
+        .tt-wrapper { cursor: pointer; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .tt-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .tt-overlay-hint { position: absolute; top: 10px; right: 10px; background: rgba(0, 242, 255, 0.7); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 2px; font-weight: bold; pointer-events: none; opacity: 0; transition: opacity 0.2s; }
+        .tt-wrapper:hover .tt-overlay-hint { opacity: 1; }
+
         .label { background: var(--brand-color); color: #000; padding: 2px 8px; font-size: 11px; font-weight: 900; text-transform: uppercase; display: block; flex-shrink: 0; z-index: 10; letter-spacing: 0.5px; }
         
         .cam-footer { display: flex; gap: 2px; align-items: center; height: 22px; flex-shrink: 0; }
@@ -288,7 +294,7 @@
     const sourceData = {
         systems: [
             {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000 (Kustwacht)', type: 'web'},
-            {id: 'https://nos.nl/teletekst/101', name: 'Teletekst 101', type: 'web'},
+            {id: 'https://nos.nl/teletekst/image/101', name: 'Teletekst 101', type: 'tt'},
             {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange', type: 'web'},
             {id: 'https://m.p2kflex.nl/index.php?regio=none%3B&audio=&volume=75&include=&exclude=&capcode=&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000 (Basis)', type: 'web'}
         ],
@@ -369,7 +375,13 @@
         const container = document.getElementById('cont-' + pos);
         const ts = new Date().getTime();
         
-        if(type === 'web') {
+        if(type === 'tt') {
+            container.innerHTML = `
+                <div class="tt-wrapper" onclick="window.open('https://nos.nl/teletekst/101', '_blank')">
+                    <img src="${id}?t=${ts}" class="tt-img" alt="NOS Teletekst">
+                    <div class="tt-overlay-hint">KLIK OM TE OPENEN</div>
+                </div>`;
+        } else if(type === 'web') {
             container.innerHTML = `<iframe src="${id}" allow="autoplay; allowfullscreen"></iframe>`;
         } else {
             container.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0&t=${ts}" allow="autoplay; allowfullscreen"></iframe>`;
@@ -382,7 +394,11 @@
         const sel = document.getElementById('sel-' + pos);
         const id = sel.value;
         const name = sel.options[sel.selectedIndex].text;
-        const type = sourceData.systems.find(s => s.id === id) ? 'web' : 'yt';
+        
+        let type = 'yt';
+        const sys = sourceData.systems.find(s => s.id === id);
+        if(sys) type = sys.type;
+
         setCamera(pos, id, name, type);
     }
 
@@ -398,6 +414,13 @@
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&random=" + t;
+        
+        // Ververs ook de teletekst afbeelding als die zichtbaar is
+        document.querySelectorAll('.tt-img').forEach(img => {
+            const base = img.src.split('?')[0];
+            img.src = base + "?t=" + new Date().getTime();
+        });
+
         document.getElementById('last-update').innerText = new Date().toLocaleTimeString('nl-NL', { hour12: false });
     }
 
@@ -406,7 +429,10 @@
         for(let p in defaults) {
             const id = defaults[p];
             const item = [...sourceData.systems, ...sourceData.webcams].find(x => x.id === id);
-            const type = sourceData.systems.find(s => s.id === id) ? 'web' : 'yt';
+            let type = 'yt';
+            const sys = sourceData.systems.find(s => s.id === id);
+            if(sys) type = sys.type;
+            
             setCamera(p, id, item.name, type);
             document.getElementById('sel-'+p).value = id;
         }
@@ -416,7 +442,7 @@
     document.addEventListener('DOMContentLoaded', () => { 
         setupSelectors(); initFleetMenu(); initNavBar(); hardReset(); updateClocks();
         setInterval(updateClocks, 1000); 
-        setInterval(verversData, 300000); 
+        setInterval(verversData, 300000); // 5 min interval
     });
 </script>
 </body>
