@@ -37,19 +37,22 @@
         button.reset-nav { padding: 2px 8px; background: #21262d; color: #c9d1d9; border: 1px solid var(--border-color); cursor: pointer; font-size: 9px; font-weight: bold; text-transform: uppercase; border-radius: 3px; }
 
         .monitor-layout { display: grid; grid-template-columns: 1fr 360px; grid-gap: 8px; flex-grow: 1; padding: 8px; overflow: hidden; }
-        .webcam-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; grid-gap: 10px; position: relative; height: 100%; }
+        .webcam-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; grid-gap: 8px; position: relative; }
         
-        .cam-box { display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 0; overflow: hidden; }
+        .cam-box { display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 0; }
         .cam-box.full-slot { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 500; background: var(--bg-black); padding: 8px; box-sizing: border-box; }
         .slot { position: relative; background: #0d1117; border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; height: 100%; }
         .slot iframe { flex-grow: 1; width: 100%; border: none; background: #000; }
         .label { background: var(--brand-color); color: #000; padding: 2px 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; display: block; flex-shrink: 0; z-index: 10; }
         
-        /* Nieuws Feed Fix: Scrollen binnen slot zonder de layout te breken */
-        .news-container { flex: 1; overflow-y: auto; background: #0d1117; padding: 10px; height: 0; }
-        .news-article { border-bottom: 1px solid var(--border-color); padding: 8px 0; }
-        .news-article a { color: var(--brand-color); text-decoration: none; font-size: 12px; font-weight: bold; display: block; margin-bottom: 2px; line-height: 1.2; }
-        .news-article .date { color: #8b949e; font-size: 10px; text-transform: uppercase; }
+        /* Compacte Nieuwsfeed */
+        .news-container { flex: 1; overflow-y: auto; background: #0d1117; padding: 5px 10px; height: 0; }
+        .news-article { border-bottom: 1px solid #1e252b; padding: 4px 0; display: flex; align-items: flex-start; gap: 8px; line-height: 1.2; }
+        .news-article:last-child { border-bottom: none; }
+        .news-article .date { color: #8b949e; font-size: 11px; font-family: 'Courier New', monospace; flex-shrink: 0; padding-top: 1px; }
+        .news-article .separator { color: var(--brand-color); font-weight: bold; flex-shrink: 0; }
+        .news-article a { color: var(--text-main); text-decoration: none; font-size: 12px; }
+        .news-article a:hover { color: var(--brand-color); text-decoration: underline; }
 
         .cam-footer { display: flex; gap: 4px; align-items: center; height: 26px; flex-shrink: 0; }
         .cam-selector { background: #161b22; color: #c9d1d9; border: 1px solid var(--border-color); padding: 4px; font-size: 11px; outline: none; border-radius: 2px; flex-grow: 1; }
@@ -250,13 +253,18 @@
 
     async function fetchRSS(pos) {
         const container = document.getElementById('cont-' + pos);
-        container.innerHTML = '<div style="padding:20px; color:#8b949e;">Nieuws laden uit GitHub...</div>';
+        container.innerHTML = '<div style="padding:20px; color:#8b949e;">Nieuws laden...</div>';
         try {
             const response = await fetch('news.json?t=' + new Date().getTime());
             const items = await response.json();
             let html = '<div class="news-container">';
             items.forEach(item => {
-                html += `<div class="news-article"><a href="${item.link}" target="_blank">${item.title}</a><span class="date">${item.pubDate}</span></div>`;
+                html += `
+                    <div class="news-article">
+                        <span class="date">${item.pubDate}</span>
+                        <span class="separator">»</span>
+                        <a href="${item.link}" target="_blank">${item.title}</a>
+                    </div>`;
             });
             html += '</div>';
             container.innerHTML = html;
