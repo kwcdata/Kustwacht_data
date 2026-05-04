@@ -37,18 +37,18 @@
         button.reset-nav { padding: 2px 8px; background: #21262d; color: #c9d1d9; border: 1px solid var(--border-color); cursor: pointer; font-size: 9px; font-weight: bold; text-transform: uppercase; border-radius: 3px; }
 
         .monitor-layout { display: grid; grid-template-columns: 1fr 360px; grid-gap: 8px; flex-grow: 1; padding: 8px; overflow: hidden; }
-        .webcam-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; grid-gap: 10px; position: relative; }
+        .webcam-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; grid-gap: 10px; position: relative; height: 100%; }
         
-        .cam-box { display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 0; }
+        .cam-box { display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 0; overflow: hidden; }
         .cam-box.full-slot { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 500; background: var(--bg-black); padding: 8px; box-sizing: border-box; }
-        .slot { position: relative; background: #0d1117; border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
-        .webcam-grid .slot { flex-grow: 1; }
+        .slot { position: relative; background: #0d1117; border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; height: 100%; }
         .slot iframe { flex-grow: 1; width: 100%; border: none; background: #000; }
         .label { background: var(--brand-color); color: #000; padding: 2px 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; display: block; flex-shrink: 0; z-index: 10; }
         
-        .news-container { flex: 1; overflow-y: auto; background: #0d1117; padding: 10px; }
-        .news-article { border-bottom: 1px solid var(--border-color); padding: 10px 0; }
-        .news-article a { color: var(--brand-color); text-decoration: none; font-size: 13px; font-weight: bold; display: block; margin-bottom: 3px; }
+        /* Nieuws Feed Fix: Scrollen binnen slot zonder de layout te breken */
+        .news-container { flex: 1; overflow-y: auto; background: #0d1117; padding: 10px; height: 0; }
+        .news-article { border-bottom: 1px solid var(--border-color); padding: 8px 0; }
+        .news-article a { color: var(--brand-color); text-decoration: none; font-size: 12px; font-weight: bold; display: block; margin-bottom: 2px; line-height: 1.2; }
         .news-article .date { color: #8b949e; font-size: 10px; text-transform: uppercase; }
 
         .cam-footer { display: flex; gap: 4px; align-items: center; height: 26px; flex-shrink: 0; }
@@ -89,19 +89,19 @@
     <div class="monitor-layout">
         <div class="webcam-grid">
             <div class="cam-box" id="box-1">
-                <div class="slot"><span class="label" id="lbl-1">Slot 1</span><div id="cont-1" style="height:100%;"></div></div>
+                <div class="slot"><span class="label" id="lbl-1">Slot 1</span><div id="cont-1" style="height:100%; display:flex; flex-direction:column;"></div></div>
                 <div class="cam-footer"><select class="cam-selector" id="sel-1" onchange="changeCam(1)"></select><button class="expand-btn" onclick="toggleFullscreen(1)">⛶</button></div>
             </div>
             <div class="cam-box" id="box-2">
-                <div class="slot"><span class="label" id="lbl-2">Slot 2</span><div id="cont-2" style="height:100%;"></div></div>
+                <div class="slot"><span class="label" id="lbl-2">Slot 2</span><div id="cont-2" style="height:100%; display:flex; flex-direction:column;"></div></div>
                 <div class="cam-footer"><select class="cam-selector" id="sel-2" onchange="changeCam(2)"></select><button class="expand-btn" onclick="toggleFullscreen(2)">⛶</button></div>
             </div>
             <div class="cam-box" id="box-3">
-                <div class="slot"><span class="label" id="lbl-3">Slot 3</span><div id="cont-3" style="height:100%;"></div></div>
+                <div class="slot"><span class="label" id="lbl-3">Slot 3</span><div id="cont-3" style="height:100%; display:flex; flex-direction:column;"></div></div>
                 <div class="cam-footer"><select class="cam-selector" id="sel-3" onchange="changeCam(3)"></select><button class="expand-btn" onclick="toggleFullscreen(3)">⛶</button></div>
             </div>
             <div class="cam-box" id="box-4">
-                <div class="slot"><span class="label" id="lbl-4">Slot 4</span><div id="cont-4" style="height:100%;"></div></div>
+                <div class="slot"><span class="label" id="lbl-4">Slot 4</span><div id="cont-4" style="height:100%; display:flex; flex-direction:column;"></div></div>
                 <div class="cam-footer"><select class="cam-selector" id="sel-4" onchange="changeCam(4)"></select><button class="expand-btn" onclick="toggleFullscreen(4)">⛶</button></div>
             </div>
         </div>
@@ -185,6 +185,13 @@
             { name: "Aireon Alert", url: "https://aireonalert.iaa.ie/alert-login" },
             { name: "METAR-TAF.com", url: "https://metar-taf.com/" },
             { name: "E6BX Calculator", url: "https://e6bx.com/" }
+        ]},
+        { title: "Luchtvaart DB", links: [
+            { name: "406 MHz Registration", url: "https://www.406registration.com/" },
+            { name: "Beacon Decode", url: "https://cospas-sarsat.int/en/beacons-pro/beacon-message-decode-program-txsep/beacon-message-decode-program" },
+            { name: "Ballonregister", url: "https://www.ballonregister.nl/" },
+            { name: "Airframes", url: "https://www.airframes.org/" },
+            { name: "Airline Codes", url: "https://airlinecodes.info/" }
         ]},
         { title: "Tracking", links: [
             { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" },
