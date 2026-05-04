@@ -44,21 +44,15 @@
         .dropdown a, .dropdown button { color: #c9d1d9; padding: 6px 12px; text-decoration: none; display: block; font-size: 11px; border-bottom: 1px solid var(--border-color); width: 100%; text-align: left; background: none; border: none; cursor: pointer; font-family: inherit; }
         .dropdown a:hover, .dropdown button:hover { background: var(--brand-color); color: #000; }
 
-        /* DE MONITOR LAYOUT REPARATIE */
-        .monitor-layout { display: grid; grid-template-columns: 1fr 360px; grid-gap: 6px; flex-grow: 1; padding: 6px; overflow: hidden; min-height: 0; }
+        /* DE ORIGINELE MONITOR LAYOUT */
+        .monitor-layout { display: grid; grid-template-columns: 1fr 360px; grid-gap: 6px; flex-grow: 1; padding: 6px; overflow: hidden; }
         
-        /* 4 GELIJKE BLOKKEN */
-        .webcam-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            grid-template-rows: repeat(2, 1fr); 
-            grid-gap: 8px; 
-            height: 100%;
-        }
+        /* DE 50/50 SPLIT ZOALS IN HET BEGIN */
+        .webcam-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; grid-gap: 8px; }
         
-        .cam-box { display: flex; flex-direction: column; min-height: 0; height: 100%; }
+        .cam-box { display: flex; flex-direction: column; height: 100%; min-height: 0; }
         .slot { position: relative; background: #000; border-radius: 2px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; flex-grow: 1; }
-        .slot iframe, .news-feed { flex-grow: 1; width: 100%; border: none; height: 100%; background: #000; }
+        .slot iframe { width: 100%; height: 100%; border: none; flex-grow: 1; }
         
         .label { background: var(--brand-color); color: #000; padding: 2px 8px; font-size: 11px; font-weight: 900; text-transform: uppercase; flex-shrink: 0; letter-spacing: 0.5px; }
         
@@ -66,19 +60,19 @@
         .cam-selector { background: #161b22; color: #c9d1d9; border: 1px solid var(--border-color); padding: 2px; font-size: 10px; outline: none; border-radius: 2px; flex-grow: 1; }
         .expand-btn { background: #161b22; color: var(--brand-color); border: 1px solid var(--border-color); padding: 0 6px; cursor: pointer; font-size: 12px; height: 22px; }
 
-        /* News API styling */
-        .news-feed { padding: 10px; overflow-y: auto; }
+        /* News feed styling binnen de slot */
+        .news-feed { background: #000; padding: 10px; overflow-y: auto; flex-grow: 1; height: 100%; box-sizing: border-box; }
         .news-item { padding: 8px 0; border-bottom: 1px solid #222; cursor: pointer; }
         .news-item:hover { background: #161b22; }
-        .news-title { color: var(--brand-color); font-weight: bold; font-size: 11px; display: block; line-height: 1.3; }
-        .news-meta { color: #8b949e; font-size: 9px; margin-top: 3px; display: block; }
+        .news-title { color: var(--brand-color); font-weight: bold; font-size: 11px; display: block; }
+        .news-meta { color: #8b949e; font-size: 9px; }
 
         .info-column { display: flex; flex-direction: column; gap: 6px; height: 100%; overflow: hidden; }
         .info-column .slot { flex: 1; min-height: 0; }
         .img-container { flex: 1; position: relative; overflow: hidden; background: #000; }
         .info-column img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
 
-        /* Fullscreen override */
+        /* Fullscreen-box */
         .cam-box.full-slot { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 5000; background: var(--bg-black); padding: 10px; box-sizing: border-box; }
     </style>
 </head>
@@ -105,32 +99,32 @@
             <div class="nav-group" style="color:var(--brand-color)">VLOOT TRACKING ▾
                 <div class="dropdown" id="fleet-dropdown"></div>
             </div>
-            <button class="reset-nav" onclick="location.reload()">Reset</button>
+            <button class="reset-nav" onclick="location.reload()" style="background:#21262d; color:#c9d1d9; border:1px solid var(--border-color); font-size:9px; cursor:pointer; padding:2px 5px;">RESET</button>
         </div>
     </nav>
 
     <div class="monitor-layout">
         <div class="webcam-grid">
             <div class="cam-box" id="box-1">
-                <div class="slot"><span class="label" id="lbl-1">Scherm 1</span><div id="cont-1" style="height:100%; display:flex; flex-direction:column;"></div></div>
+                <div class="slot"><span class="label" id="lbl-1">L-Boven</span><div id="cont-1" style="height:100%; display:flex; flex-direction:column;"></div></div>
                 <div class="cam-footer"><select class="cam-selector" id="sel-1" onchange="changeCam(1)"></select><button class="expand-btn" onclick="toggleFullscreen(1)">⛶</button></div>
             </div>
             <div class="cam-box" id="box-2">
-                <div class="slot"><span class="label" id="lbl-2">Scherm 2</span><div id="cont-2" style="height:100%; display:flex; flex-direction:column;"></div></div>
+                <div class="slot"><span class="label" id="lbl-2">R-Boven</span><div id="cont-2" style="height:100%; display:flex; flex-direction:column;"></div></div>
                 <div class="cam-footer"><select class="cam-selector" id="sel-2" onchange="changeCam(2)"></select><button class="expand-btn" onclick="toggleFullscreen(2)">⛶</button></div>
             </div>
             <div class="cam-box" id="box-3">
-                <div class="slot"><span class="label" id="lbl-3">Scherm 3</span><div id="cont-3" style="height:100%; display:flex; flex-direction:column;"></div></div>
+                <div class="slot"><span class="label" id="lbl-3">L-Onder</span><div id="cont-3" style="height:100%; display:flex; flex-direction:column;"></div></div>
                 <div class="cam-footer"><select class="cam-selector" id="sel-3" onchange="changeCam(3)"></select><button class="expand-btn" onclick="toggleFullscreen(3)">⛶</button></div>
             </div>
             <div class="cam-box" id="box-4">
-                <div class="slot"><span class="label" id="lbl-4">Scherm 4</span><div id="cont-4" style="height:100%; display:flex; flex-direction:column;"></div></div>
+                <div class="slot"><span class="label" id="lbl-4">R-Onder</span><div id="cont-4" style="height:100%; display:flex; flex-direction:column;"></div></div>
                 <div class="cam-footer"><select class="cam-selector" id="sel-4" onchange="changeCam(4)"></select><button class="expand-btn" onclick="toggleFullscreen(4)">⛶</button></div>
             </div>
         </div>
         <div class="info-column">
             <div class="slot"><span class="label">Noordzee</span><div class="img-container"><img id="knmi-1"></div></div>
-            <div class="slot"><span class="label">Kust- ruime wateren</span><div class="img-container"><img id="knmi-2"></div></div>
+            <div class="slot"><span class="label">Kust-ruime wateren</span><div class="img-container"><img id="knmi-2"></div></div>
             <div class="slot"><span class="label">Radar</span><div class="img-container"><img id="radar-img"></div></div>
         </div>
     </div>
@@ -147,7 +141,7 @@
             { name: "LCMS", url: "https://mijn.lcms.nl/gebruikersbeheer/#/login" },
             { name: "ISAR Bristow", url: "https://isar.im/" },
             { name: "CECIS Marine Pollution", url: "https://webgate.ec.europa.eu/CECIS/login.jsp" },
-            { name: "P2kflex", url: "https://expert.p2kflex.nl/index.php?regio=403%3B404%3B&include=knrm%3Bkustwacht%3Bredding%3Bwater%3Bgrip" },
+            { name: "P2kflex", url: "https://expert.p2kflex.nl/index.php?regio=403%3B404%3B&audio=&volume=75&include=knrm%3Bkustwacht%3Bredding%3Bwater%3Bgrip" },
             { name: "Winnies P2000", url: "https://winnies.livep2000.nl/" },
             { name: "P2000.page", url: "https://p2000.page/" },
             { name: "112MELDINGEN.NL", url: "http://112meldingen.nl/index.php" },
@@ -197,7 +191,7 @@
             { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" },
             { name: "Flightradar24", url: "https://www.flightradar24.com/" }
         ]},
-        { title: "Navigatie/Tools", links: [
+        { title: "Tools", links: [
             { name: "GPS Converter", url: "http://www.gpscoordinaten.nl/converteer-gps-coordinaten.php" },
             { name: "Time Zone Map", url: "https://www.timeanddate.com/time/map/" },
             { name: "NATO Translator", url: "https://cryptii.com/pipes/nato-phonetic-alphabet" },
@@ -231,7 +225,6 @@
     };
 
     const posFavorites = { 1: sourceData.systems[0].id, 2: 'news_api', 3: 'A5kXiKzbBFs', 4: 'q0-DDh1zdY4' };
-    const defaults = { 1: posFavorites[1], 2: posFavorites[2], 3: posFavorites[3], 4: posFavorites[4] };
 
     function updateClocks() {
         const nu = new Date();
@@ -258,7 +251,7 @@
     function setCamera(pos, id, name, type) {
         const container = document.getElementById('cont-' + pos);
         if (type === 'news') {
-            container.innerHTML = `<div id="news-box-${pos}" style="height:100%; overflow:hidden;"></div>`;
+            container.innerHTML = `<div id="news-box-${pos}" class="news-feed"></div>`;
             fetchNews(`news-box-${pos}`);
         } else if (type === 'web') {
             container.innerHTML = `<iframe src="${id}"></iframe>`;
@@ -279,6 +272,7 @@
     function setupSelectors() {
         for (let i = 1; i <= 4; i++) {
             const sel = document.getElementById('sel-' + i);
+            sel.innerHTML = '';
             const g1 = document.createElement('optgroup'); g1.label = "SYSTEMEN";
             sourceData.systems.forEach(s => {
                 const opt = new Option((s.id === posFavorites[i] ? "★ " : "") + s.name, s.id);
@@ -289,7 +283,7 @@
                 const opt = new Option((w.id === posFavorites[i] ? "★ " : "") + w.name, w.id);
                 opt.dataset.type = 'yt'; g2.appendChild(opt);
             });
-            sel.appendChild(g1); sel.appendChild(g2); sel.value = defaults[i];
+            sel.appendChild(g1); sel.appendChild(g2); sel.value = posFavorites[i];
         }
     }
 
