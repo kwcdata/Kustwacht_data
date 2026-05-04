@@ -19,57 +19,51 @@
         
         header { 
             padding: 2px 15px; background: var(--bg-dark); border-bottom: 1px solid var(--border-color); 
-            display: flex; justify-content: space-between; align-items: center; height: 45px; flex-shrink: 0;
+            display: flex; justify-content: space-between; align-items: center; height: 40px; flex-shrink: 0;
         }
         .header-title-area { display: flex; align-items: center; gap: 10px; }
-        .header-logo { height: 32px; width: auto; }
+        .header-logo { height: 28px; width: auto; }
         header h1 { margin: 0; font-size: 13px; color: var(--brand-color); text-transform: uppercase; letter-spacing: 1px; }
         
         .header-info-area { display: flex; align-items: center; gap: 20px; }
         .clocks { display: flex; gap: 15px; font-family: 'Courier New', monospace; }
         .clock-item { display: flex; align-items: baseline; gap: 6px; } 
         .clock-label { font-size: 9px; color: #8b949e; text-transform: uppercase; font-weight: bold; }
-        .clock-time { font-size: 26px; color: var(--brand-color); font-weight: 800; line-height: 1; }
-        .fetch-time { font-family: 'Courier New', monospace; font-size: 16px; color: #c9d1d9; font-weight: bold; border-left: 1px solid var(--border-color); padding-left: 15px; }
+        .clock-time { font-size: 28px; color: var(--brand-color); font-weight: 800; line-height: 1; }
+        .fetch-time { font-family: 'Courier New', monospace; font-size: 18px; color: #c9d1d9; font-weight: bold; border-left: 1px solid var(--border-color); padding-left: 15px; }
 
         .nav-bar { 
             background: var(--bg-dark); border-bottom: 1px solid var(--border-color); 
-            display: flex; padding: 0 10px; z-index: 1000; align-items: center; justify-content: space-between; flex-shrink: 0; min-height: 28px;
+            display: flex; padding: 0 10px; z-index: 1000; align-items: center; justify-content: space-between; flex-shrink: 0; min-height: 24px;
         }
         .nav-links-wrapper { display: flex; flex-wrap: wrap; align-items: center; flex-grow: 1; }
-        .nav-group { position: relative; padding: 4px 10px; cursor: pointer; font-size: 10px; font-weight: bold; color: #c9d1d9; text-transform: uppercase; white-space: nowrap; }
+        .nav-group { position: relative; padding: 2px 8px; cursor: pointer; font-size: 10px; font-weight: bold; color: #c9d1d9; text-transform: uppercase; white-space: nowrap; }
         .nav-group:hover { background: #30363d; color: var(--brand-color); }
         .dropdown { display: none; position: absolute; top: 100%; left: 0; background: #161b22; border: 1px solid var(--border-color); min-width: 220px; box-shadow: 0 8px 16px rgba(0,0,0,0.8); max-height: 80vh; overflow-y: auto; z-index: 2000; }
         .nav-group:hover .dropdown { display: block; }
-        .dropdown a, .dropdown button { color: #c9d1d9; padding: 8px 12px; text-decoration: none; display: block; font-size: 11px; border-bottom: 1px solid var(--border-color); width: 100%; text-align: left; background: none; border: none; cursor: pointer; font-family: inherit; }
+        .dropdown a, .dropdown button { color: #c9d1d9; padding: 6px 12px; text-decoration: none; display: block; font-size: 11px; border-bottom: 1px solid var(--border-color); width: 100%; text-align: left; background: none; border: none; cursor: pointer; font-family: inherit; }
         .dropdown a:hover, .dropdown button:hover { background: var(--brand-color); color: #000; }
 
-        /* Aangepaste verhoudingen layout */
-        .monitor-layout { 
-            display: grid; 
-            grid-template-columns: 1fr 20%; /* Rechterkolom nu relatief ipv vast 360px */
-            grid-gap: 6px; 
-            flex-grow: 1; 
-            padding: 6px; 
-            overflow: hidden; 
-        }
+        .monitor-layout { display: grid; grid-template-columns: 1fr 360px; grid-gap: 6px; flex-grow: 1; padding: 6px; overflow: hidden; }
         
+        /* FIX: Forceert 50/50 verhouding zodat onderste rij niet verdwijnt */
         .webcam-grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
-            grid-template-rows: 1fr 1fr; 
+            grid-template-rows: repeat(2, minmax(0, 1fr)); 
             grid-gap: 8px; 
+            height: 100%;
         }
         
-        .cam-box { display: flex; flex-direction: column; height: 100%; min-height: 0; }
-        .slot { position: relative; background: #000; border-radius: 2px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; flex-grow: 1; }
+        .cam-box { display: flex; flex-direction: column; height: 100%; min-height: 0; overflow: hidden; }
+        .slot { position: relative; background: #000; border-radius: 2px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; flex-grow: 1; min-height: 0; }
         .slot iframe { width: 100%; height: 100%; border: none; flex-grow: 1; }
         
         .label { background: var(--brand-color); color: #000; padding: 2px 8px; font-size: 11px; font-weight: 900; text-transform: uppercase; flex-shrink: 0; letter-spacing: 0.5px; }
         
-        .cam-footer { display: flex; gap: 2px; align-items: center; height: 24px; flex-shrink: 0; background: #161b22; }
-        .cam-selector { background: transparent; color: #c9d1d9; border: none; padding: 2px 5px; font-size: 10px; outline: none; flex-grow: 1; cursor: pointer; }
-        .expand-btn { background: transparent; color: var(--brand-color); border: none; border-left: 1px solid var(--border-color); padding: 0 10px; cursor: pointer; font-size: 14px; height: 100%; }
+        .cam-footer { display: flex; gap: 2px; align-items: center; height: 22px; flex-shrink: 0; }
+        .cam-selector { background: #161b22; color: #c9d1d9; border: 1px solid var(--border-color); padding: 2px; font-size: 10px; outline: none; border-radius: 2px; flex-grow: 1; }
+        .expand-btn { background: #161b22; color: var(--brand-color); border: 1px solid var(--border-color); padding: 0 6px; cursor: pointer; font-size: 12px; height: 22px; }
 
         .news-feed { background: #000; padding: 10px; overflow-y: auto; flex-grow: 1; height: 100%; box-sizing: border-box; }
         .news-item { padding: 8px 0; border-bottom: 1px solid #222; cursor: pointer; }
@@ -79,8 +73,8 @@
 
         .info-column { display: flex; flex-direction: column; gap: 6px; height: 100%; overflow: hidden; }
         .info-column .slot { flex: 1; min-height: 0; }
-        .img-container { flex: 1; position: relative; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; }
-        .info-column img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+        .img-container { flex: 1; position: relative; overflow: hidden; background: #000; }
+        .info-column img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
 
         .cam-box.full-slot { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 5000; background: var(--bg-black); padding: 10px; box-sizing: border-box; }
     </style>
@@ -104,11 +98,11 @@
 
     <nav class="nav-bar">
         <div class="nav-links-wrapper" id="nav-bar-links"></div>
-        <div class="nav-controls" style="display:flex; align-items:center; gap:10px;">
+        <div class="nav-controls">
             <div class="nav-group" style="color:var(--brand-color)">VLOOT TRACKING ▾
                 <div class="dropdown" id="fleet-dropdown"></div>
             </div>
-            <button onclick="location.reload()" style="background:#21262d; color:#c9d1d9; border:1px solid var(--border-color); font-size:9px; cursor:pointer; padding:3px 8px; border-radius:3px;">RESET</button>
+            <button class="reset-nav" onclick="location.reload()" style="background:#21262d; color:#c9d1d9; border:1px solid var(--border-color); font-size:9px; cursor:pointer; padding:2px 5px;">RESET</button>
         </div>
     </nav>
 
@@ -133,7 +127,7 @@
         </div>
         <div class="info-column">
             <div class="slot"><span class="label">Noordzee</span><div class="img-container"><img id="knmi-1"></div></div>
-            <div class="slot"><span class="label">Kust wateren</span><div class="img-container"><img id="knmi-2"></div></div>
+            <div class="slot"><span class="label">Kust-ruime wateren</span><div class="img-container"><img id="knmi-2"></div></div>
             <div class="slot"><span class="label">Radar</span><div class="img-container"><img id="radar-img"></div></div>
         </div>
     </div>
@@ -149,20 +143,63 @@
             { name: "Amver (surpic)", url: "http://www.amver.com/Forms/SurpicRequest" },
             { name: "LCMS", url: "https://mijn.lcms.nl/gebruikersbeheer/#/login" },
             { name: "ISAR Bristow", url: "https://isar.im/" },
+            { name: "CECIS Marine Pollution", url: "https://webgate.ec.europa.eu/CECIS/login.jsp" },
             { name: "P2kflex", url: "https://expert.p2kflex.nl/index.php?regio=403%3B404%3B&audio=&volume=75&include=knrm%3Bkustwacht%3Bredding%3Bwater%3Bgrip" },
-            { name: "Winnies P2000", url: "https://winnies.livep2000.nl/" }
+            { name: "Winnies P2000", url: "https://winnies.livep2000.nl/" },
+            { name: "P2000.page", url: "https://p2000.page/" },
+            { name: "112MELDINGEN.NL", url: "http://112meldingen.nl/index.php" },
+            { name: "Global SAR Hub", url: "https://www.globalsarhub.com/sea-sar.html" },
+            { name: "Cospas-Sarsat", url: "https://cospas-sarsat.int/en/" },
+            { name: "LADR", url: "https://ladr.eurocontrol.int/ops/frontend" }
+        ]},
+        { title: "KNRM/KNBRD", links: [
+            { name: "Strandveilig", url: "https://strandveilig.nl/beschikbaar/#/login" },
+            { name: "KNRM helpt", url: "https://www.knrmhelpt.nl/" },
+            { name: "Radio Medische Dienst", url: "https://rmd.businessfundamentals.nl/" },
+            { name: "Pre-Com", url: "https://www.pre-com.nl/" },
+            { name: "GIS KNRM", url: "https://www.arcgis.com/apps/mapviewer/index.html?webmap=04162a3c264d462e96e4ec508519ce95" },
+            { name: "Lifeguard Tracking", url: "https://portal.lifeguardtracking.nl/" }
         ]},
         { title: "Overheid", links: [
             { name: "RWsOS Viewer", url: "https://rwsos.rws.nl/viewer/map/noordzee/waterkwantiteit" },
             { name: "Waterberichtgeving", url: "https://waterberichtgeving.rws.nl/owb/home" },
             { name: "KNMI extranet", url: "https://mijn.knmi.nl" },
-            { name: "Noordzeeloket", url: "https://www.noordzeeloket.nl/" }
+            { name: "Waddendata", url: "https://waddendata.nl/" },
+            { name: "Waterinfo RWS", url: "https://waterinfo.rws.nl/" },
+            { name: "GeoWeb (Betonning)", url: "https://maps.rijkswaterstaat.nl/geoweb55/index.html?viewer=NMA" },
+            { name: "Noordzeeloket", url: "https://www.noordzeeloket.nl/" },
+            { name: "Weerdata KWC", url: "https://weerdatakustwacht.wordpress.com/" }
         ]},
-        { title: "AIS/Lucht", links: [
+        { title: "Scheepvaart", links: [
+            { name: "EMSA Portal", url: "https://portal.emsa.europa.eu/home" },
+            { name: "ERICards", url: "http://www.ericards.net/" },
+            { name: "Lloyds Seasearcher", url: "https://www.seasearcher.com/" },
+            { name: "Navtex", url: "http://navtex.lv/" },
+            { name: "Nautical calculator", url: "https://www.madinstro.net/" },
+            { name: "Kabels Noordzee", url: "https://kis-orca.org/map/" },
+            { name: "Ship Station ITU", url: "https://www.itu.int/mmsapp/ShipStation/list" }
+        ]},
+        { title: "AIS", links: [
             { name: "VIIA", url: "https://viia-p.kustwacht.nl/" },
+            { name: "Waterkaart.net", url: "https://waterkaart.net/" },
+            { name: "AMS (AIS RWS)", url: "https://ais-ams.rws.rijksweb.nl/ams/" },
+            { name: "Maritime Control", url: "https://bfa.kustwacht.nl/" },
+            { name: "Madesmart", url: "https://tracker.madesmart.nl/" }
+        ]},
+        { title: "Luchtvaart", links: [
+            { name: "LVNL AIS", url: "https://www.lvnl.nl/informatie-voor-luchtvarenden/publicaties-voor-luchtvarenden" },
+            { name: "SkyVector", url: "https://skyvector.com/" },
+            { name: "METAR-TAF.com", url: "https://metar-taf.com/" },
+            { name: "FlightAware", url: "https://www.flightaware.com/" },
             { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" },
-            { name: "Flightradar24", url: "https://www.flightradar24.com/" },
-            { name: "SkyVector", url: "https://skyvector.com/" }
+            { name: "Flightradar24", url: "https://www.flightradar24.com/" }
+        ]},
+        { title: "Tools", links: [
+            { name: "GPS Converter", url: "http://www.gpscoordinaten.nl/converteer-gps-coordinaten.php" },
+            { name: "Time Zone Map", url: "https://www.timeanddate.com/time/map/" },
+            { name: "NATO Translator", url: "https://cryptii.com/pipes/nato-phonetic-alphabet" },
+            { name: "Web 2.0 Calc", url: "https://web2.0calc.com/" },
+            { name: "GitHub Edit", url: "https://github.com/kwcdata/Kustwacht_data/edit/main/index.html" }
         ]}
     ];
 
@@ -170,7 +207,8 @@
         systems: [
             {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart', name: 'P2000 (Kustwacht)', type: 'web'},
             {id: 'news_api', name: 'NOS Nieuws (Live)', type: 'news'},
-            {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange', type: 'web'}
+            {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange', type: 'web'},
+            {id: 'https://m.p2kflex.nl/index.php?regio=none%3B&audio=&include=&exclude=&capcode=&city=&geo=0', name: 'P2000 (Basis)', type: 'web'}
         ],
         webcams: [
             {id: 'A5kXiKzbBFs', name: 'Scheveningen Blvd', type: 'yt'},
@@ -178,10 +216,18 @@
             {id: 'mI1Os7TFdGc', name: 'Egmond aan Zee', type: 'yt'},
             {id: 'Ud7I4jprFN0', name: 'Maasvlakte', type: 'yt'},
             {id: 'jDF264Bg1_c', name: 'Hoek v Holland Blvd', type: 'yt'},
-            {id: 'mnxV4iit7S4', name: 'Kijkduin Blvd', type: 'yt'}
+            {id: 'mnxV4iit7S4', name: 'Kijkduin Blvd', type: 'yt'},
+            {id: 'KjK02QIm4ZI', name: 'Brouwersdam', type: 'yt'},
+            {id: '_pGIJmXxAHk', name: 'Nieuwe Waterweg', type: 'yt'},
+            {id: 'dtFG_mcfWjQ', name: 'Noordwijk Blvd', type: 'yt'},
+            {id: 'L76VKII_Z7k', name: 'Noordwijk Vuurtoren', type: 'yt'},
+            {id: 'csMnwbjV5vg', name: 'Rockanje', type: 'yt'},
+            {id: 'DaG5JReOYEw', name: 'Scheveningen Noord', type: 'yt'},
+            {id: 't3qbzZHOTyg', name: 'Wassenaarse Slag', type: 'yt'}
         ]
     };
 
+    // Herstelde favorieten per kwadrant
     const posFavorites = { 1: sourceData.systems[0].id, 2: 'news_api', 3: 'A5kXiKzbBFs', 4: 'q0-DDh1zdY4' };
 
     function updateClocks() {
