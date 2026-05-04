@@ -31,7 +31,6 @@
         .nav-controls { display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding: 2px 0; }
         .vloot-btn-group { border-left: 1px solid var(--border-color); color: var(--brand-color); margin-left: 5px; }
         button.reset-nav { padding: 2px 8px; background: #21262d; color: #c9d1d9; border: 1px solid var(--border-color); cursor: pointer; font-size: 9px; font-weight: bold; text-transform: uppercase; border-radius: 3px; }
-        button.reset-nav:hover { background: #30363d; color: #fff; }
         .monitor-layout { display: grid; grid-template-columns: 1fr 360px; grid-gap: 8px; flex-grow: 1; padding: 8px; overflow: hidden; }
         .webcam-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; grid-gap: 10px; position: relative; }
         .cam-box { display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 0; }
@@ -162,8 +161,7 @@
         { title: "Luchtvaart", links: [
             { name: "LVNL AIS", url: "https://www.lvnl.nl/informatie-voor-luchtvarenden/publicaties-voor-luchtvarenden" },
             { name: "SkyVector", url: "https://skyvector.com/" },
-            { name: "Aireon Alert", url: "https://aireonalert.iaa.ie/alert-login" },
-            { name: "METAR-TAF.com", url: "https://metar-taf.com/" }
+            { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" }
         ]},
         { title: "Tracking", links: [
             { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" },
@@ -210,6 +208,7 @@
         ]
     };
 
+    // Nieuwsfeed als favoriet rechtsboven (Slot 2)
     const defaults = { 1: sourceData.systems[0].id, 2: 'news_file', 3: sourceData.systems[2].id, 4: 'A5kXiKzbBFs' };
     let activeStreams = { 1: null, 2: null, 3: null, 4: null };
 
@@ -225,6 +224,7 @@
         container.innerHTML = '<div style="padding:20px; color:#8b949e;">Nieuws laden uit GitHub...</div>';
         try {
             const response = await fetch('news.json?t=' + new Date().getTime());
+            if (!response.ok) throw new Error();
             const items = await response.json();
             let html = '<div class="news-container">';
             items.forEach(item => {
@@ -232,7 +232,7 @@
             });
             html += '</div>';
             container.innerHTML = html;
-        } catch (e) { container.innerHTML = '<div style="padding:20px; color:#ff4444;">Nieuws-bestand (news.json) nog niet beschikbaar.</div>'; }
+        } catch (e) { container.innerHTML = '<div style="padding:20px; color:#ff4444;">Nieuws-bestand nog niet beschikbaar.</div>'; }
     }
 
     function initFleetMenu() {
