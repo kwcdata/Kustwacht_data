@@ -287,8 +287,8 @@
 
     const sourceData = {
         systems: [
-            {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: '★ P2000 (Kustwacht)', type: 'web'},
-            {id: 'https://nos.nl/teletekst/101', name: '★ Teletekst 101', type: 'web'},
+            {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000 (Kustwacht)', type: 'web'},
+            {id: 'https://nos.nl/teletekst/101', name: 'Teletekst 101', type: 'web'},
             {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange', type: 'web'},
             {id: 'https://m.p2kflex.nl/index.php?regio=none%3B&audio=&volume=75&include=&exclude=&capcode=&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000 (Basis)', type: 'web'}
         ],
@@ -302,15 +302,22 @@
             {id: 'dtFG_mcfWjQ', name: 'Noordwijk Blvd', type: 'yt'},
             {id: 'L76VKII_Z7k', name: 'Noordwijk Vuurtoren', type: 'yt'},
             {id: 'csMnwbjV5vg', name: 'Rockanje', type: 'yt'},
-            {id: 'A5kXiKzbBFs', name: '★ Scheveningen Blvd', type: 'yt'},
+            {id: 'A5kXiKzbBFs', name: 'Scheveningen Blvd', type: 'yt'},
             {id: 'DaG5JReOYEw', name: 'Scheveningen Noord', type: 'yt'},
             {id: 't3qbzZHOTyg', name: 'Wassenaarse Slag', type: 'yt'},
-            {id: 'q0-DDh1zdY4', name: '★ Zandvoort Blvd', type: 'yt'}
+            {id: 'q0-DDh1zdY4', name: 'Zandvoort Blvd', type: 'yt'}
         ]
     };
 
-    // Standaard indeling: LB: P2000, RB: Teletekst, LO: Scheveningen, RO: Zandvoort
-    const defaults = { 1: sourceData.systems[0].id, 2: sourceData.systems[1].id, 3: 'A5kXiKzbBFs', 4: 'q0-DDh1zdY4' };
+    // De specifieke favorieten per positie (ID)
+    const posFavorites = {
+        1: sourceData.systems[0].id, // P2000
+        2: sourceData.systems[1].id, // Teletekst
+        3: 'A5kXiKzbBFs',            // Scheveningen
+        4: 'q0-DDh1zdY4'             // Zandvoort
+    };
+
+    const defaults = { 1: posFavorites[1], 2: posFavorites[2], 3: posFavorites[3], 4: posFavorites[4] };
 
     function updateClocks() {
         const nu = new Date();
@@ -337,14 +344,24 @@
         document.getElementById('sel-2').value = sourceData.systems[2].id; 
     }
 
+    // Bouwt de dropdowns op per scherm en voegt alleen het sterretje toe aan de favoriet van DAT scherm
     function setupSelectors() {
         for (let i = 1; i <= 4; i++) {
             const sel = document.getElementById('sel-' + i);
             sel.innerHTML = '';
+            
             const g1 = document.createElement('optgroup'); g1.label = "SYSTEMEN";
-            sourceData.systems.forEach(s => g1.appendChild(new Option(s.name, s.id)));
+            sourceData.systems.forEach(s => {
+                const prefix = (s.id === posFavorites[i]) ? "★ " : "";
+                g1.appendChild(new Option(prefix + s.name, s.id));
+            });
+            
             const g2 = document.createElement('optgroup'); g2.label = "WEBCAMS";
-            sourceData.webcams.forEach(w => g2.appendChild(new Option(w.name, w.id)));
+            sourceData.webcams.forEach(w => {
+                const prefix = (w.id === posFavorites[i]) ? "★ " : "";
+                g2.appendChild(new Option(prefix + w.name, w.id));
+            });
+            
             sel.appendChild(g1); sel.appendChild(g2);
             sel.value = defaults[i];
         }
@@ -355,6 +372,7 @@
         const ts = new Date().getTime();
         const url = type === 'web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0&t=${ts}`;
         container.innerHTML = `<iframe src="${url}" allow="autoplay; allowfullscreen"></iframe>`;
+        // Verwijder sterretje voor de tekst in de blauwe balk bovenin
         document.getElementById('lbl-' + pos).innerText = name.replace("★ ", "");
     }
 
@@ -385,6 +403,7 @@
         document.querySelectorAll('.cam-box').forEach(b => b.classList.remove('full-slot'));
         for(let p in defaults) {
             const id = defaults[p];
+            // Zoek de juiste naam in systemen of webcams
             const item = [...sourceData.systems, ...sourceData.webcams].find(x => x.id === id);
             setCamera(p, id, item.name, sourceData.systems.find(s => s.id === id) ? 'web' : 'yt');
             document.getElementById('sel-'+p).value = id;
