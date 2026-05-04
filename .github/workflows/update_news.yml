@@ -16,20 +16,46 @@ jobs:
       
       - name: Fetch RSS and convert to JSON
         run: |
-          curl -s https://rss.nos.nl/nosnieuwsalgemeen | grep -oP '(?<=<item>).*?(?=</item>)' | sed 's/&lt;/</g; s/&gt;/>/g' | python3 -c "
-          import sys, re, json
-          items = []
-          for entry in sys.stdin:
-              try:
-                  title = re.search(r'<title>(.*?)</title>', entry).group(1)
-                  link = re.search(r'<link>(.*?)</link>', entry).group(1)
-                  pubDate = re.search(r'<pubDate>(.*?)</pubDate>', entry).group(1)
-                  items.append({'title': title, 'link': link, 'pubDate': pubDate})
-              except:
-                  continue
-          print(json.dumps(items[:25]))
-          " > news.json
+          # Haal de RSS feed op
+          curl -sL https://rss.nos.nl/nosnieuwsalgemeen > nos.xml
+          
+          # Gebruik Python om de XML veilig te parsen naar JSON
+          python3 -c "
+          import xml.etree.ElementTree as ET
+          import json
+          import os
 
+          try:
+              tree = ET.parse('nos.xml')
+              root = tree.getroot()
+              items = []
+              
+              for item in root.findall('.//item'):
+                  title = item.find('title').text if item.find('title') is not None else 'Geen titel'
+                  link = item.find('link').text if item.find('link') is not None else '#'
+                  pubDate = item.find('pubDate').text if item.find('pubDate') is not None else ''
+                  
+                  # Formatteer datum (optioneel: haal alleen tijd eruit)
+                  # pubDate ziet eruit als: Mon, 04 May 2026 15:30:00 +0200
+                  short_time = ' '.join(pubDate.split(' ')[4:5])[:-3] if pubDate else ''
+                  
+                  items.append({
+                      'title': title,
+                      'link': link,
+                      'pubDate': short_time if short_time else pubDate
+                  })
+              
+              with open('news.json', 'w') as f:
+                  json.dump(items[:25], f, indent=2)
+              print(f'Succesvol {len(items)} items verwerkt.')
+          except Exception as e:
+              print(f'Fout bij verwerken RSS: {e}')
+              # Maak een dummy bestand als het mislukt om fouten in dashboard te voorkomen
+              if not os.path.exists('news.json'):
+                  with open('news.json', 'w') as f:
+                      json.dump([{'title': 'Nieuwsfeed tijdelijk niet beschikbaar', 'link': '#', 'pubDate': ''}], f)
+          "
+          
       - name: Commit and push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -37,5 +63,5 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add news.json
-          git commit -m "Update news.json" || exit 0
+          git commit -m "Update news.json via robuuste parser" || exit 0
           git push
