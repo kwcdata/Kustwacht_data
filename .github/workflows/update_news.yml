@@ -2,19 +2,22 @@ name: Update NOS News
 
 on:
   schedule:
-    # Dit voert het script elke 5 minuten uit
     - cron: '*/5 * * * *'
-  workflow_dispatch: # Hiermee kun je het handmatig starten in het 'Actions' tabblad
+  workflow_dispatch: 
+
+# Voeg dit blok toe om rechten expliciet in de code te zetten
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Geüpdatet naar v4 voor Node.js 20+
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5 # Geüpdatet naar v5
         with:
           python-version: '3.x'
 
@@ -29,5 +32,4 @@ jobs:
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add news.json
-          # Alleen commiten als er echt iets veranderd is
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update news.json" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update news.json met snippets" && git push)
