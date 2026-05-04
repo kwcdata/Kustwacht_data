@@ -91,7 +91,7 @@
 
         .slot { position: relative; background: #000; border-radius: 2px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
         .webcam-grid .slot { flex-grow: 1; }
-        .slot iframe { flex-grow: 1; width: 100%; border: none; }
+        .slot iframe { flex-grow: 1; width: 100%; border: none; height: 100%; background: #000; }
         
         .label { background: var(--brand-color); color: #000; padding: 2px 8px; font-size: 11px; font-weight: 900; text-transform: uppercase; display: block; flex-shrink: 0; z-index: 10; letter-spacing: 0.5px; }
         
@@ -309,12 +309,11 @@
         ]
     };
 
-    // De specifieke favorieten per positie (ID)
     const posFavorites = {
-        1: sourceData.systems[0].id, // P2000
-        2: sourceData.systems[1].id, // Teletekst
-        3: 'A5kXiKzbBFs',            // Scheveningen
-        4: 'q0-DDh1zdY4'             // Zandvoort
+        1: sourceData.systems[0].id,
+        2: sourceData.systems[1].id,
+        3: 'A5kXiKzbBFs',
+        4: 'q0-DDh1zdY4'
     };
 
     const defaults = { 1: posFavorites[1], 2: posFavorites[2], 3: posFavorites[3], 4: posFavorites[4] };
@@ -344,7 +343,6 @@
         document.getElementById('sel-2').value = sourceData.systems[2].id; 
     }
 
-    // Bouwt de dropdowns op per scherm en voegt alleen het sterretje toe aan de favoriet van DAT scherm
     function setupSelectors() {
         for (let i = 1; i <= 4; i++) {
             const sel = document.getElementById('sel-' + i);
@@ -370,9 +368,13 @@
     function setCamera(pos, id, name, type) {
         const container = document.getElementById('cont-' + pos);
         const ts = new Date().getTime();
-        const url = type === 'web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0&t=${ts}`;
-        container.innerHTML = `<iframe src="${url}" allow="autoplay; allowfullscreen"></iframe>`;
-        // Verwijder sterretje voor de tekst in de blauwe balk bovenin
+        
+        if(type === 'web') {
+            container.innerHTML = `<iframe src="${id}" allow="autoplay; allowfullscreen"></iframe>`;
+        } else {
+            container.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0&t=${ts}" allow="autoplay; allowfullscreen"></iframe>`;
+        }
+        
         document.getElementById('lbl-' + pos).innerText = name.replace("★ ", "");
     }
 
@@ -403,9 +405,9 @@
         document.querySelectorAll('.cam-box').forEach(b => b.classList.remove('full-slot'));
         for(let p in defaults) {
             const id = defaults[p];
-            // Zoek de juiste naam in systemen of webcams
             const item = [...sourceData.systems, ...sourceData.webcams].find(x => x.id === id);
-            setCamera(p, id, item.name, sourceData.systems.find(s => s.id === id) ? 'web' : 'yt');
+            const type = sourceData.systems.find(s => s.id === id) ? 'web' : 'yt';
+            setCamera(p, id, item.name, type);
             document.getElementById('sel-'+p).value = id;
         }
         verversData();
