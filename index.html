@@ -26,12 +26,38 @@
             align-items: center; 
             height: 50px; 
             flex-shrink: 0;
+            gap: 20px;
         }
-        .header-title-area { display: flex; align-items: center; gap: 12px; }
+        .header-title-area { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
         .header-logo { height: 35px; width: auto; }
         header h1 { margin: 0; font-size: 16px; color: var(--brand-color); text-transform: uppercase; letter-spacing: 2px; }
         
-        .header-info-area { display: flex; align-items: center; gap: 30px; }
+        /* Nieuws Ticker (Lopende Band) */
+        .ticker-container {
+            flex-grow: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            background: rgba(0,0,0,0.2);
+            height: 24px;
+            display: flex;
+            align-items: center;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+        #ticker-text {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 60s linear infinite;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #c9d1d9;
+        }
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+        .header-info-area { display: flex; align-items: center; gap: 30px; flex-shrink: 0; }
         .clocks { display: flex; gap: 30px; font-family: 'Courier New', monospace; align-items: center; }
         .clock-item { display: flex; align-items: baseline; gap: 10px; }
         .clock-label { font-size: 11px; color: #8b949e; text-transform: uppercase; font-weight: bold; }
@@ -47,6 +73,34 @@
         }
         .fetch-label { font-size: 9px; color: #8b949e; text-transform: uppercase; font-weight: bold; }
         .fetch-time { font-size: 20px; color: #c9d1d9; font-weight: bold; line-height: 1; }
+
+        /* Nieuws Feed Slot Styling */
+        .news-feed-container {
+            background: #0d1117;
+            height: 100%;
+            overflow-y: auto;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .news-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+        .news-item:hover { background: #161b22; }
+        .news-item a {
+            color: var(--brand-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .news-item .news-meta {
+            font-size: 10px;
+            color: #8b949e;
+            text-transform: uppercase;
+        }
 
         .nav-bar { 
             background: var(--bg-dark); 
@@ -124,6 +178,11 @@
             <img src="https://raw.githubusercontent.com/kwcdata/Kustwacht_data/refs/heads/main/kustwacht-logo.svg" alt="Kustwacht Logo" class="header-logo">
             <h1>Kustwacht Dashboard</h1>
         </div>
+
+        <div class="ticker-container">
+            <div id="ticker-text">Laden van nieuwsberichten... +++ </div>
+        </div>
+
         <div class="header-info-area">
             <div class="clocks">
                 <div class="clock-item">
@@ -315,7 +374,8 @@
         systems: [
             {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000 (Kustwacht)', type: 'web'},
             {id: 'https://m.p2kflex.nl/index.php?regio=none%3B&audio=&volume=75&include=&exclude=&capcode=&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000 (Basis)', type: 'web'},
-            {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange', type: 'web'}
+            {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange', type: 'web'},
+            {id: 'news_feed', name: 'LIVE NIEUWSFEED', type: 'news'}
         ],
         webcams: [
             {id: 'KjK02QIm4ZI', name: 'Brouwersdam', type: 'yt'},
@@ -334,15 +394,49 @@
         ]
     };
 
-    const defaults = { 1: sourceData.systems[0].id, 2: sourceData.systems[2].id, 3: 'A5kXiKzbBFs', 4: 'q0-DDh1zdY4' };
+    const defaults = { 1: sourceData.systems[0].id, 2: sourceData.systems[2].id, 3: 'A5kXiKzbBFs', 4: 'news_feed' };
     let activeStreams = { 1: null, 2: null, 3: null, 4: null };
 
     function updateClocks() {
         const nu = new Date();
         const opts = { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        
         document.getElementById('local-clock').innerText = nu.toLocaleTimeString('nl-NL', { ...opts, timeZone: 'Europe/Amsterdam' });
         document.getElementById('zulu-clock').innerText = nu.toLocaleTimeString('nl-NL', { ...opts, timeZone: 'UTC' });
+    }
+
+    // Nieuws Feed Functies
+    async function updateNews() {
+        try {
+            const rssUrl = encodeURIComponent('https://rss.nos.nl/nosnieuwsalgemeen');
+            const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
+            const data = await response.json();
+            
+            if (data.status === 'ok') {
+                // Ticker tekst update
+                const tickerContent = data.items.map(item => item.title.toUpperCase()).join(' +++ ');
+                document.getElementById('ticker-text').innerHTML = tickerContent + ' +++ ';
+
+                // Update actieve nieuws slots
+                for (let pos in activeStreams) {
+                    if (activeStreams[pos] && activeStreams[pos].type === 'news') {
+                        renderNewsInSlot(pos, data.items);
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Nieuws update mislukt", e);
+        }
+    }
+
+    function renderNewsInSlot(pos, items) {
+        const container = document.getElementById('cont-' + pos);
+        const html = items.map(item => `
+            <div class="news-item">
+                <a href="${item.link}" target="_blank">${item.title}</a>
+                <div class="news-meta">${new Date(item.pubDate).toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'})} | NOS NIEUWS</div>
+            </div>
+        `).join('');
+        container.innerHTML = `<div class="news-feed-container">${html}</div>`;
     }
 
     function initFleetMenu() {
@@ -392,17 +486,24 @@
     function setCamera(pos, id, name, type) {
         const container = document.getElementById('cont-' + pos);
         activeStreams[pos] = { id, name, type };
-        const ts = new Date().getTime();
-        const url = type === 'web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0&t=${ts}`;
-        container.innerHTML = `<iframe id="frame-${pos}" src="${url}" allow="autoplay; allowfullscreen"></iframe>`;
-        document.getElementById('lbl-' + pos).innerText = name.replace("★ ", "");
+        
+        if (type === 'news') {
+            document.getElementById('lbl-' + pos).innerText = "LIVE NIEUWSFEED";
+            updateNews(); // Initial load for news slot
+        } else {
+            const ts = new Date().getTime();
+            const url = type === 'web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0&t=${ts}`;
+            container.innerHTML = `<iframe id="frame-${pos}" src="${url}" allow="autoplay; allowfullscreen"></iframe>`;
+            document.getElementById('lbl-' + pos).innerText = name.replace("★ ", "");
+        }
     }
 
     function changeCam(pos) {
         const sel = document.getElementById('sel-' + pos);
         const id = sel.value;
         const name = sel.options[sel.selectedIndex].text;
-        const type = sourceData.systems.find(s => s.id === id) ? 'web' : 'yt';
+        const system = sourceData.systems.find(s => s.id === id);
+        const type = system ? system.type : 'yt';
         setCamera(pos, id, name, type);
     }
 
@@ -419,6 +520,7 @@
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&random=" + t;
         document.getElementById('last-update').innerText = new Date().toLocaleTimeString('nl-NL', { hour12: false });
+        updateNews();
     }
 
     function hardReset() {
@@ -426,7 +528,8 @@
         for(let p in defaults) {
             const id = defaults[p];
             const item = [...sourceData.systems, ...sourceData.webcams].find(x => x.id === id);
-            setCamera(p, id, item.name, sourceData.systems.find(s => s.id === id) ? 'web' : 'yt');
+            const system = sourceData.systems.find(s => s.id === id);
+            setCamera(p, id, item.name, system ? system.type : 'yt');
             document.getElementById('sel-'+p).value = id;
         }
         verversData();
