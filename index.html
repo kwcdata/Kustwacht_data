@@ -1,265 +1,979 @@
 <!DOCTYPE html>
+
 <html lang="nl">
+
 <head>
+
     <meta charset="UTF-8">
+
     <title>Kustwacht Dashboard</title>
+
     <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/kwcdata/Kustwacht_data/refs/heads/main/kustwacht-logo.svg">
+
     
+
     <style>
+
+        /* Kleurenpalet op basis van afbeelding */
+
         :root {
-            --brand-color: #4df2ff; 
-            --bg-dark: #1e252b;    
-            --bg-black: #0d1117;   
+
+            --brand-color: #4df2ff; /* De cyan kleur uit de knop */
+
+            --bg-dark: #1e252b;    /* De donkere achtergrond van de balk */
+
+            --bg-black: #0d1117;   /* Diepere achtergrond voor contrast */
+
             --text-main: #ffffff;
+
             --border-color: #30363d;
+
         }
+
+
 
         body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; background: var(--bg-black); color: var(--text-main); font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+
         .main-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+
         
+
         header { 
-            padding: 5px 20px; background: var(--bg-dark); border-bottom: 1px solid var(--border-color); 
-            display: flex; justify-content: space-between; align-items: center; height: 35px; flex-shrink: 0;
+
+            padding: 5px 20px; 
+
+            background: var(--bg-dark); 
+
+            border-bottom: 1px solid var(--border-color); 
+
+            display: flex; 
+
+            justify-content: space-between; 
+
+            align-items: center; 
+
+            height: 35px; 
+
+            flex-shrink: 0;
+
         }
+
         .header-title-area { display: flex; align-items: center; gap: 12px; }
+
         .header-logo { height: 28px; width: auto; }
+
         header h1 { margin: 0; font-size: 16px; color: var(--brand-color); text-transform: uppercase; letter-spacing: 2px; }
+
         
+
         .header-info-area { display: flex; align-items: center; gap: 25px; }
+
         .clocks { display: flex; gap: 20px; font-family: 'Courier New', monospace; }
+
         .clock-item { text-align: right; }
+
         .clock-label { font-size: 8px; color: #8b949e; text-transform: uppercase; display: block; margin-bottom: -2px; }
+
         .clock-time { font-size: 14px; color: var(--brand-color); font-weight: bold; }
+
         
+
         .fetch-display { font-family: 'Courier New', monospace; text-align: right; border-left: 1px solid var(--border-color); padding-left: 20px; }
+
         .fetch-label { font-size: 8px; color: #8b949e; text-transform: uppercase; display: block; margin-bottom: -2px; }
+
         .fetch-time { font-size: 12px; color: #c9d1d9; font-weight: bold; }
 
+
+
         .nav-bar { 
-            background: var(--bg-dark); border-bottom: 1px solid var(--border-color); 
-            display: flex; padding: 0 10px; z-index: 1000; align-items: center; justify-content: space-between; flex-shrink: 0; min-height: 28px;
+
+            background: var(--bg-dark); 
+
+            border-bottom: 1px solid var(--border-color); 
+
+            display: flex; 
+
+            padding: 0 10px; 
+
+            z-index: 1000; 
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            flex-shrink: 0;
+
+            min-height: 28px;
+
         }
+
         .nav-links-wrapper { display: flex; flex-wrap: wrap; align-items: center; flex-grow: 1; }
-        .nav-group { position: relative; padding: 5px 10px; cursor: pointer; font-size: 10px; font-weight: bold; color: #c9d1d9; text-transform: uppercase; white-space: nowrap; }
+
+        .nav-group { 
+
+            position: relative; 
+
+            padding: 5px 10px; 
+
+            cursor: pointer; 
+
+            font-size: 10px; 
+
+            font-weight: bold; 
+
+            color: #c9d1d9; 
+
+            text-transform: uppercase; 
+
+            white-space: nowrap; 
+
+        }
+
         .nav-group:hover { background: #30363d; color: var(--brand-color); }
+
+        
+
         .dropdown { display: none; position: absolute; top: 100%; left: 0; background: #161b22; border: 1px solid var(--border-color); min-width: 220px; box-shadow: 0 8px 16px rgba(0,0,0,0.8); max-height: 75vh; overflow-y: auto; overflow-x: hidden; }
+
         .nav-group:hover .dropdown { display: block; }
-        .dropdown a, .dropdown button { color: #c9d1d9; padding: 8px 12px; text-decoration: none; display: block; font-size: 11px; border-bottom: 1px solid var(--border-color); width: 100%; text-align: left; background: none; border: none; cursor: pointer; font-family: inherit; }
+
+        
+
+        .dropdown a, .dropdown button { 
+
+            color: #c9d1d9; padding: 8px 12px; text-decoration: none; display: block; font-size: 11px; border-bottom: 1px solid var(--border-color); width: 100%; text-align: left; background: none; border: none; cursor: pointer; font-family: inherit;
+
+        }
+
         .dropdown a:hover, .dropdown button:hover { background: var(--brand-color); color: #000; }
 
+
+
         .nav-controls { display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding: 2px 0; }
+
+        .vloot-btn-group { border-left: 1px solid var(--border-color); color: var(--brand-color); margin-left: 5px; }
+
         button.reset-nav { padding: 2px 8px; background: #21262d; color: #c9d1d9; border: 1px solid var(--border-color); cursor: pointer; font-size: 9px; font-weight: bold; text-transform: uppercase; border-radius: 3px; }
 
+        button.reset-nav:hover { background: #30363d; color: #fff; }
+
+
+
         .monitor-layout { display: grid; grid-template-columns: 1fr 360px; grid-gap: 8px; flex-grow: 1; padding: 8px; overflow: hidden; }
+
+        .webcam-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; grid-gap: 10px; position: relative; }
+
         
-        /* FIX: Verhoudingen worden geforceerd door de rows op 1fr te houden */
-        .webcam-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(2, minmax(0, 1fr)); grid-gap: 10px; position: relative; }
-        
-        .cam-box { display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 0; overflow: hidden; }
+
+        .cam-box { display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 0; }
+
         .cam-box.full-slot { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 500; background: var(--bg-black); padding: 8px; box-sizing: border-box; }
 
-        .slot { position: relative; background: #0d1117; border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; flex-grow: 1; min-height: 0; }
+
+
+        .slot { position: relative; background: #0d1117; border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
+
+        .webcam-grid .slot { flex-grow: 1; }
+
         .slot iframe { flex-grow: 1; width: 100%; border: none; background: #000; }
+
         
+
         .label { background: var(--brand-color); color: #000; padding: 2px 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; display: block; flex-shrink: 0; z-index: 10; }
+
         
-        /* RSS Feed Styling */
-        .rss-container { flex-grow: 1; overflow-y: auto; background: #000; padding: 10px; box-sizing: border-box; }
-        .rss-item { border-bottom: 1px solid #222; padding: 8px 0; cursor: pointer; }
-        .rss-item:hover { background: #161b22; }
-        .rss-title { color: var(--brand-color); font-size: 12px; font-weight: bold; display: block; margin-bottom: 3px; }
-        .rss-meta { color: #8b949e; font-size: 10px; }
 
         .cam-footer { display: flex; gap: 4px; align-items: center; height: 26px; flex-shrink: 0; }
+
         .cam-selector { background: #161b22; color: #c9d1d9; border: 1px solid var(--border-color); padding: 4px; font-size: 11px; outline: none; border-radius: 2px; flex-grow: 1; }
+
         .expand-btn { background: #161b22; color: var(--brand-color); border: 1px solid var(--border-color); padding: 0 8px; cursor: pointer; font-size: 14px; border-radius: 2px; height: 26px; display: flex; align-items: center; justify-content: center; }
 
+        .expand-btn:hover { background: #30363d; }
+
+
+
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; overflow: hidden; }
-        .info-column .slot { flex: 1; min-height: 0; }
+
+        .info-column .slot { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+
         .img-container { flex: 1; position: relative; overflow: hidden; background: #000; }
-        .info-column img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+
+        .info-column img { 
+
+            position: absolute;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: contain;
+
+            background: #000;
+
+        }
+
+
 
         #p2k-notification-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .p2k-toast { background: rgba(22, 27, 34, 0.95); border-left: 4px solid var(--brand-color); color: white; padding: 12px; border-radius: 4px; width: 300px; border: 1px solid var(--border-color); pointer-events: auto; cursor: pointer; animation: slideIn 0.5s ease-out; }
+
+        .p2k-toast { background: rgba(22, 27, 34, 0.95); border-left: 4px solid var(--brand-color); color: white; padding: 12px; border-radius: 4px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); animation: slideIn 0.5s ease-out; pointer-events: auto; cursor: pointer; border: 1px solid var(--border-color); }
+
         .p2k-toast.urgency { border-left-color: #ff4444; background: rgba(60, 0, 0, 0.95); }
+
+        .p2k-toast-header { font-size: 10px; color: var(--brand-color); font-weight: bold; margin-bottom: 5px; display: flex; justify-content: space-between; }
+
+        .p2k-toast-body { font-size: 12px; line-height: 1.4; }
+
+        
+
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
     </style>
+
 </head>
+
 <body>
+
+
 
 <div id="p2k-notification-container"></div>
 
+
+
 <div class="main-container">
+
     <header>
+
         <div class="header-title-area">
+
             <img src="https://raw.githubusercontent.com/kwcdata/Kustwacht_data/refs/heads/main/kustwacht-logo.svg" alt="Kustwacht Logo" class="header-logo">
+
             <h1>Kustwacht Dashboard</h1>
+
         </div>
+
         <div class="header-info-area">
+
             <div class="clocks">
+
                 <div class="clock-item"><span class="clock-label">Lokaal (NL)</span><span id="local-clock" class="clock-time">00:00:00</span></div>
+
                 <div class="clock-item"><span class="clock-label">Zulu (UTC)</span><span id="zulu-clock" class="clock-time">00:00:00</span></div>
+
             </div>
+
             <div class="fetch-display">
+
                 <span class="fetch-label">Data Update</span>
+
                 <span id="last-update" class="fetch-time">--:--:--</span>
+
             </div>
+
         </div>
+
     </header>
 
+
+
     <nav class="nav-bar">
+
         <div class="nav-links-wrapper" id="nav-bar-links"></div>
+
         <div class="nav-controls">
-            <div class="nav-group" style="color:var(--brand-color); border-left: 1px solid var(--border-color);">VLOOT TRACKING ▾
+
+            <div class="nav-group vloot-btn-group">VLOOT TRACKING ▾
+
                 <div class="dropdown" id="fleet-dropdown"></div>
+
             </div>
+
             <span id="p2k-status" style="font-size: 9px; color: #444; text-transform: uppercase;">Monitor: Actief</span>
+
             <button class="reset-nav" onclick="hardReset()">Herstel Standaard</button>
+
         </div>
+
     </nav>
 
+
+
     <div class="monitor-layout">
+
         <div class="webcam-grid">
+
             <div class="cam-box" id="box-1">
-                <div class="slot"><span class="label" id="lbl-1">L-Boven</span><div id="cont-1" style="height:100%;"></div></div>
-                <div class="cam-footer"><select class="cam-selector" id="sel-1" onchange="changeCam(1)"></select><button class="expand-btn" onclick="toggleFullscreen(1)">⛶</button></div>
+
+                <div class="slot"><span class="label" id="lbl-1">L-Boven</span><div id="cont-1" style="height:100%; display:flex; flex-direction:column;"></div></div>
+
+                <div class="cam-footer">
+
+                    <select class="cam-selector" id="sel-1" onchange="changeCam(1)"></select>
+
+                    <button class="expand-btn" onclick="toggleFullscreen(1)">⛶</button>
+
+                </div>
+
             </div>
+
             <div class="cam-box" id="box-2">
-                <div class="slot"><span class="label" id="lbl-2">R-Boven</span><div id="cont-2" style="height:100%;"></div></div>
-                <div class="cam-footer"><select class="cam-selector" id="sel-2" onchange="changeCam(2)"></select><button class="expand-btn" onclick="toggleFullscreen(2)">⛶</button></div>
+
+                <div class="slot"><span class="label" id="lbl-2">R-Boven</span><div id="cont-2" style="height:100%; display:flex; flex-direction:column;"></div></div>
+
+                <div class="cam-footer">
+
+                    <select class="cam-selector" id="sel-2" onchange="changeCam(2)"></select>
+
+                    <button class="expand-btn" onclick="toggleFullscreen(2)">⛶</button>
+
+                </div>
+
             </div>
+
             <div class="cam-box" id="box-3">
-                <div class="slot"><span class="label" id="lbl-3">L-Onder</span><div id="cont-3" style="height:100%;"></div></div>
-                <div class="cam-footer"><select class="cam-selector" id="sel-3" onchange="changeCam(3)"></select><button class="expand-btn" onclick="toggleFullscreen(3)">⛶</button></div>
+
+                <div class="slot"><span class="label" id="lbl-3">L-Onder</span><div id="cont-3" style="height:100%; display:flex; flex-direction:column;"></div></div>
+
+                <div class="cam-footer">
+
+                    <select class="cam-selector" id="sel-3" onchange="changeCam(3)"></select>
+
+                    <button class="expand-btn" onclick="toggleFullscreen(3)">⛶</button>
+
+                </div>
+
             </div>
+
             <div class="cam-box" id="box-4">
-                <div class="slot"><span class="label" id="lbl-4">R-Onder</span><div id="cont-4" style="height:100%;"></div></div>
-                <div class="cam-footer"><select class="cam-selector" id="sel-4" onchange="changeCam(4)"></select><button class="expand-btn" onclick="toggleFullscreen(4)">⛶</button></div>
+
+                <div class="slot"><span class="label" id="lbl-4">R-Onder</span><div id="cont-4" style="height:100%; display:flex; flex-direction:column;"></div></div>
+
+                <div class="cam-footer">
+
+                    <select class="cam-selector" id="sel-4" onchange="changeCam(4)"></select>
+
+                    <button class="expand-btn" onclick="toggleFullscreen(4)">⛶</button>
+
+                </div>
+
             </div>
+
         </div>
+
         <div class="info-column">
-            <div class="slot"><span class="label">Noordzee</span><div class="img-container"><img id="knmi-1"></div></div>
-            <div class="slot"><span class="label">Kust- en binnenwateren</span><div class="img-container"><img id="knmi-2"></div></div>
-            <div class="slot"><span class="label">Radar</span><div class="img-container"><img id="radar-img"></div></div>
+
+            <div class="slot">
+
+                <span class="label">Noordzee</span>
+
+                <div class="img-container"><img id="knmi-1"></div>
+
+            </div>
+
+            <div class="slot">
+
+                <span class="label">Kust- en binnenwateren</span>
+
+                <div class="img-container"><img id="knmi-2"></div>
+
+            </div>
+
+            <div class="slot">
+
+                <span class="label">Radar</span>
+
+                <div class="img-container"><img id="radar-img"></div>
+
+            </div>
+
         </div>
+
     </div>
+
 </div>
 
+
+
 <script>
+
     const aircraft = [
+
         { reg: "PH-SAR", icao: "486449" }, { reg: "PH-RSQ", icao: "48644A" },
+
         { reg: "PH-NCG", icao: "48644B" }, { reg: "C-GCFK", icao: "C04A7D" }, { reg: "C-FCGE", icao: "C005E9" }
+
     ];
 
+
+
+    const bookmarkGroups = [
+
+        { title: "SAR", links: [
+
+            { name: "Amver (surpic)", url: "http://www.amver.com/Forms/SurpicRequest" },
+
+            { name: "LCMS", url: "https://mijn.lcms.nl/gebruikersbeheer/#/login" },
+
+            { name: "ISAR Bristow", url: "https://isar.im/" },
+
+            { name: "CECIS Marine Pollution Log In", url: "https://webgate.ec.europa.eu/CECIS/login.jsp" },
+
+            { name: "P2kflex", url: "https://expert.p2kflex.nl/index.php?regio=403%3B404%3B&audio=&volume=75&include=knrm%3Bkustwacht%3Bredding%3Bwater%3Bgrip" },
+
+            { name: "Winnies.livep2000.nl", url: "https://winnies.livep2000.nl/" },
+
+            { name: "P2000.page", url: "https://p2000.page/" },
+
+            { name: "112MELDINGEN.NL", url: "http://112meldingen.nl/index.php" },
+
+            { name: "CAPCode database", url: "http://www.capcode.nl/capsite/index.php" },
+
+            { name: "Global SAR Hub (Sea-SAR)", url: "https://www.globalsarhub.com/sea-sar.html" },
+
+            { name: "International Cospas-Sarsat", url: "https://cospas-sarsat.int/en/" },
+
+            { name: "LADR", url: "https://ladr.eurocontrol.int/ops/frontend" }
+
+        ]},
+
+        { title: "KNRM/KNBRD", links: [
+
+            { name: "Strandveilig", url: "https://strandveilig.nl/beschikbaar/#/login" },
+
+            { name: "KNRM helpt", url: "https://www.knrmhelpt.nl/index.html?home" },
+
+            { name: "Radio Medische Dienst", url: "https://rmd.businessfundamentals.nl/auth/signin?ReturnUrl=%2fdossiers" },
+
+            { name: "Pre-Com", url: "https://www.pre-com.nl/PreCom/Account/Login" },
+
+            { name: "GIS KNRM", url: "https://www.arcgis.com/apps/mapviewer/index.html?webmap=04162a3c264d462e96e4ec508519ce95" },
+
+            { name: "Portal.lifeguardtracking.nl", url: "https://portal.lifeguardtracking.nl/" }
+
+        ]},
+
+        { title: "Overheid", links: [
+
+            { name: "RWsOS Viewer", url: "https://rwsos.rws.nl/viewer/map/noordzee/waterkwantiteit" },
+
+            { name: "Waterberichtgeving KWC", url: "https://waterberichtgeving.rws.nl/owb/home" },
+
+            { name: "KNMI extranet", url: "https://mijn.knmi.nl" },
+
+            { name: "Waddendata.nl", url: "https://waddendata.nl/" },
+
+            { name: "Rijkswaterstaat Waterinfo", url: "https://waterinfo.rws.nl/#!/kaart/waterhoogte-t-o-v-nap/" },
+
+            { name: "GeoWeb (betonning)", url: "https://maps.rijkswaterstaat.nl/geoweb55/index.html?viewer=NMA" },
+
+            { name: "Noordzeeloket", url: "https://www.noordzeeloket.nl/" },
+
+            { name: "Onderwaterobjecten RWS", url: "https://onderwaterobjecten.rws.nl/" },
+
+            { name: "Weerdata Kustwacht", url: "https://weerdatakustwacht.wordpress.com/" }
+
+        ]},
+
+        { title: "Scheepvaart", links: [
+
+            { name: "EMSA Portal", url: "https://portal.emsa.europa.eu/home" },
+
+            { name: "ERICards", url: "http://www.ericards.net/" },
+
+            { name: "Rainwat", url: "http://www.rainwat.bipt.be/" },
+
+            { name: "Lloyds Seasearcher", url: "https://www.seasearcher.com/" },
+
+            { name: "Sign In | NATO ISMERLO", url: "https://ismerlo.org/accounts/login/" },
+
+            { name: "Nautical calculator", url: "https://www.madinstro.net/" },
+
+            { name: "Navtex", url: "http://navtex.lv/" },
+
+            { name: "Kabels Noordzee", url: "https://kis-orca.org/map/" }
+
+        ]},
+
+        { title: "Scheepvaart DB", links: [
+
+            { name: "Sketchy.boats", url: "https://sketchy.boats/" },
+
+            { name: "406 MHz Registration", url: "https://www.406registration.com" },
+
+            { name: "RescueNET", url: "https://msds.portal.inmarsat.com/msds/" },
+
+            { name: "Beacon Decode", url: "https://cospas-sarsat.int/en/beacons-pro/beacon-message-decode-program-txsep/beacon-message-decode-program" },
+
+            { name: "Ship Station List (ITU)", url: "https://www.itu.int/mmsapp/ShipStation/list" },
+
+            { name: "MMSI MID Codes", url: "https://www.vtexplorer.com/mmsi-mid-codes-en/" },
+
+            { name: "NOGEPA RAS", url: "http://ras.nogepa.nl/login.php" }
+
+        ]},
+
+        { title: "AIS", links: [
+
+            { name: "VIIA", url: "https://viia-p.kustwacht.nl/" },
+
+            { name: "Waterkaart.net", url: "https://waterkaart.net/" },
+
+            { name: "AMS (AIS RWS)", url: "https://ais-ams.rws.rijksweb.nl/ams/" },
+
+            { name: "Maritime Control", url: "https://bfa.kustwacht.nl/" },
+
+            { name: "Madesmart", url: "https://tracker.madesmart.nl/" }
+
+        ]},
+
+        { title: "Plannen", links: [
+
+            { name: "IBP Noordzee", url: "https://noordzeeloket.nl/functies-gebruik/artikel-baseline-0/" },
+
+            { name: "IBP SAMIJ", url: "https://ibpsamij.calamiteiten.online/templates/" },
+
+            { name: "Handboek incident", url: "https://nipv.nl/wp-content/uploads/2025/12/20251203-NIPV-Handboek-incidentbestrijding-op-het-water.pdf" }
+
+        ]},
+
+        { title: "Luchtvaart", links: [
+
+            { name: "LVNL AIS", url: "https://www.lvnl.nl/informatie-voor-luchtvarenden/publicaties-voor-luchtvarenden" },
+
+            { name: "SkyVector", url: "https://skyvector.com/" },
+
+            { name: "Aireon Alert", url: "https://aireonalert.iaa.ie/alert-login" },
+
+            { name: "METAR-TAF.com", url: "https://metar-taf.com/" },
+
+            { name: "E6BX Calculator", url: "https://e6bx.com/" },
+
+            { name: "Aviation Glossary", url: "https://www.pilotscafe.com/glossary/" },
+
+            { name: "EHAMCDM Mobile", url: "https://mobile.ehamcdm.nl/" }
+
+        ]},
+
+        { title: "Luchtvaart DB", links: [
+
+            { name: "406 MHz Registration", url: "https://www.406registration.com/" },
+
+            { name: "Beacon Decode", url: "https://cospas-sarsat.int/en/beacons-pro/beacon-message-decode-program-txsep/beacon-message-decode-program" },
+
+            { name: "Ballonregister", url: "https://www.ballonregister.nl/" },
+
+            { name: "Airframes", url: "https://www.airframes.org/" },
+
+            { name: "Airline Codes", url: "https://airlinecodes.info/" }
+
+        ]},
+
+        { title: "Tracking", links: [
+
+            { name: "FlightAware", url: "https://www.flightaware.com/" },
+
+            { name: "Casper Tracking", url: "https://kustwacht-flighttracking.casper.aero/index.php" },
+
+            { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" },
+
+            { name: "Flightradar24", url: "https://www.flightradar24.com/" }
+
+        ]},
+
+        { title: "Taal/Rekenen", links: [
+
+            { name: "Spelling.nu", url: "https://www.spelling.nu/" },
+
+            { name: "Vertalen.nu", url: "http://www.vertalen.nu/vervoegen/" },
+
+            { name: "NATO Translator", url: "https://cryptii.com/pipes/nato-phonetic-alphabet" },
+
+            { name: "Web 2.0 Calc", url: "https://web2.0calc.com/" }
+
+        ]},
+
+        { title: "Navigatie", links: [
+
+            { name: "GPS Converter", url: "http://www.gpscoordinaten.nl/converteer-gps-coordinaten.php" },
+
+            { name: "Hectometerpaal", url: "http://www.hmpaal.nl/" },
+
+            { name: "Time Zone Map", url: "https://www.timeanddate.com/time/map/" },
+
+            { name: "Apple Maps Beta", url: "https://beta.maps.apple.com/" },
+
+            { name: "Remove Paywalls", url: "https://removepaywalls.com/" }
+
+        ]},
+
+        { title: "Beheer", links: [
+
+            { name: "GitHub Edit", url: "https://github.com/kwcdata/Kustwacht_data/edit/main/index.html" }
+
+        ]}
+
+    ];
+
+
+
     const sourceData = {
+
         systems: [
-            {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0', name: 'P2000 (Kustwacht)', type: 'web'},
-            {id: 'https://feeds.nos.nl/nosnieuwsalgemeen', name: 'NOS Nieuws (RSS)', type: 'rss'},
+
+            {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000 (Kustwacht)', type: 'web'},
+
+            {id: 'https://m.p2kflex.nl/index.php?regio=none%3B&audio=&volume=75&include=&exclude=&capcode=&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000 (Basis)', type: 'web'},
+
             {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange', type: 'web'}
+
         ],
+
         webcams: [
-            {id: 'A5kXiKzbBFs', name: 'Scheveningen Blvd', type: 'yt'},
-            {id: 'q0-DDh1zdY4', name: 'Zandvoort Blvd', type: 'yt'},
+
+            {id: 'KjK02QIm4ZI', name: 'Brouwersdam', type: 'yt'},
+
             {id: 'mI1Os7TFdGc', name: 'Egmond aan Zee', type: 'yt'},
-            {id: 'Ud7I4jprFN0', name: 'Maasvlakte', type: 'yt'},
+
             {id: 'jDF264Bg1_c', name: 'Hoek v Holland Blvd', type: 'yt'},
+
             {id: 'mnxV4iit7S4', name: 'Kijkduin Blvd', type: 'yt'},
-            {id: 'KjK02QIm4ZI', name: 'Brouwersdam', type: 'yt'}
+
+            {id: 'Ud7I4jprFN0', name: 'Maasvlakte', type: 'yt'},
+
+            {id: '_pGIJmXxAHk', name: 'Nieuwe Waterweg', type: 'yt'},
+
+            {id: 'dtFG_mcfWjQ', name: 'Noordwijk Blvd', type: 'yt'},
+
+            {id: 'L76VKII_Z7k', name: 'Noordwijk Vuurtoren', type: 'yt'},
+
+            {id: 'csMnwbjV5vg', name: 'Rockanje', type: 'yt'},
+
+            {id: 'A5kXiKzbBFs', name: 'Scheveningen Blvd', type: 'yt'},
+
+            {id: 'DaG5JReOYEw', name: 'Scheveningen Noord', type: 'yt'},
+
+            {id: 't3qbzZHOTyg', name: 'Wassenaarse Slag', type: 'yt'},
+
+            {id: 'q0-DDh1zdY4', name: 'Zandvoort Blvd', type: 'yt'}
+
         ]
+
     };
 
-    // Standaard instellingen: Box 2 is nu de RSS feed
-    const defaults = { 1: sourceData.systems[0].id, 2: sourceData.systems[1].id, 3: 'A5kXiKzbBFs', 4: 'q0-DDh1zdY4' };
-    
+
+
+    const defaults = { 1: sourceData.systems[0].id, 2: sourceData.systems[2].id, 3: 'A5kXiKzbBFs', 4: 'q0-DDh1zdY4' };
+
+    let activeStreams = { 1: null, 2: null, 3: null, 4: null };
+
+    let lastP2kId = null;
+
+
+
     function updateClocks() {
+
         const nu = new Date();
-        document.getElementById('local-clock').innerText = nu.toLocaleTimeString('nl-NL', { hour12: false });
-        document.getElementById('zulu-clock').innerText = nu.toLocaleTimeString('nl-NL', { timeZone: 'UTC', hour12: false });
+
+        
+
+        const nlTime = nu.toLocaleTimeString('nl-NL', { 
+
+            timeZone: 'Europe/Amsterdam', 
+
+            hour12: false, 
+
+            hour: '2-digit', 
+
+            minute: '2-digit', 
+
+            second: '2-digit' 
+
+        });
+
+        document.getElementById('local-clock').innerText = nlTime;
+
+
+
+        const zuluTime = nu.toLocaleTimeString('nl-NL', { 
+
+            timeZone: 'UTC', 
+
+            hour12: false, 
+
+            hour: '2-digit', 
+
+            minute: '2-digit', 
+
+            second: '2-digit' 
+
+        });
+
+        document.getElementById('zulu-clock').innerText = zuluTime;
+
     }
 
-    async function fetchRSS(url, pos) {
-        const container = document.getElementById('cont-' + pos);
-        container.innerHTML = '<div style="padding:15px; color:#888;">Laden...</div>';
-        try {
-            const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`);
-            const data = await response.json();
-            if (data.status === 'ok') {
-                container.innerHTML = `<div class="rss-container">` + data.items.map(item => `
-                    <div class="rss-item" onclick="window.open('${item.link}', '_blank')">
-                        <span class="rss-title">${item.title}</span>
-                        <span class="rss-meta">${new Date(item.pubDate).toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'})} - ${data.feed.title}</span>
-                    </div>`).join('') + `</div>`;
-            }
-        } catch (e) { container.innerHTML = '<div style="padding:15px; color:red;">RSS Fout</div>'; }
+
+
+    function initFleetMenu() {
+
+        const menu = document.getElementById('fleet-dropdown');
+
+        menu.innerHTML = aircraft.map(p => `<button onclick="trackPlane('${p.icao}', '${p.reg}')">Track: ${p.reg}</button>`).join('');
+
     }
 
-    function setCamera(pos, id, name, type) {
-        const container = document.getElementById('cont-' + pos);
-        if (type === 'rss') {
-            fetchRSS(id, pos);
-        } else if (type === 'web') {
-            container.innerHTML = `<iframe src="${id}" allow="autoplay; allowfullscreen"></iframe>`;
-        } else {
-            container.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0" allow="autoplay; allowfullscreen"></iframe>`;
-        }
-        document.getElementById('lbl-' + pos).innerText = name.replace("★ ", "");
+
+
+    function initNavBar() {
+
+        const nav = document.getElementById('nav-bar-links');
+
+        nav.innerHTML = bookmarkGroups.map(g => `
+
+            <div class="nav-group">${g.title} ▾
+
+                <div class="dropdown">${g.links.map(l => `<a href="${l.url}" target="_blank">${l.name}</a>`).join('')}</div>
+
+            </div>
+
+        `).join('');
+
     }
 
-    function changeCam(pos) {
-        const sel = document.getElementById('sel-' + pos);
-        const id = sel.value;
-        const name = sel.options[sel.selectedIndex].text;
-        const system = sourceData.systems.find(s => s.id === id);
-        setCamera(pos, id, name, system ? system.type : 'yt');
+
+
+    function trackPlane(icao, reg) {
+
+        const url = `https://globe.adsbexchange.com/?icao=${icao}&zoom=11`;
+
+        setCamera(2, url, `Tracking: ${reg}`, 'web');
+
+        document.getElementById('sel-2').value = sourceData.systems[2].id; 
+
     }
+
+
 
     function setupSelectors() {
+
         for (let i = 1; i <= 4; i++) {
+
             const sel = document.getElementById('sel-' + i);
-            sel.innerHTML = '';
+
+            sel.innerHTML = ''; 
+
+            const defaultId = defaults[i];
+
+
+
             const g1 = document.createElement('optgroup'); g1.label = "SYSTEMEN";
-            sourceData.systems.forEach(s => sel.add(new Option((s.id === defaults[i] ? "★ " : "") + s.name, s.id)));
+
+            sourceData.systems.forEach(s => { 
+
+                const opt = new Option((s.id === defaultId ? "★ " : "") + s.name, s.id);
+
+                g1.appendChild(opt); 
+
+            });
+
+
+
             const g2 = document.createElement('optgroup'); g2.label = "WEBCAMS";
-            sourceData.webcams.forEach(w => sel.add(new Option((w.id === defaults[i] ? "★ " : "") + w.name, w.id)));
-            sel.value = defaults[i];
+
+            sourceData.webcams.forEach(w => { 
+
+                const opt = new Option((w.id === defaultId ? "★ " : "") + w.name, w.id);
+
+                g2.appendChild(opt); 
+
+            });
+
+
+
+            sel.appendChild(g1);
+
+            sel.appendChild(g2);
+
+            sel.value = defaultId;
+
         }
+
     }
 
-    function verversData() {
-        const t = new Date().getTime();
-        document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
-        document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
-        document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&r=" + t;
-        document.getElementById('last-update').innerText = new Date().toLocaleTimeString('nl-NL', { hour12: false });
+
+
+    function setCamera(pos, id, name, type) {
+
+        const container = document.getElementById('cont-' + pos);
+
+        activeStreams[pos] = { id, name, type };
+
+        const ts = new Date().getTime();
+
+        const url = type === 'web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0&t=${ts}`;
+
+        container.innerHTML = `<iframe id="frame-${pos}" src="${url}" allow="autoplay; allowfullscreen"></iframe>`;
+
+        document.getElementById('lbl-' + pos).innerText = name.replace("★ ", "");
+
     }
+
+
+
+    function changeCam(pos) {
+
+        const sel = document.getElementById('sel-' + pos);
+
+        const id = sel.value;
+
+        const name = sel.options[sel.selectedIndex].text;
+
+        const type = sourceData.systems.find(s => s.id === id) ? 'web' : 'yt';
+
+        setCamera(pos, id, name, type);
+
+    }
+
+
 
     function toggleFullscreen(pos) {
-        document.getElementById('box-' + pos).classList.toggle('full-slot');
+
+        const box = document.getElementById('box-' + pos);
+
+        const isFull = box.classList.contains('full-slot');
+
+        document.querySelectorAll('.cam-box').forEach(b => b.classList.remove('full-slot'));
+
+        if (!isFull) box.classList.add('full-slot');
+
     }
+
+
+
+    function verversData() {
+
+        const t = new Date().getTime();
+
+        document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
+
+        document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
+
+        document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&random=" + t;
+
+        document.getElementById('last-update').innerText = new Date().toLocaleTimeString('nl-NL', { hour12: false });
+
+    }
+
+
+
+    async function checkP2000() {
+
+        try {
+
+            const rssUrl = encodeURIComponent('https://p2000.net/rss/index.php?regio=403,404');
+
+            const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
+
+            const data = await response.json();
+
+            if (data.status === 'ok' && data.items.length > 0) {
+
+                const latest = data.items[0];
+
+                const latestId = latest.guid || latest.link;
+
+                if (lastP2kId && latestId !== lastP2kId) { showNotification(latest); }
+
+                lastP2kId = latestId;
+
+                document.getElementById('p2k-status').style.color = '#00ff00';
+
+            }
+
+        } catch (e) { document.getElementById('p2k-status').style.color = '#ff4444'; }
+
+    }
+
+
+
+    function showNotification(item) {
+
+        const container = document.getElementById('p2k-notification-container');
+
+        const toast = document.createElement('div');
+
+        const isUrgent = item.title.toLowerCase().includes('prio 1') || item.title.toLowerCase().includes('grip');
+
+        toast.className = `p2k-toast ${isUrgent ? 'urgency' : ''}`;
+
+        toast.innerHTML = `<div class="p2k-toast-header"><span>NIEUWE MELDING</span><span>${new Date().toLocaleTimeString('nl-NL', { hour12: false })}</span></div><div class="p2k-toast-body">${item.title}</div>`;
+
+        toast.onclick = () => {
+
+            setCamera(1, sourceData.systems[0].id, sourceData.systems[0].name, 'web');
+
+            document.getElementById('sel-1').value = sourceData.systems[0].id;
+
+            toast.remove();
+
+        };
+
+        container.appendChild(toast);
+
+        setTimeout(() => { if (toast.parentNode) toast.remove(); }, 15000);
+
+        const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+
+        audio.play().catch(e => {});
+
+    }
+
+
 
     function hardReset() {
+
+        document.querySelectorAll('.cam-box').forEach(b => b.classList.remove('full-slot'));
+
         for(let p in defaults) {
+
             const id = defaults[p];
+
             const item = [...sourceData.systems, ...sourceData.webcams].find(x => x.id === id);
-            setCamera(p, id, item.name, sourceData.systems.find(s => s.id === id)?.type || 'yt');
+
+            setCamera(p, id, item.name, sourceData.systems.find(s => s.id === id) ? 'web' : 'yt');
+
             document.getElementById('sel-'+p).value = id;
+
         }
+
+        verversData();
+
     }
 
-    // Navigatie & Fleet menu initialisatie (hergebruikt van vorige versie)
-    function initMenus() {
-        document.getElementById('nav-bar-links').innerHTML = [
-            { title: "SAR", links: [{ name: "Amver", url: "http://www.amver.com" }, { name: "LCMS", url: "https://mijn.lcms.nl" }] },
-            { title: "Overheid", links: [{ name: "KNMI", url: "https://mijn.knmi.nl" }] }
-        ].map(g => `<div class="nav-group">${g.title} ▾ <div class="dropdown">${g.links.map(l => `<a href="${l.url}" target="_blank">${l.name}</a>`).join('')}</div></div>`).join('');
-        
-        document.getElementById('fleet-dropdown').innerHTML = aircraft.map(p => `<button onclick="setCamera(2, 'https://globe.adsbexchange.com/?icao=${p.icao}&zoom=11', 'Track: ${p.reg}', 'web')">Track: ${p.reg}</button>`).join('');
-    }
+
 
     document.addEventListener('DOMContentLoaded', () => { 
-        setupSelectors(); initMenus(); hardReset(); updateClocks();
-        setInterval(updateClocks, 1000); setInterval(verversData, 300000); verversData();
+
+        setupSelectors(); initFleetMenu(); initNavBar(); hardReset(); updateClocks();
+
+        setInterval(updateClocks, 1000); 
+
+        setInterval(verversData, 300000); 
+
+        setInterval(checkP2000, 300000);
+
+        checkP2000();
+
     });
+
 </script>
+
 </body>
+
 </html>
