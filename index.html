@@ -8,10 +8,12 @@
         :root { --brand-color: #4df2ff; --bg-dark: #1e252b; --bg-black: #0d1117; --text-main: #ffffff; --border-color: #30363d; }
         body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; background: var(--bg-black); color: var(--text-main); font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         .main-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+        
         header { padding: 0 20px; background: var(--bg-dark); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; height: 50px; flex-shrink: 0; }
         .header-title-area { display: flex; align-items: center; gap: 12px; }
         .header-logo { height: 35px; width: auto; }
         header h1 { margin: 0; font-size: 16px; color: var(--brand-color); text-transform: uppercase; letter-spacing: 2px; }
+        
         .header-info-area { display: flex; align-items: center; gap: 30px; }
         .clocks { display: flex; gap: 30px; font-family: 'Courier New', monospace; align-items: center; }
         .clock-item { display: flex; align-items: baseline; gap: 10px; }
@@ -20,6 +22,7 @@
         .fetch-display { font-family: 'Courier New', monospace; border-left: 1px solid var(--border-color); padding-left: 20px; display: flex; align-items: baseline; gap: 8px; }
         .fetch-label { font-size: 9px; color: #8b949e; text-transform: uppercase; font-weight: bold; }
         .fetch-time { font-size: 20px; color: #c9d1d9; font-weight: bold; line-height: 1; }
+
         .nav-bar { background: var(--bg-dark); border-bottom: 1px solid var(--border-color); display: flex; padding: 0 10px; z-index: 1000; align-items: center; justify-content: space-between; flex-shrink: 0; min-height: 28px; }
         .nav-links-wrapper { display: flex; flex-wrap: wrap; align-items: center; flex-grow: 1; }
         .nav-group { position: relative; padding: 5px 10px; cursor: pointer; font-size: 10px; font-weight: bold; color: #c9d1d9; text-transform: uppercase; white-space: nowrap; }
@@ -28,24 +31,30 @@
         .nav-group:hover .dropdown { display: block; }
         .dropdown a, .dropdown button { color: #c9d1d9; padding: 8px 12px; text-decoration: none; display: block; font-size: 11px; border-bottom: 1px solid var(--border-color); width: 100%; text-align: left; background: none; border: none; cursor: pointer; font-family: inherit; }
         .dropdown a:hover, .dropdown button:hover { background: var(--brand-color); color: #000; }
+
         .nav-controls { display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding: 2px 0; }
         .vloot-btn-group { border-left: 1px solid var(--border-color); color: var(--brand-color); margin-left: 5px; }
         button.reset-nav { padding: 2px 8px; background: #21262d; color: #c9d1d9; border: 1px solid var(--border-color); cursor: pointer; font-size: 9px; font-weight: bold; text-transform: uppercase; border-radius: 3px; }
+
         .monitor-layout { display: grid; grid-template-columns: 1fr 360px; grid-gap: 8px; flex-grow: 1; padding: 8px; overflow: hidden; }
         .webcam-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; grid-gap: 10px; position: relative; }
+        
         .cam-box { display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 0; }
         .cam-box.full-slot { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 500; background: var(--bg-black); padding: 8px; box-sizing: border-box; }
         .slot { position: relative; background: #0d1117; border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
         .webcam-grid .slot { flex-grow: 1; }
         .slot iframe { flex-grow: 1; width: 100%; border: none; background: #000; }
         .label { background: var(--brand-color); color: #000; padding: 2px 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; display: block; flex-shrink: 0; z-index: 10; }
+        
         .news-container { flex: 1; overflow-y: auto; background: #0d1117; padding: 10px; }
         .news-article { border-bottom: 1px solid var(--border-color); padding: 10px 0; }
         .news-article a { color: var(--brand-color); text-decoration: none; font-size: 13px; font-weight: bold; display: block; margin-bottom: 3px; }
         .news-article .date { color: #8b949e; font-size: 10px; text-transform: uppercase; }
+
         .cam-footer { display: flex; gap: 4px; align-items: center; height: 26px; flex-shrink: 0; }
         .cam-selector { background: #161b22; color: #c9d1d9; border: 1px solid var(--border-color); padding: 4px; font-size: 11px; outline: none; border-radius: 2px; flex-grow: 1; }
         .expand-btn { background: #161b22; color: var(--brand-color); border: 1px solid var(--border-color); padding: 0 8px; cursor: pointer; font-size: 14px; border-radius: 2px; height: 26px; display: flex; align-items: center; justify-content: center; }
+
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; overflow: hidden; }
         .info-column .slot { flex: 1; min-height: 0; display: flex; flex-direction: column; }
         .img-container { flex: 1; position: relative; overflow: hidden; background: #000; }
@@ -53,6 +62,7 @@
     </style>
 </head>
 <body>
+
 <div class="main-container">
     <header>
         <div class="header-title-area">
@@ -67,6 +77,7 @@
             <div class="fetch-display"><span class="fetch-label">Update</span><span id="last-update" class="fetch-time">--:--:--</span></div>
         </div>
     </header>
+
     <nav class="nav-bar">
         <div class="nav-links-wrapper" id="nav-bar-links"></div>
         <div class="nav-controls">
@@ -74,6 +85,7 @@
             <button class="reset-nav" onclick="hardReset()">Herstel Standaard</button>
         </div>
     </nav>
+
     <div class="monitor-layout">
         <div class="webcam-grid">
             <div class="cam-box" id="box-1">
@@ -100,6 +112,7 @@
         </div>
     </div>
 </div>
+
 <script>
     const aircraft = [
         { reg: "PH-SAR", icao: "486449" }, { reg: "PH-RSQ", icao: "48644A" },
@@ -136,12 +149,16 @@
             { name: "Waddendata.nl", url: "https://waddendata.nl/" },
             { name: "RWS Waterinfo", url: "https://waterinfo.rws.nl/#!/kaart/waterhoogte-t-o-v-nap/" },
             { name: "GeoWeb (betonning)", url: "https://maps.rijkswaterstaat.nl/geoweb55/index.html?viewer=NMA" },
-            { name: "Noordzeeloket", url: "https://www.noordzeeloket.nl/" }
+            { name: "Noordzeeloket", url: "https://www.noordzeeloket.nl/" },
+            { name: "Onderwaterobjecten RWS", url: "https://onderwaterobjecten.rws.nl/" },
+            { name: "Weerdata KWC", url: "https://weerdatakustwacht.wordpress.com/" }
         ]},
         { title: "Scheepvaart", links: [
             { name: "EMSA Portal", url: "https://portal.emsa.europa.eu/home" },
             { name: "ERICards", url: "http://www.ericards.net/" },
+            { name: "Rainwat", url: "http://www.rainwat.bipt.be/" },
             { name: "Lloyds Seasearcher", url: "https://www.seasearcher.com/" },
+            { name: "NATO ISMERLO", url: "https://ismerlo.org/accounts/login/" },
             { name: "Nautical calculator", url: "https://www.madinstro.net/" },
             { name: "Navtex", url: "http://navtex.lv/" },
             { name: "Kabels Noordzee", url: "https://kis-orca.org/map/" }
@@ -149,19 +166,25 @@
         { title: "Scheepvaart DB", links: [
             { name: "Sketchy.boats", url: "https://sketchy.boats/" },
             { name: "406 MHz Registration", url: "https://www.406registration.com" },
+            { name: "RescueNET", url: "https://msds.portal.inmarsat.com/msds/" },
+            { name: "Beacon Decode", url: "https://cospas-sarsat.int/en/beacons-pro/beacon-message-decode-program-txsep/beacon-message-decode-program" },
             { name: "Ship Station List (ITU)", url: "https://www.itu.int/mmsapp/ShipStation/list" },
-            { name: "MMSI MID Codes", url: "https://www.vtexplorer.com/mmsi-mid-codes-en/" }
+            { name: "MMSI MID Codes", url: "https://www.vtexplorer.com/mmsi-mid-codes-en/" },
+            { name: "NOGEPA RAS", url: "http://ras.nogepa.nl/login.php" }
         ]},
         { title: "AIS", links: [
             { name: "VIIA", url: "https://viia-p.kustwacht.nl/" },
             { name: "Waterkaart.net", url: "https://waterkaart.net/" },
             { name: "AMS (AIS RWS)", url: "https://ais-ams.rws.rijksweb.nl/ams/" },
-            { name: "Maritime Control", url: "https://bfa.kustwacht.nl/" }
+            { name: "Maritime Control", url: "https://bfa.kustwacht.nl/" },
+            { name: "Madesmart", url: "https://tracker.madesmart.nl/" }
         ]},
         { title: "Luchtvaart", links: [
             { name: "LVNL AIS", url: "https://www.lvnl.nl/informatie-voor-luchtvarenden/publicaties-voor-luchtvarenden" },
             { name: "SkyVector", url: "https://skyvector.com/" },
-            { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" }
+            { name: "Aireon Alert", url: "https://aireonalert.iaa.ie/alert-login" },
+            { name: "METAR-TAF.com", url: "https://metar-taf.com/" },
+            { name: "E6BX Calculator", url: "https://e6bx.com/" }
         ]},
         { title: "Tracking", links: [
             { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" },
@@ -208,7 +231,6 @@
         ]
     };
 
-    // Nieuwsfeed als favoriet rechtsboven (Slot 2)
     const defaults = { 1: sourceData.systems[0].id, 2: 'news_file', 3: sourceData.systems[2].id, 4: 'A5kXiKzbBFs' };
     let activeStreams = { 1: null, 2: null, 3: null, 4: null };
 
@@ -224,7 +246,6 @@
         container.innerHTML = '<div style="padding:20px; color:#8b949e;">Nieuws laden uit GitHub...</div>';
         try {
             const response = await fetch('news.json?t=' + new Date().getTime());
-            if (!response.ok) throw new Error();
             const items = await response.json();
             let html = '<div class="news-container">';
             items.forEach(item => {
@@ -232,7 +253,7 @@
             });
             html += '</div>';
             container.innerHTML = html;
-        } catch (e) { container.innerHTML = '<div style="padding:20px; color:#ff4444;">Nieuws-bestand nog niet beschikbaar.</div>'; }
+        } catch (e) { container.innerHTML = '<div style="padding:20px; color:#ff4444;">Nieuwsfeed tijdelijk niet beschikbaar.</div>'; }
     }
 
     function initFleetMenu() {
