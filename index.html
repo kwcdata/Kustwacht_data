@@ -51,7 +51,6 @@
         .slot { flex-grow: 1; min-height: 0; position: relative; display: flex; flex-direction: column; }
         .slot iframe { width: 100%; height: 100%; border: none; background: #000; }
 
-        /* --- NIEUWSFEED OPTIMALISATIE --- */
         .news-container { flex: 1; overflow-y: auto; background: #0d1117; padding: 4px 8px; height: 100%; font-family: 'Segoe UI', sans-serif; }
         .news-article { border-bottom: 1px solid #1e252d; padding: 8px 0; display: flex; flex-direction: column; }
         .news-header { display: flex; gap: 10px; align-items: baseline; line-height: 1.2; margin-bottom: 4px; }
@@ -182,19 +181,15 @@
         if (activeStreams[4].type === 'yt') { setCamera(4, cam4.id, cam4.name, 'yt'); document.getElementById('sel-4').value = cam4.id; }
     }
 
-    // ROBUUST NIEUWS LADEN MET CACHE
     async function fetchRSS(pos) {
         const container = document.getElementById('cont-' + pos);
         const rssUrl = "https://feeds.nos.nl/nosnieuwsalgemeen";
-        
-        // Proxy-lijst voor maximale kans op succes
         const proxyUrls = [
             `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}&t=${new Date().getTime()}`,
             `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`,
             `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(rssUrl)}`
         ];
 
-        // Eerst kijken of we iets in het geheugen hebben
         const cachedNews = localStorage.getItem('kwc_news_cache');
         if (cachedNews && (container.innerHTML === "" || container.innerText.includes("laden"))) {
             container.innerHTML = cachedNews;
@@ -203,13 +198,10 @@
         for (let proxy of proxyUrls) {
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 6000); // 6 sec timeout
-
+                const timeoutId = setTimeout(() => controller.abort(), 6000);
                 const response = await fetch(proxy, { signal: controller.signal });
                 clearTimeout(timeoutId);
-
                 if (!response.ok) continue;
-
                 let xmlString;
                 if (proxy.includes('allorigins')) {
                     const data = await response.json();
@@ -217,24 +209,19 @@
                 } else {
                     xmlString = await response.text();
                 }
-
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlString, "text/xml");
                 const items = xmlDoc.querySelectorAll("item");
-
                 if (items.length === 0) continue;
-
                 let html = '<div class="news-container">';
                 Array.from(items).slice(0, 15).forEach(item => {
                     const title = item.querySelector("title")?.textContent || "Geen titel";
                     const link = item.querySelector("link")?.textContent || "#";
                     const rawDesc = item.querySelector("description")?.textContent || "";
                     const cleanDesc = rawDesc.replace(/<[^>]*>?/gm, '').trim();
-                    
                     const pubDate = item.querySelector("pubDate")?.textContent || "";
                     const dateObj = new Date(pubDate);
                     const time = dateObj.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
-
                     html += `
                     <div class="news-article">
                         <div class="news-header">
@@ -245,28 +232,18 @@
                     </div>`;
                 });
                 html += '</div>';
-
-                // Opslaan in geheugen voor de volgende keer
                 localStorage.setItem('kwc_news_cache', html);
                 container.innerHTML = html;
-                return; // Succes!
-            } catch (e) {
-                console.warn("Proxy switch...", e);
-            }
-        }
-
-        // Als alles faalt en we hebben niks in de cache
-        if (!localStorage.getItem('kwc_news_cache')) {
-            container.innerHTML = '<div class="news-container" style="color:#ff4444; padding:20px;">Geen nieuws beschikbaar. Probeer de pagina te verversen.</div>';
+                return;
+            } catch (e) { console.warn("Proxy switch...", e); }
         }
     }
 
     function setCamera(pos, id, name, type) {
         const container = document.getElementById('cont-' + pos);
         activeStreams[pos] = { id, type };
-        if (type === 'rss') { 
-            fetchRSS(pos); 
-        } else {
+        if (type === 'rss') { fetchRSS(pos); } 
+        else {
             const url = type === 'web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0`;
             container.innerHTML = `<iframe src="${url}" allow="autoplay; allowfullscreen"></iframe>`;
         }
@@ -284,12 +261,15 @@
         box.classList.toggle('full-slot'); 
     }
 
+    // WEER-DATA VERVERSING (ELKE 2 MINUTEN)
     function verversData() {
         const t = new Date().getTime();
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&random=" + t;
         document.getElementById('last-update').innerText = new Date().toLocaleTimeString('nl-NL', { hour12: false });
+        
+        // Alleen nieuws verversen als er een RSS stream actief is
         [1,2,3,4].forEach(p => { if(activeStreams[p] && activeStreams[p].type === 'rss') fetchRSS(p); });
     }
 
@@ -305,11 +285,9 @@
 
     document.addEventListener('DOMContentLoaded', () => { 
         document.getElementById('nav-bar-links').innerHTML = bookmarkGroups.map(g => `<div class="nav-group">${g.title} ▾<div class="dropdown">${g.links.map(l => `<a href="${l.url}" target="_blank">${l.name}</a>`).join('')}</div></div>`).join('');
-        
         document.getElementById('fleet-dropdown').innerHTML = aircraft.map(p => `
             <button onclick="setCamera(2, 'https://globe.adsbexchange.com/?icao=${p.icao}&zoom=11', 'Track: ${p.reg}', 'web')">Track: ${p.reg}</button>
         `).join('');
-        
         for (let i = 1; i <= 4; i++) {
             const sel = document.getElementById('sel-' + i);
             const g1 = document.createElement('optgroup'); g1.label = "SYSTEMEN";
@@ -325,7 +303,9 @@
             document.getElementById('zulu-clock').innerText = nu.toLocaleTimeString('nl-NL', { hour12: false, timeZone: 'UTC' });
         }, 1000); 
         setInterval(runTimer, 1000);
-        setInterval(verversData, 600000); // Elke 10 minuten
+        
+        // Ververs data nu elke 2 minuten (120.000 ms) voor actuele KNMI/Buienradar info
+        setInterval(verversData, 120000); 
     });
 </script>
 </body>
