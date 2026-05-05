@@ -182,10 +182,12 @@
         if (activeStreams[4].type === 'yt') { setCamera(4, cam4.id, cam4.name, 'yt'); document.getElementById('sel-4').value = cam4.id; }
     }
 
-    // LIVE RSS FETCH MET ROBUUSTE PARSING
+    // PERSISTENT RSS FETCH LOGIC
     async function fetchRSS(pos) {
         const container = document.getElementById('cont-' + pos);
         const rssUrl = "https://feeds.nos.nl/nosnieuwsalgemeen";
+        
+        // Proxy lijst
         const proxyUrls = [
             `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}&t=${new Date().getTime()}`,
             `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`
@@ -193,7 +195,13 @@
 
         for (let proxy of proxyUrls) {
             try {
-                const response = await fetch(proxy);
+                // Timeout toevoegen om te voorkomen dat hij te lang blijft hangen
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+                const response = await fetch(proxy, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
                 if (!response.ok) continue;
 
                 let xmlString;
@@ -214,7 +222,6 @@
                 Array.from(items).slice(0, 15).forEach(item => {
                     const title = item.querySelector("title")?.textContent || "Geen titel";
                     const link = item.querySelector("link")?.textContent || "#";
-                    // Description kan HTML bevatten, we halen de ruwe tekst eruit
                     const rawDesc = item.querySelector("description")?.textContent || "";
                     const cleanDesc = rawDesc.replace(/<[^>]*>?/gm, '').trim();
                     
@@ -232,12 +239,16 @@
                     </div>`;
                 });
                 container.innerHTML = html + '</div>';
-                return; 
+                return; // Succesvol geladen
             } catch (e) {
                 console.warn("Proxy switch...", e);
             }
         }
-        container.innerHTML = '<div class="news-container" style="color:#ff4444; padding:20px;">Nieuws laden mislukt.</div>';
+        
+        // Alleen een error tonen als de container nog helemaal leeg is
+        if (container.innerHTML === "" || container.innerText.includes("laden")) {
+            container.innerHTML = '<div class="news-container" style="color:#ff4444; padding:20px;">Nieuws laden mislukt.</div>';
+        }
     }
 
     function setCamera(pos, id, name, type) {
@@ -304,7 +315,9 @@
             document.getElementById('zulu-clock').innerText = nu.toLocaleTimeString('nl-NL', { hour12: false, timeZone: 'UTC' });
         }, 1000); 
         setInterval(runTimer, 1000);
-        setInterval(verversData, 300000); 
+        
+        // Ververs data nu elke 10 minuten (600.000 ms) om proxy blokkades te voorkomen
+        setInterval(verversData, 600000); 
     });
 </script>
 </body>
