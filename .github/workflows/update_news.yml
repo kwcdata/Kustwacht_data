@@ -2,7 +2,7 @@ name: Update NOS News
 
 on:
   schedule:
-    # Dit zorgt ervoor dat het script elke 5 minuten draait
+    # Dit zorgt ervoor dat het script elke 1 minuten draait
     - cron: '*/1 * * * *'
   # Dit zorgt ervoor dat je de update ook handmatig kunt starten via het 'Actions' tabblad
   workflow_dispatch: 
