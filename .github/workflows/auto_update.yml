@@ -1,7 +1,8 @@
-name: KWC News Auto Update
+name: Update NOS News
 
 on:
   schedule:
+    # Elke 5 minuten
     - cron: '*/5 * * * *'
   workflow_dispatch: 
 
@@ -9,28 +10,35 @@ permissions:
   contents: write
 
 jobs:
-  refresh-data:
+  update-news:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      - name: Install libs
-        run: pip install feedparser pytz
+      - name: Install dependencies
+        run: |
+          pip install feedparser pytz
 
-      - name: Execute script
+      - name: Run fetch_news.py
         run: python fetch_news.py
 
       - name: Commit and Push changes
         run: |
-          git config --global user.name "KWC Automation"
-          git config --global user.email "automation@kustwacht.nl"
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          
+          # Forceer een wijziging door de huidige tijd in een hulpbestand te zetten
           date > last_run.txt
+          
           git add news.json last_run.txt
-          git commit -m "System: News Feed Updated $(date)" || echo "No changes to commit"
+          
+          # We committen ALTIJD omdat last_run.txt sowieso veranderd is
+          git commit -m "Automatische nieuws update: $(date)"
           git push
