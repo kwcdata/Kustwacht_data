@@ -189,12 +189,24 @@
         try {
             const response = await fetch('news.json?t=' + new Date().getTime());
             const items = await response.json();
+            
+            // Tijd formatting voor Nederlandse lokale tijd (automatisch zomertijd correctie)
+            const timeFormatter = new Intl.DateTimeFormat('nl-NL', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+                timeZone: 'Europe/Amsterdam'
+            });
+
             let html = '<div class="news-container">';
             items.forEach(item => { 
+                // Zet de input datum (is UTC) om naar lokale tijd string
+                const localTime = timeFormatter.format(new Date(item.pubDate));
+                
                 html += `
                 <div class="news-article">
                     <div class="news-header">
-                        <span class="news-date">${item.pubDate}</span>
+                        <span class="news-date">${localTime}</span>
                         <span class="news-sep">»</span>
                         <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
                     </div>
