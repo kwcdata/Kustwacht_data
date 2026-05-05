@@ -14,13 +14,16 @@
         .header-logo { height: 35px; width: auto; }
         header h1 { margin: 0; font-size: 16px; color: var(--brand-color); text-transform: uppercase; letter-spacing: 2px; }
         
-        .header-info-area { display: flex; align-items: center; gap: 30px; font-family: 'Courier New', monospace; }
-        .clocks { display: flex; gap: 30px; align-items: center; }
-        .clock-item { display: flex; align-items: baseline; gap: 10px; }
-        .clock-label { font-size: 11px; color: #8b949e; text-transform: uppercase; font-weight: bold; }
-        .clock-time { font-size: 28px; color: var(--brand-color); font-weight: bold; line-height: 1; }
-        .fetch-display { border-left: 1px solid var(--border-color); padding-left: 20px; display: flex; align-items: baseline; gap: 8px; }
-        .fetch-time { font-size: 18px; color: #c9d1d9; font-weight: bold; line-height: 1; }
+        .header-info-area { display: flex; align-items: center; gap: 20px; font-family: 'Courier New', monospace; }
+        .clocks { display: flex; gap: 20px; align-items: center; }
+        .clock-item { display: flex; align-items: baseline; gap: 8px; }
+        .clock-label { font-size: 10px; color: #8b949e; text-transform: uppercase; font-weight: bold; }
+        .clock-time { font-size: 24px; color: var(--brand-color); font-weight: bold; line-height: 1; }
+        
+        .fetch-group { display: flex; gap: 15px; border-left: 1px solid var(--border-color); padding-left: 15px; }
+        .fetch-display { display: flex; flex-direction: column; gap: 2px; min-width: 140px; }
+        .fetch-time { font-size: 14px; color: #c9d1d9; font-weight: bold; }
+        .countdown-display { font-size: 11px; color: var(--brand-color); }
 
         .nav-bar { background: var(--bg-dark); border-bottom: 1px solid var(--border-color); display: flex; padding: 0 10px; z-index: 1000; align-items: center; justify-content: space-between; flex-shrink: 0; height: 32px; }
         .nav-links-wrapper { display: flex; align-items: center; flex-grow: 1; height: 100%; }
@@ -79,7 +82,13 @@
                 <div class="clock-item"><span class="clock-label">Lokaal</span><span id="local-clock" class="clock-time">00:00:00</span></div>
                 <div class="clock-item"><span class="clock-label">Zulu</span><span id="zulu-clock" class="clock-time">00:00:00</span></div>
             </div>
-            <div class="fetch-display"><span class="clock-label">Update</span><span id="last-update" class="fetch-time">00:00:00</span></div>
+            <div class="fetch-group">
+                <div class="fetch-display">
+                    <span class="clock-label">Laatste Systeem Update</span>
+                    <span id="last-update-all" class="fetch-time">--:--:--</span>
+                    <span id="refresh-countdown" class="countdown-display">Volgende: 15:00</span>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -87,7 +96,7 @@
         <div class="nav-links-wrapper" id="nav-bar-links"></div>
         <div class="nav-controls">
             <div class="rotate-wrapper">
-                <span id="rotate-timer" class="rotate-timer">30</span>
+                <span id="rotate-timer" class="rotate-timer">60</span>
                 <button id="rotate-btn" class="rotate-btn active" onclick="toggleRotation()">Auto-Rotate</button>
             </div>
             <div class="nav-group" style="color:var(--brand-color)">VLOOT TRACKING ▾<div class="dropdown" id="fleet-dropdown"></div></div>
@@ -156,20 +165,35 @@
     let activeStreams = { 1: null, 2: null, 3: null, 4: null };
     let webcamPairIndex = 0;
     let rotationActive = true;
-    let secondsLeft = 30;
+    let webcamSecondsLeft = 60;
+    
+    // Systeem refresh instellingen (15 minuten)
+    const REFRESH_INTERVAL_SEC = 900; 
+    let systemSecondsLeft = REFRESH_INTERVAL_SEC;
 
     function toggleRotation() {
         rotationActive = !rotationActive;
         const btn = document.getElementById('rotate-btn');
         btn.classList.toggle('active', rotationActive);
-        document.getElementById('rotate-timer').innerText = rotationActive ? secondsLeft : "--";
+        document.getElementById('rotate-timer').innerText = rotationActive ? webcamSecondsLeft : "--";
     }
 
-    function runTimer() {
-        if (!rotationActive) return;
-        secondsLeft--;
-        if (secondsLeft <= 0) { rotateWebcams(); secondsLeft = 30; }
-        document.getElementById('rotate-timer').innerText = secondsLeft;
+    function runTimers() {
+        // Webcam timer
+        if (rotationActive) {
+            webcamSecondsLeft--;
+            if (webcamSecondsLeft <= 0) { rotateWebcams(); webcamSecondsLeft = 60; }
+            document.getElementById('rotate-timer').innerText = webcamSecondsLeft;
+        }
+
+        // Systeem refresh timer
+        systemSecondsLeft--;
+        if (systemSecondsLeft <= 0) { verversSysteem(); systemSecondsLeft = REFRESH_INTERVAL_SEC; }
+        
+        // Formatteer countdown (MM:SS)
+        const mins = Math.floor(systemSecondsLeft / 60);
+        const secs = systemSecondsLeft % 60;
+        document.getElementById('refresh-countdown').innerText = `Volgende: ${mins}:${secs.toString().padStart(2, '0')}`;
     }
 
     function rotateWebcams() {
@@ -261,16 +285,19 @@
         box.classList.toggle('full-slot'); 
     }
 
-    // WEER-DATA VERVERSING (ELKE 2 MINUTEN)
-    function verversData() {
+    // Centrale systeem verversing (Nieuws + KNMI + Radar)
+    function verversSysteem() {
         const t = new Date().getTime();
+        // Ververs afbeeldingen
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&random=" + t;
-        document.getElementById('last-update').innerText = new Date().toLocaleTimeString('nl-NL', { hour12: false });
         
-        // Alleen nieuws verversen als er een RSS stream actief is
+        // Ververs Nieuws
         [1,2,3,4].forEach(p => { if(activeStreams[p] && activeStreams[p].type === 'rss') fetchRSS(p); });
+        
+        // Update algemene timestamp
+        document.getElementById('last-update-all').innerText = new Date().toLocaleTimeString('nl-NL', { hour12: false });
     }
 
     function hardReset() {
@@ -280,7 +307,8 @@
             const item = [...sourceData.systems, ...sourceData.webcams].find(x => x.id === id);
             setCamera(p, id, item.name, item.type);
         }
-        verversData();
+        systemSecondsLeft = REFRESH_INTERVAL_SEC;
+        verversSysteem();
     }
 
     document.addEventListener('DOMContentLoaded', () => { 
@@ -302,10 +330,8 @@
             document.getElementById('local-clock').innerText = nu.toLocaleTimeString('nl-NL', { hour12: false, timeZone: 'Europe/Amsterdam' });
             document.getElementById('zulu-clock').innerText = nu.toLocaleTimeString('nl-NL', { hour12: false, timeZone: 'UTC' });
         }, 1000); 
-        setInterval(runTimer, 1000);
         
-        // Ververs data nu elke 2 minuten (120.000 ms) voor actuele KNMI/Buienradar info
-        setInterval(verversData, 120000); 
+        setInterval(runTimers, 1000); // Draait elke seconde voor alle klokken en countdowns
     });
 </script>
 </body>
