@@ -2,22 +2,21 @@ name: Update NOS News
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
-  workflow_dispatch: 
+    - cron: '*/5 * * * *'  # Elke 5 minuten
+  workflow_dispatch:      # Om handmatig te kunnen testen
 
-# Voeg dit blok toe om rechten expliciet in de code te zetten
 permissions:
-  contents: write
+  contents: write         # CRUCIAAL: Geeft de Action recht om bestanden aan te passen
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4 # Geüpdatet naar v4 voor Node.js 20+
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5 # Geüpdatet naar v5
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
@@ -32,4 +31,10 @@ jobs:
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add news.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update news.json met snippets" && git push)
+          # Controleer of er echt iets veranderd is
+          if git diff --staged --quiet; then
+            echo "Geen wijzigingen gevonden in news.json"
+          else
+            git commit -m "Update news.json: $(date +'%Y-%m-%d %H:%M:%S')"
+            git push
+          fi
