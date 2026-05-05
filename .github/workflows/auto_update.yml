@@ -2,9 +2,7 @@ name: KWC News Auto Update
 
 on:
   schedule:
-    # We zetten hem op 6 minuten. Soms werken "unieke" intervallen beter 
-    # dan de standaard 5 minuten om uit de drukste wachtrijen te blijven.
-    - cron: '*/6 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch: 
 
 permissions:
@@ -28,9 +26,11 @@ jobs:
       - name: Execute script
         run: python fetch_news.py
 
-      - name: Push to Repo
+      - name: Commit and Push changes
         run: |
           git config --global user.name "KWC Automation"
           git config --global user.email "automation@kustwacht.nl"
-          git add news.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "System: News Feed Updated" && git push)
+          date > last_run.txt
+          git add news.json last_run.txt
+          git commit -m "System: News Feed Updated $(date)" || echo "No changes to commit"
+          git push
