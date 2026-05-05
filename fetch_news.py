@@ -28,4 +28,4 @@ def fetch_nos_news():
         json.dump(news_items, f, ensure_ascii=False, indent=4)
 
 if __name__ == "__main__":
-    fetch_nos_news()
+    fetch_nos_news() 
