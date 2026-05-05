@@ -51,14 +51,15 @@
         .slot { flex-grow: 1; min-height: 0; position: relative; display: flex; flex-direction: column; }
         .slot iframe { width: 100%; height: 100%; border: none; background: #000; }
 
-        /* NIEUWS FEED: COMPACT & GROOT */
+        /* --- EXTREEM COMPACTE NIEUWSFEED --- */
         .news-container { flex: 1; overflow-y: auto; background: #0d1117; padding: 2px 8px; height: 100%; font-family: 'Segoe UI', sans-serif; }
-        .news-article { border-bottom: 1px solid #1e252d; padding: 4px 0; display: flex; flex-direction: column; gap: 0px; }
-        .news-header { display: flex; gap: 8px; align-items: baseline; line-height: 1.1; }
+        .news-article { border-bottom: 1px solid #1e252d; padding: 4px 0; display: flex; flex-direction: column; gap: 0; }
+        .news-header { display: flex; gap: 8px; align-items: baseline; line-height: 1.0; margin-bottom: 0; }
         .news-date { color: var(--brand-color); font-size: 18px; flex-shrink: 0; font-weight: bold; font-family: 'Courier New', monospace; }
-        .news-sep { color: #555; font-weight: bold; font-size: 18px; }
-        .news-title { color: var(--text-main); text-decoration: none; font-size: 20px; font-weight: 800; letter-spacing: -0.2px; }
-        .news-snippet { color: #abb2bf; font-size: 18px; line-height: 1.25; padding-left: 0; margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+        .news-sep { color: #444; font-weight: bold; font-size: 18px; }
+        .news-title { color: var(--text-main); text-decoration: none; font-size: 20px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.0; }
+        .news-snippet { color: #abb2bf; font-size: 18px; line-height: 1.15; padding-left: 0; margin-top: 0; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+        /* --- EINDE NIEUWSFEED --- */
 
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; min-height: 0; }
         .info-column .slot { flex: 1; min-height: 0; background: #0d1117; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
