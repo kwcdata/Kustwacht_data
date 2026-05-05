@@ -182,22 +182,28 @@
         if (activeStreams[4].type === 'yt') { setCamera(4, cam4.id, cam4.name, 'yt'); document.getElementById('sel-4').value = cam4.id; }
     }
 
-    // PERSISTENT RSS FETCH LOGIC
+    // ROBUUST NIEUWS LADEN MET CACHE
     async function fetchRSS(pos) {
         const container = document.getElementById('cont-' + pos);
         const rssUrl = "https://feeds.nos.nl/nosnieuwsalgemeen";
         
-        // Proxy lijst
+        // Proxy-lijst voor maximale kans op succes
         const proxyUrls = [
             `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}&t=${new Date().getTime()}`,
-            `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`
+            `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`,
+            `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(rssUrl)}`
         ];
+
+        // Eerst kijken of we iets in het geheugen hebben
+        const cachedNews = localStorage.getItem('kwc_news_cache');
+        if (cachedNews && (container.innerHTML === "" || container.innerText.includes("laden"))) {
+            container.innerHTML = cachedNews;
+        }
 
         for (let proxy of proxyUrls) {
             try {
-                // Timeout toevoegen om te voorkomen dat hij te lang blijft hangen
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                const timeoutId = setTimeout(() => controller.abort(), 6000); // 6 sec timeout
 
                 const response = await fetch(proxy, { signal: controller.signal });
                 clearTimeout(timeoutId);
@@ -238,16 +244,20 @@
                         <div class="news-snippet">${cleanDesc}</div>
                     </div>`;
                 });
-                container.innerHTML = html + '</div>';
-                return; // Succesvol geladen
+                html += '</div>';
+
+                // Opslaan in geheugen voor de volgende keer
+                localStorage.setItem('kwc_news_cache', html);
+                container.innerHTML = html;
+                return; // Succes!
             } catch (e) {
                 console.warn("Proxy switch...", e);
             }
         }
-        
-        // Alleen een error tonen als de container nog helemaal leeg is
-        if (container.innerHTML === "" || container.innerText.includes("laden")) {
-            container.innerHTML = '<div class="news-container" style="color:#ff4444; padding:20px;">Nieuws laden mislukt.</div>';
+
+        // Als alles faalt en we hebben niks in de cache
+        if (!localStorage.getItem('kwc_news_cache')) {
+            container.innerHTML = '<div class="news-container" style="color:#ff4444; padding:20px;">Geen nieuws beschikbaar. Probeer de pagina te verversen.</div>';
         }
     }
 
@@ -315,9 +325,7 @@
             document.getElementById('zulu-clock').innerText = nu.toLocaleTimeString('nl-NL', { hour12: false, timeZone: 'UTC' });
         }, 1000); 
         setInterval(runTimer, 1000);
-        
-        // Ververs data nu elke 10 minuten (600.000 ms) om proxy blokkades te voorkomen
-        setInterval(verversData, 600000); 
+        setInterval(verversData, 600000); // Elke 10 minuten
     });
 </script>
 </body>
