@@ -183,25 +183,30 @@
     }
 
     async function fetchRSS(pos) {
-        const container = document.getElementById('cont-' + pos);
-        try {
-            const response = await fetch('news.json?t=' + new Date().getTime());
-            const items = await response.json();
-            let html = '<div class="news-container">';
-            items.forEach(item => { 
-                html += `
-                <div class="news-article">
-                    <div class="news-header">
-                        <span class="news-date">${item.pubDate}</span>
-                        <span class="news-sep">»</span>
-                        <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
-                    </div>
-                    <div class="news-snippet">${item.description || ''}</div>
-                </div>`; 
-            });
-            container.innerHTML = html + '</div>';
-        } catch (e) { container.innerHTML = '<div class="news-container" style="color:#ff4444;">Nieuws offline.</div>'; }
+    const container = document.getElementById('cont-' + pos);
+    try {
+        // De 'nocache' parameter dwingt de browser om de ECHTE nieuwe news.json op te halen
+        const response = await fetch('news.json?nocache=' + new Date().getTime());
+        const items = await response.json();
+        
+        let html = '<div class="news-container">';
+        items.forEach(item => { 
+            html += `
+            <div class="news-article">
+                <div class="news-header">
+                    <span class="news-date">${item.pubDate}</span>
+                    <span class="news-sep">»</span>
+                    <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
+                </div>
+                <div class="news-snippet">${item.description || ''}</div>
+            </div>`; 
+        });
+        container.innerHTML = html + '</div>';
+    } catch (e) { 
+        console.error("Fout bij laden news.json:", e);
+        container.innerHTML = '<div class="news-container" style="color:#ff4444;">Nieuws offline.</div>'; 
     }
+}
 
     function setCamera(pos, id, name, type) {
         const container = document.getElementById('cont-' + pos);
