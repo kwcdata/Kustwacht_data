@@ -51,7 +51,7 @@
         .slot { flex-grow: 1; min-height: 0; position: relative; display: flex; flex-direction: column; }
         .slot iframe { width: 100%; height: 100%; border: none; background: #000; }
 
-        /* --- NIEUWSFEED --- */
+        /* --- NIEUWSFEED ZONDER WITRUIMTE --- */
         .news-container { flex: 1; overflow-y: auto; background: #0d1117; padding: 2px 8px; height: 100%; font-family: 'Segoe UI', sans-serif; }
         .news-article { border-bottom: 1px solid #1e252d; padding: 4px 0; display: flex; flex-direction: column; }
         .news-header { display: flex; gap: 8px; align-items: baseline; line-height: 20px; margin: 0; padding: 0; }
@@ -59,6 +59,7 @@
         .news-sep { color: #444; font-weight: bold; font-size: 18px; }
         .news-title { color: var(--text-main); text-decoration: none; font-size: 20px; font-weight: 800; letter-spacing: -0.3px; line-height: 20px; display: block; }
         .news-snippet { color: #abb2bf; font-size: 18px; line-height: 1.15; padding: 0; margin: -2px 0 0 0; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+        /* --- EINDE NIEUWSFEED --- */
 
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; min-height: 0; }
         .info-column .slot { flex: 1; min-height: 0; background: #0d1117; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
@@ -186,22 +187,14 @@
     async function fetchRSS(pos) {
         const container = document.getElementById('cont-' + pos);
         try {
-            // Timestamp toevoegen om browser-caching te voorkomen
-            const response = await fetch('news.json?t=' + Date.now());
-            if (!response.ok) throw new Error('Bestand niet gevonden');
-            
+            const response = await fetch('news.json?t=' + new Date().getTime());
             const items = await response.json();
-            const timeFormatter = new Intl.DateTimeFormat('nl-NL', {
-                hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Europe/Amsterdam'
-            });
-
             let html = '<div class="news-container">';
             items.forEach(item => { 
-                const localTime = timeFormatter.format(new Date(item.pubDate));
                 html += `
                 <div class="news-article">
                     <div class="news-header">
-                        <span class="news-date">${localTime}</span>
+                        <span class="news-date">${item.pubDate}</span>
                         <span class="news-sep">»</span>
                         <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
                     </div>
@@ -209,10 +202,7 @@
                 </div>`; 
             });
             container.innerHTML = html + '</div>';
-        } catch (e) { 
-            console.error("Fout bij laden nieuws:", e);
-            container.innerHTML = '<div class="news-container" style="color:#ff4444; padding: 20px;">Nieuws offline.<br><small>Controleer of news.json aanwezig is.</small></div>'; 
-        }
+        } catch (e) { container.innerHTML = '<div class="news-container" style="color:#ff4444;">Nieuws offline.</div>'; }
     }
 
     function setCamera(pos, id, name, type) {
@@ -238,7 +228,7 @@
     }
 
     function verversData() {
-        const t = Date.now();
+        const t = new Date().getTime();
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&random=" + t;
