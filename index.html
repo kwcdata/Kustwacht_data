@@ -51,13 +51,13 @@
         .slot { flex-grow: 1; min-height: 0; position: relative; display: flex; flex-direction: column; }
         .slot iframe { width: 100%; height: 100%; border: none; background: #000; }
 
-        /* --- NIEUWSFEED STYLING --- */
+        /* --- NIEUWSFEED OPTIMALISATIE --- */
         .news-container { flex: 1; overflow-y: auto; background: #0d1117; padding: 4px 8px; height: 100%; font-family: 'Segoe UI', sans-serif; }
-        .news-article { border-bottom: 1px solid #1e252d; padding: 6px 0; display: flex; flex-direction: column; }
-        .news-header { display: flex; gap: 8px; align-items: baseline; line-height: 1.2; margin-bottom: 2px; }
+        .news-article { border-bottom: 1px solid #1e252d; padding: 8px 0; display: flex; flex-direction: column; }
+        .news-header { display: flex; gap: 10px; align-items: baseline; line-height: 1.2; margin-bottom: 4px; }
         .news-date { color: var(--brand-color); font-size: 16px; flex-shrink: 0; font-weight: bold; font-family: 'Courier New', monospace; }
         .news-title { color: var(--text-main); text-decoration: none; font-size: 18px; font-weight: 800; line-height: 1.2; display: block; }
-        .news-snippet { color: #abb2bf; font-size: 15px; line-height: 1.3; margin: 2px 0 0 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .news-snippet { color: #abb2bf; font-size: 15px; line-height: 1.4; margin: 0; padding-top: 2px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; min-height: 0; }
         .info-column .slot { flex: 1; min-height: 0; background: #0d1117; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
@@ -182,24 +182,22 @@
         if (activeStreams[4].type === 'yt') { setCamera(4, cam4.id, cam4.name, 'yt'); document.getElementById('sel-4').value = cam4.id; }
     }
 
-    // LIVE BROWSER-BASED RSS FETCH MET FAILSAFE PROXY
+    // LIVE RSS FETCH MET ROBUUSTE PARSING
     async function fetchRSS(pos) {
         const container = document.getElementById('cont-' + pos);
         const rssUrl = "https://feeds.nos.nl/nosnieuwsalgemeen";
-        
-        // We proberen twee verschillende proxy's voor maximale betrouwbaarheid
-        const proxies = [
+        const proxyUrls = [
             `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}&t=${new Date().getTime()}`,
             `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`
         ];
 
-        for (let url of proxies) {
+        for (let proxy of proxyUrls) {
             try {
-                const response = await fetch(url);
+                const response = await fetch(proxy);
                 if (!response.ok) continue;
 
                 let xmlString;
-                if (url.includes('allorigins')) {
+                if (proxy.includes('allorigins')) {
                     const data = await response.json();
                     xmlString = data.contents;
                 } else {
@@ -214,11 +212,13 @@
 
                 let html = '<div class="news-container">';
                 Array.from(items).slice(0, 15).forEach(item => {
-                    const title = item.querySelector("title")?.textContent || "";
+                    const title = item.querySelector("title")?.textContent || "Geen titel";
                     const link = item.querySelector("link")?.textContent || "#";
-                    const description = item.querySelector("description")?.textContent || "";
-                    const pubDate = item.querySelector("pubDate")?.textContent || "";
+                    // Description kan HTML bevatten, we halen de ruwe tekst eruit
+                    const rawDesc = item.querySelector("description")?.textContent || "";
+                    const cleanDesc = rawDesc.replace(/<[^>]*>?/gm, '').trim();
                     
+                    const pubDate = item.querySelector("pubDate")?.textContent || "";
                     const dateObj = new Date(pubDate);
                     const time = dateObj.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
 
@@ -228,16 +228,16 @@
                             <span class="news-date">${time}</span>
                             <a href="${link}" target="_blank" class="news-title">${title}</a>
                         </div>
-                        <div class="news-snippet">${description.split('<')[0]}</div>
+                        <div class="news-snippet">${cleanDesc}</div>
                     </div>`;
                 });
                 container.innerHTML = html + '</div>';
-                return; // Succes! Stop de loop.
+                return; 
             } catch (e) {
-                console.warn("Proxy failed, trying next...", e);
+                console.warn("Proxy switch...", e);
             }
         }
-        container.innerHTML = '<div class="news-container" style="color:#ff4444; padding:20px;">Nieuws laden mislukt (Proxy Error).</div>';
+        container.innerHTML = '<div class="news-container" style="color:#ff4444; padding:20px;">Nieuws laden mislukt.</div>';
     }
 
     function setCamera(pos, id, name, type) {
