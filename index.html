@@ -50,14 +50,15 @@
 
         .slot { flex-grow: 1; min-height: 0; position: relative; display: flex; flex-direction: column; }
         .slot iframe { width: 100%; height: 100%; border: none; background: #000; }
-        
-        .news-container { flex: 1; overflow-y: auto; background: #0d1117; padding: 2px 10px; height: 100%; font-family: 'Courier New', monospace; }
-        .news-article { border-bottom: 1px solid #1e252b; padding: 4px 0; display: flex; flex-direction: column; gap: 1px; }
-        .news-header { display: flex; gap: 8px; align-items: flex-start; }
-        .news-date { color: #8b949e; font-size: 12px; flex-shrink: 0; font-weight: bold; }
-        .news-sep { color: var(--brand-color); font-weight: bold; }
-        .news-title { color: var(--p2k-text); text-decoration: none; font-size: 15px; line-height: 1.1; font-weight: bold; }
-        .news-snippet { color: #8b949e; font-size: 12px; line-height: 1.2; padding-left: 20px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+        /* VERBETERDE NIEUWS FEED CSS */
+        .news-container { flex: 1; overflow-y: auto; background: #0d1117; padding: 5px 12px; height: 100%; font-family: 'Segoe UI', sans-serif; }
+        .news-article { border-bottom: 1px solid #1e252b; padding: 8px 0; display: flex; flex-direction: column; gap: 2px; }
+        .news-header { display: flex; gap: 10px; align-items: baseline; }
+        .news-date { color: var(--brand-color); font-size: 18px; flex-shrink: 0; font-weight: bold; font-family: 'Courier New', monospace; }
+        .news-sep { color: #8b949e; font-weight: bold; font-size: 18px; }
+        .news-title { color: var(--text-main); text-decoration: none; font-size: 20px; line-height: 1.1; font-weight: 800; }
+        .news-snippet { color: #8b949e; font-size: 16px; line-height: 1.3; padding-left: 0; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; min-height: 0; }
         .info-column .slot { flex: 1; min-height: 0; background: #0d1117; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
@@ -182,31 +183,27 @@
         if (activeStreams[4].type === 'yt') { setCamera(4, cam4.id, cam4.name, 'yt'); document.getElementById('sel-4').value = cam4.id; }
     }
 
+    // VERBETERDE FETCH FUNCTIE MET CACHE-BUSTING
     async function fetchRSS(pos) {
-    const container = document.getElementById('cont-' + pos);
-    try {
-        // De 'nocache' parameter dwingt de browser om de ECHTE nieuwe news.json op te halen
-        const response = await fetch('news.json?nocache=' + new Date().getTime());
-        const items = await response.json();
-        
-        let html = '<div class="news-container">';
-        items.forEach(item => { 
-            html += `
-            <div class="news-article">
-                <div class="news-header">
-                    <span class="news-date">${item.pubDate}</span>
-                    <span class="news-sep">»</span>
-                    <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
-                </div>
-                <div class="news-snippet">${item.description || ''}</div>
-            </div>`; 
-        });
-        container.innerHTML = html + '</div>';
-    } catch (e) { 
-        console.error("Fout bij laden news.json:", e);
-        container.innerHTML = '<div class="news-container" style="color:#ff4444;">Nieuws offline.</div>'; 
+        const container = document.getElementById('cont-' + pos);
+        try {
+            const response = await fetch('news.json?t=' + new Date().getTime());
+            const items = await response.json();
+            let html = '<div class="news-container">';
+            items.forEach(item => { 
+                html += `
+                <div class="news-article">
+                    <div class="news-header">
+                        <span class="news-date">${item.pubDate}</span>
+                        <span class="news-sep">»</span>
+                        <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
+                    </div>
+                    <div class="news-snippet">${item.description || ''}</div>
+                </div>`; 
+            });
+            container.innerHTML = html + '</div>';
+        } catch (e) { container.innerHTML = '<div class="news-container" style="color:#ff4444;">Nieuws offline.</div>'; }
     }
-}
 
     function setCamera(pos, id, name, type) {
         const container = document.getElementById('cont-' + pos);
@@ -252,7 +249,6 @@
     document.addEventListener('DOMContentLoaded', () => { 
         document.getElementById('nav-bar-links').innerHTML = bookmarkGroups.map(g => `<div class="nav-group">${g.title} ▾<div class="dropdown">${g.links.map(l => `<a href="${l.url}" target="_blank">${l.name}</a>`).join('')}</div></div>`).join('');
         
-        // Vloot Tracking knoppen aangepast naar Slot 2 (RB)
         document.getElementById('fleet-dropdown').innerHTML = aircraft.map(p => `
             <button onclick="setCamera(2, 'https://globe.adsbexchange.com/?icao=${p.icao}&zoom=11', 'Track: ${p.reg}', 'web')">Track: ${p.reg}</button>
         `).join('');
