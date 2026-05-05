@@ -185,36 +185,51 @@
     }
 
     async function fetchRSS(pos) {
-        const container = document.getElementById('cont-' + pos);
-        try {
-            const response = await fetch('news.json?t=' + new Date().getTime());
-            const items = await response.json();
-            let html = '<div class="news-container">';
-            items.forEach(item => { 
-                html += `
-                <div class="news-article">
-                    <div class="news-header">
-                        <span class="news-date">${item.pubDate}</span>
-                        <span class="news-sep">»</span>
-                        <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
-                    </div>
-                    <div class="news-snippet">${item.description || ''}</div>
-                </div>`; 
-            });
-            container.innerHTML = html + '</div>';
-        } catch (e) { container.innerHTML = '<div class="news-container" style="color:#ff4444;">Nieuws offline.</div>'; }
-    }
+    const container = document.getElementById('cont-' + pos);
+    // We gebruiken de AllOrigins proxy om de CORS-beveiliging van de NOS te omzeilen
+    const rssUrl = "https://feeds.nos.nl/nosnieuwsalgemeen";
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}&t=${new Date().getTime()}`;
 
-    function setCamera(pos, id, name, type) {
-        const container = document.getElementById('cont-' + pos);
-        activeStreams[pos] = { id, type };
-        if (type === 'rss') { fetchRSS(pos); } 
-        else {
-            const url = type === 'web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0`;
-            container.innerHTML = `<iframe src="${url}" allow="autoplay; allowfullscreen"></iframe>`;
-        }
-        document.getElementById('sel-' + pos).value = id;
+    try {
+        const response = await fetch(proxyUrl);
+        const data = await response.json();
+        
+        // De proxy stopt de XML-tekst in data.contents
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+        const items = xmlDoc.querySelectorAll("item");
+
+        let html = '<div class="news-container">';
+        
+        // We pakken de eerste 15 berichten
+        Array.from(items).slice(0, 15).forEach(item => {
+            const title = item.querySelector("title")?.textContent || "";
+            const link = item.querySelector("link")?.textContent || "#";
+            const description = item.querySelector("description")?.textContent || "";
+            const pubDate = item.querySelector("pubDate")?.textContent || "";
+            
+            // Tijd extraheren (bijv. 12:34)
+            const dateObj = new Date(pubDate);
+            const time = dateObj.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+
+            html += `
+            <div class="news-article">
+                <div class="news-header">
+                    <span class="news-date">${time}</span>
+                    <span class="news-sep">»</span>
+                    <a href="${link}" target="_blank" class="news-title">${title}</a>
+                </div>
+                <div class="news-snippet">${description.split('<')[0]}</div>
+            </div>`;
+        });
+
+        container.innerHTML = html + '</div>';
+        console.log("Nieuws live opgehaald via Proxy om " + new Date().toLocaleTimeString());
+    } catch (e) {
+        console.error("RSS Error:", e);
+        container.innerHTML = '<div style="color:white; padding:20px;">Nieuws laden mislukt...</div>';
     }
+}
 
     function changeCam(pos) {
         const sel = document.getElementById('sel-' + pos);
