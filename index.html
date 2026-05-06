@@ -47,26 +47,27 @@
         .cam-box { display: flex; flex-direction: column; background: #0d1117; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; min-height: 0; position: relative; }
         .cam-box.full-slot { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; border: none; border-radius: 0; }
         
-        .label-header { background: var(--brand-color); color: #000 !important; padding: 0 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; height: 24px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-        .label-header select { background: transparent !important; border: none !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 10px !important; cursor: pointer; flex-grow: 1; outline: none; color: #000 !important; appearance: none; }
+        /* Blauwe balk headers aangepast voor grotere tekst */
+        .label-header { background: var(--brand-color); color: #000 !important; padding: 0 8px; font-size: 14px; font-weight: bold; text-transform: uppercase; height: 28px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+        .label-header select { background: transparent !important; border: none !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 14px !important; cursor: pointer; flex-grow: 1; outline: none; color: #000 !important; appearance: none; }
         .label-header select option, .label-header select optgroup { background-color: #161b22 !important; color: #ffffff !important; }
 
         .slot { flex-grow: 1; min-height: 0; position: relative; display: flex; flex-direction: column; }
         .slot iframe { width: 100%; height: 100%; border: none; background: #000; }
 
-        .news-container { flex: 1; overflow-y: auto; background: #0d1117; padding: 4px 8px; height: 100%; font-family: 'Segoe UI', sans-serif; }
-        .news-article { border-bottom: 1px solid #1e252d; padding: 8px 0; display: flex; flex-direction: column; }
-        .news-header { display: flex; gap: 10px; align-items: baseline; line-height: 1.2; margin-bottom: 4px; }
+        .news-container { flex: 1; overflow-y: auto; background: #0d1117; padding: 0 4px; height: 100%; font-family: 'Segoe UI', sans-serif; }
+        .news-article { border-bottom: 1px solid #1e252d; padding: 4px 0 6px 0; display: flex; flex-direction: column; }
+        .news-header { display: flex; gap: 8px; align-items: baseline; line-height: 1.1; margin-bottom: 1px; }
         .news-date { color: var(--brand-color); font-size: 16px; flex-shrink: 0; font-weight: bold; font-family: 'Courier New', monospace; }
-        .news-title { color: var(--text-main); text-decoration: none; font-size: 18px; font-weight: 800; line-height: 1.2; display: block; }
-        .news-snippet { color: #abb2bf; font-size: 15px; line-height: 1.4; margin: 0; padding-top: 2px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .news-title { color: var(--text-main); text-decoration: none; font-size: 19px; font-weight: 800; line-height: 1.1; display: block; }
+        .news-snippet { color: #abb2bf; font-size: 18px; line-height: 1.25; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; min-height: 0; }
         .info-column .slot { flex: 1; min-height: 0; background: #0d1117; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
-        .static-label { background: var(--brand-color); color: #000; padding: 4px 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; flex-shrink: 0; }
+        .static-label { background: var(--brand-color); color: #000; padding: 4px 8px; font-size: 12px; font-weight: bold; text-transform: uppercase; flex-shrink: 0; }
         .img-container { flex: 1; position: relative; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; }
         .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .fs-toggle { cursor: pointer; font-size: 14px; padding-left: 10px; border-left: 1px solid rgba(0,0,0,0.2); line-height: 24px; color: #000; }
+        .fs-toggle { cursor: pointer; font-size: 16px; padding-left: 10px; border-left: 1px solid rgba(0,0,0,0.2); line-height: 28px; color: #000; }
     </style>
 </head>
 <body>
@@ -84,9 +85,9 @@
             </div>
             <div class="fetch-group">
                 <div class="fetch-display">
-                    <span class="clock-label">Laatste Systeem Update</span>
+                    <span class="clock-label">Systeem Sync (5m)</span>
                     <span id="last-update-all" class="fetch-time">--:--:--</span>
-                    <span id="refresh-countdown" class="countdown-display">Volgende: 15:00</span>
+                    <span id="refresh-countdown" class="countdown-display">Volgende Sync: --:--</span>
                 </div>
             </div>
         </div>
@@ -165,44 +166,70 @@
     let activeStreams = { 1: null, 2: null, 3: null, 4: null };
     let webcamPairIndex = 0;
     let rotationActive = true;
-    let webcamSecondsLeft = 60;
+    let lastRefreshMinute = -1;
+    let lastRotateMinute = -1;
     
-    // Systeem refresh instellingen (15 minuten)
-    const REFRESH_INTERVAL_SEC = 900; 
-    let systemSecondsLeft = REFRESH_INTERVAL_SEC;
+    // Bijhouden welke slots door de gebruiker zijn aangepast (vergrendeld voor auto-rotate)
+    let userLockedSlots = { 1: false, 2: false, 3: false, 4: false };
 
     function toggleRotation() {
         rotationActive = !rotationActive;
         const btn = document.getElementById('rotate-btn');
         btn.classList.toggle('active', rotationActive);
-        document.getElementById('rotate-timer').innerText = rotationActive ? webcamSecondsLeft : "--";
+        updateRotateDisplay();
+    }
+
+    function updateRotateDisplay() {
+        if (!rotationActive) {
+            document.getElementById('rotate-timer').innerText = "--";
+            return;
+        }
+        const nu = new Date();
+        const secs = nu.getSeconds();
+        document.getElementById('rotate-timer').innerText = 60 - secs;
     }
 
     function runTimers() {
-        // Webcam timer
+        const nu = new Date();
+        const mins = nu.getMinutes();
+        const secs = nu.getSeconds();
+
+        // Webcam Sync Logica (Elke hele minuut :00)
         if (rotationActive) {
-            webcamSecondsLeft--;
-            if (webcamSecondsLeft <= 0) { rotateWebcams(); webcamSecondsLeft = 60; }
-            document.getElementById('rotate-timer').innerText = webcamSecondsLeft;
+            if (secs === 0 && lastRotateMinute !== mins) {
+                rotateWebcams();
+                lastRotateMinute = mins;
+            }
+            updateRotateDisplay();
         }
 
-        // Systeem refresh timer
-        systemSecondsLeft--;
-        if (systemSecondsLeft <= 0) { verversSysteem(); systemSecondsLeft = REFRESH_INTERVAL_SEC; }
-        
-        // Formatteer countdown (MM:SS)
-        const mins = Math.floor(systemSecondsLeft / 60);
-        const secs = systemSecondsLeft % 60;
-        document.getElementById('refresh-countdown').innerText = `Volgende: ${mins}:${secs.toString().padStart(2, '0')}`;
+        // Systeem Sync Logica (Elke 5 minuten :00, :05, :10...)
+        if (mins % 5 === 0 && lastRefreshMinute !== mins) {
+            verversSysteem();
+            lastRefreshMinute = mins;
+        }
+
+        // Countdown berekening voor Systeem Sync display
+        const minsToNext = 5 - (mins % 5);
+        const secsToNext = (secs === 0) ? 0 : 60 - secs;
+        const displayMins = (secs === 0) ? minsToNext : minsToNext - 1;
+        document.getElementById('refresh-countdown').innerText = `Volgende Sync: ${displayMins}:${secsToNext.toString().padStart(2, '0')}`;
     }
 
     function rotateWebcams() {
         webcamPairIndex = (webcamPairIndex + 2) % sourceData.webcams.length;
-        if (webcamPairIndex >= sourceData.webcams.length) webcamPairIndex = 0;
         const cam3 = sourceData.webcams[webcamPairIndex];
         const cam4 = sourceData.webcams[(webcamPairIndex + 1) % sourceData.webcams.length];
-        if (activeStreams[3].type === 'yt') { setCamera(3, cam3.id, cam3.name, 'yt'); document.getElementById('sel-3').value = cam3.id; }
-        if (activeStreams[4].type === 'yt') { setCamera(4, cam4.id, cam4.name, 'yt'); document.getElementById('sel-4').value = cam4.id; }
+        
+        // Alleen roteren als de slot nog op een webcam staat EN niet handmatig is vergrendeld
+        if (activeStreams[3].type === 'yt' && !userLockedSlots[3]) { 
+            setCamera(3, cam3.id, cam3.name, 'yt', false); 
+            document.getElementById('sel-3').value = cam3.id; 
+        }
+        if (activeStreams[4].type === 'yt' && !userLockedSlots[4]) { 
+            setCamera(4, cam4.id, cam4.name, 'yt', false); 
+            document.getElementById('sel-4').value = cam4.id; 
+        }
     }
 
     async function fetchRSS(pos) {
@@ -263,9 +290,17 @@
         }
     }
 
-    function setCamera(pos, id, name, type) {
+    function setCamera(pos, id, name, type, isUserAction = false) {
         const container = document.getElementById('cont-' + pos);
         activeStreams[pos] = { id, type };
+        
+        // Als de gebruiker zelf iets kiest, vergrendelen we dit slot voor auto-rotate
+        if (isUserAction) {
+            userLockedSlots[pos] = true;
+            // Markeer de header om te laten zien dat hij vergrendeld is (optioneel visual effect)
+            document.getElementById('box-' + pos).querySelector('.label-header').style.background = '#00c3ff'; 
+        }
+
         if (type === 'rss') { fetchRSS(pos); } 
         else {
             const url = type === 'web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0`;
@@ -277,7 +312,7 @@
     function changeCam(pos) {
         const sel = document.getElementById('sel-' + pos);
         const item = [...sourceData.systems, ...sourceData.webcams].find(x => x.id === sel.value);
-        setCamera(pos, sel.value, item.name, item.type);
+        setCamera(pos, sel.value, item.name, item.type, true); // True geeft aan dat dit een handmatige actie is
     }
 
     function toggleFullscreen(pos) { 
@@ -285,36 +320,35 @@
         box.classList.toggle('full-slot'); 
     }
 
-    // Centrale systeem verversing (Nieuws + KNMI + Radar)
     function verversSysteem() {
         const t = new Date().getTime();
-        // Ververs afbeeldingen
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&random=" + t;
-        
-        // Ververs Nieuws
         [1,2,3,4].forEach(p => { if(activeStreams[p] && activeStreams[p].type === 'rss') fetchRSS(p); });
-        
-        // Update algemene timestamp
         document.getElementById('last-update-all').innerText = new Date().toLocaleTimeString('nl-NL', { hour12: false });
     }
 
     function hardReset() {
-        document.querySelectorAll('.cam-box').forEach(b => b.classList.remove('full-slot'));
+        document.querySelectorAll('.cam-box').forEach(b => {
+            b.classList.remove('full-slot');
+            b.querySelector('.label-header').style.background = 'var(--brand-color)'; // Reset kleur
+        });
+        userLockedSlots = { 1: false, 2: false, 3: false, 4: false }; // Reset vergrendelingen
         for(let p in defaults) {
             const id = defaults[p];
             const item = [...sourceData.systems, ...sourceData.webcams].find(x => x.id === id);
-            setCamera(p, id, item.name, item.type);
+            setCamera(p, id, item.name, item.type, false);
         }
-        systemSecondsLeft = REFRESH_INTERVAL_SEC;
+        lastRefreshMinute = -1; 
+        lastRotateMinute = -1;
         verversSysteem();
     }
 
     document.addEventListener('DOMContentLoaded', () => { 
         document.getElementById('nav-bar-links').innerHTML = bookmarkGroups.map(g => `<div class="nav-group">${g.title} ▾<div class="dropdown">${g.links.map(l => `<a href="${l.url}" target="_blank">${l.name}</a>`).join('')}</div></div>`).join('');
         document.getElementById('fleet-dropdown').innerHTML = aircraft.map(p => `
-            <button onclick="setCamera(2, 'https://globe.adsbexchange.com/?icao=${p.icao}&zoom=11', 'Track: ${p.reg}', 'web')">Track: ${p.reg}</button>
+            <button onclick="setCamera(2, 'https://globe.adsbexchange.com/?icao=${p.icao}&zoom=11', 'Track: ${p.reg}', 'web', true)">Track: ${p.reg}</button>
         `).join('');
         for (let i = 1; i <= 4; i++) {
             const sel = document.getElementById('sel-' + i);
@@ -325,13 +359,13 @@
             sel.appendChild(g1); sel.appendChild(g2);
         }
         hardReset(); 
+        
         setInterval(() => {
             const nu = new Date();
             document.getElementById('local-clock').innerText = nu.toLocaleTimeString('nl-NL', { hour12: false, timeZone: 'Europe/Amsterdam' });
             document.getElementById('zulu-clock').innerText = nu.toLocaleTimeString('nl-NL', { hour12: false, timeZone: 'UTC' });
+            runTimers(); 
         }, 1000); 
-        
-        setInterval(runTimers, 1000); // Draait elke seconde voor alle klokken en countdowns
     });
 </script>
 </body>
