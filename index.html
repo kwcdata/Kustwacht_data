@@ -15,23 +15,6 @@
         header h1 { margin: 0; font-size: 16px; color: var(--brand-color); text-transform: uppercase; letter-spacing: 2px; }
         
         .header-info-area { display: flex; align-items: center; gap: 25px; font-family: 'Courier New', monospace; }
-        
-        /* Status Indicator Rechterkant */
-        .status-switcher { display: flex; align-items: center; gap: 12px; background: #161b22; padding: 4px 15px; border-radius: 4px; border: 2px solid var(--border-color); cursor: pointer; user-select: none; transition: all 0.2s ease; }
-        .status-light { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); }
-        .status-label-text { font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; min-width: 120px; text-align: center; }
-        
-        .state-green { border-color: #00c851; }
-        .state-green .status-light { background: #00c851; box-shadow: 0 0 10px #00c851; }
-        .state-green .status-label-text { color: #00c851; }
-        
-        .state-orange { border-color: #ffbb33; }
-        .state-orange .status-light { background: #ffbb33; box-shadow: 0 0 10px #ffbb33; }
-        .state-orange .status-label-text { color: #ffbb33; }
-        
-        .state-red { border-color: #ff4444; }
-        .state-red .status-light { background: #ff4444; box-shadow: 0 0 10px #ff4444; }
-        .state-red .status-label-text { color: #ff4444; }
 
         .clocks { display: flex; gap: 20px; align-items: center; }
         .clock-item { display: flex; align-items: baseline; gap: 8px; }
@@ -62,12 +45,10 @@
 
         .monitor-layout { display: grid; grid-template-columns: 1fr 360px; grid-gap: 8px; padding: 8px; flex-grow: 1; height: calc(100vh - 82px); box-sizing: border-box; }
         
-        /* Container voor de 4 blokjes */
         .webcam-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; grid-gap: 8px; height: 100%; min-height: 0; position: relative; }
         
         .cam-box { display: flex; flex-direction: column; background: #0d1117; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; min-height: 0; position: relative; }
         
-        /* Aangepaste Full-Slot klasse: blijft binnen de webcam-grid container */
         .cam-box.full-slot { 
             position: absolute; 
             top: 0; 
@@ -79,9 +60,23 @@
             border-radius: 0; 
         }
         
-        .label-header { background: var(--brand-color); color: #000 !important; padding: 0 8px; font-size: 14px; font-weight: bold; text-transform: uppercase; height: 28px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+        .label-header { background: var(--brand-color); color: #000 !important; padding: 0 8px; font-size: 14px; font-weight: bold; text-transform: uppercase; height: 28px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; position: relative; }
         .label-header select { background: transparent !important; border: none !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 14px !important; cursor: pointer; flex-grow: 1; outline: none; color: #000 !important; appearance: none; }
         .label-header select option, .label-header select optgroup { background-color: #161b22 !important; color: #ffffff !important; }
+
+        /* Tooltip style voor laatste refresh */
+        .label-header:hover::after, .static-label:hover::after {
+            content: attr(data-refresh);
+            position: absolute;
+            right: 40px;
+            background: #000;
+            color: #fff;
+            padding: 2px 6px;
+            font-size: 10px;
+            border-radius: 3px;
+            z-index: 10;
+            text-transform: none;
+        }
 
         .slot { flex-grow: 1; min-height: 0; position: relative; display: flex; flex-direction: column; }
         .slot iframe { width: 100%; height: 100%; border: none; background: #000; }
@@ -95,7 +90,7 @@
 
         .info-column { display: flex; flex-direction: column; gap: 8px; height: 100%; min-height: 0; }
         .info-column .slot { flex: 1; min-height: 0; background: #0d1117; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
-        .static-label { background: var(--brand-color); color: #000; padding: 4px 8px; font-size: 12px; font-weight: bold; text-transform: uppercase; flex-shrink: 0; }
+        .static-label { background: var(--brand-color); color: #000; padding: 4px 8px; font-size: 12px; font-weight: bold; text-transform: uppercase; flex-shrink: 0; position: relative; cursor: help; }
         .img-container { flex: 1; position: relative; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; }
         .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .fs-toggle { cursor: pointer; font-size: 16px; padding-left: 10px; border-left: 1px solid rgba(0,0,0,0.2); line-height: 28px; color: #000; }
@@ -110,19 +105,13 @@
             <h1>Kustwacht Dashboard</h1>
         </div>
         <div class="header-info-area">
-            <!-- Bezoek Button Nu aan de rechterkant -->
-            <div class="status-switcher state-green" id="status-switcher" onclick="cycleStatus()">
-                <div class="status-light"></div>
-                <div class="status-label-text" id="status-label">Bezoek Welkom</div>
-            </div>
-
             <div class="clocks">
                 <div class="clock-item"><span class="clock-label">Lokaal</span><span id="local-clock" class="clock-time">00:00:00</span></div>
                 <div class="clock-item"><span class="clock-label">Zulu</span><span id="zulu-clock" class="clock-time">00:00:00</span></div>
             </div>
             <div class="fetch-group">
                 <div class="fetch-display">
-                    <span class="clock-label">Systeem Sync (5m)</span>
+                    <span class="clock-label">Systeem Sync</span>
                     <span id="last-update-all" class="fetch-time">--:--:--</span>
                     <span id="refresh-countdown" class="countdown-display">Volgende Sync: --:--</span>
                 </div>
@@ -150,31 +139,14 @@
             <div class="cam-box" id="box-4"><div class="label-header"><select id="sel-4" onchange="changeCam(4)"></select><span class="fs-toggle" onclick="toggleFullscreen(4)">⛶</span></div><div class="slot" id="cont-4"></div></div>
         </div>
         <div class="info-column">
-            <div class="slot"><span class="static-label">Noordzee</span><div class="img-container"><img id="knmi-1"></div></div>
-            <div class="slot"><span class="static-label">Kust- en binnenwateren</span><div class="img-container"><img id="knmi-2"></div></div>
-            <div class="slot"><span class="static-label">Radar</span><div class="img-container"><img id="radar-img"></div></div>
+            <div class="slot"><span class="static-label" id="lbl-knmi-1">Noordzee</span><div class="img-container"><img id="knmi-1"></div></div>
+            <div class="slot"><span class="static-label" id="lbl-knmi-2">Kust- en binnenwateren</span><div class="img-container"><img id="knmi-2"></div></div>
+            <div class="slot"><span class="static-label" id="lbl-radar">Radar</span><div class="img-container"><img id="radar-img"></div></div>
         </div>
     </div>
 </div>
 
 <script>
-    // Status Indicator Logica
-    let currentStatusIdx = 0;
-    const states = [
-        { label: "Bezoek Welkom", class: "state-green" },
-        { label: "Beperkt Bezoek", class: "state-orange" },
-        { label: "Geen Bezoek", class: "state-red" }
-    ];
-
-    function cycleStatus() {
-        currentStatusIdx = (currentStatusIdx + 1) % states.length;
-        const switcher = document.getElementById('status-switcher');
-        const label = document.getElementById('status-label');
-        
-        switcher.className = "status-switcher " + states[currentStatusIdx].class;
-        label.innerText = states[currentStatusIdx].label;
-    }
-
     const aircraft = [ { reg: "PH-SAR", icao: "486449" }, { reg: "PH-RSQ", icao: "48644A" }, { reg: "PH-NCG", icao: "48644B" }, { reg: "C-GCFK", icao: "C04A7D" }, { reg: "C-FCGE", icao: "C005E9" } ];
     
     const bookmarkGroups = [
@@ -220,7 +192,8 @@
     let activeStreams = { 1: null, 2: null, 3: null, 4: null };
     let webcamPairIndex = 0;
     let rotationActive = true;
-    let lastRefreshMinute = -1;
+    let lastRefresh5Min = -1;
+    let lastRefresh15Min = -1;
     let lastRotateMinute = -1;
     
     let userLockedSlots = { 1: false, 2: false, 3: false, 4: false };
@@ -255,15 +228,22 @@
             updateRotateDisplay();
         }
 
-        if (mins % 5 === 0 && lastRefreshMinute !== mins) {
-            verversSysteem();
-            lastRefreshMinute = mins;
+        // Kaarten verversen elke 5 hele minuten
+        if (mins % 5 === 0 && lastRefresh5Min !== mins) {
+            verversKaarten();
+            lastRefresh5Min = mins;
+        }
+
+        // Nieuws verversen elke 15 hele minuten
+        if (mins % 15 === 0 && lastRefresh15Min !== mins) {
+            verversNieuws();
+            lastRefresh15Min = mins;
         }
 
         const minsToNext = 5 - (mins % 5);
         const secsToNext = (secs === 0) ? 0 : 60 - secs;
         const displayMins = (secs === 0) ? minsToNext : minsToNext - 1;
-        document.getElementById('refresh-countdown').innerText = `Volgende Sync: ${displayMins}:${secsToNext.toString().padStart(2, '0')}`;
+        document.getElementById('refresh-countdown').innerText = `Sync Kaarten: ${displayMins}:${secsToNext.toString().padStart(2, '0')}`;
     }
 
     function rotateWebcams() {
@@ -283,6 +263,7 @@
 
     async function fetchRSS(pos) {
         const container = document.getElementById('cont-' + pos);
+        const boxLabel = document.getElementById('box-' + pos).querySelector('.label-header');
         const rssUrl = "https://feeds.nos.nl/nosnieuwsalgemeen";
         const proxyUrls = [
             `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}&t=${new Date().getTime()}`,
@@ -334,6 +315,8 @@
                 html += '</div>';
                 localStorage.setItem('kwc_news_cache', html);
                 container.innerHTML = html;
+                const nowStr = new Date().toLocaleTimeString('nl-NL');
+                boxLabel.setAttribute('data-refresh', 'Laatste refresh: ' + nowStr);
                 return;
             } catch (e) { console.warn("Proxy switch...", e); }
         }
@@ -352,6 +335,8 @@
         else {
             const url = type === 'web' ? id : `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&rel=0&showinfo=0`;
             container.innerHTML = `<iframe src="${url}" allow="autoplay; allowfullscreen"></iframe>`;
+            const nowStr = new Date().toLocaleTimeString('nl-NL');
+            document.getElementById('box-' + pos).querySelector('.label-header').setAttribute('data-refresh', 'Geladen: ' + nowStr);
         }
         document.getElementById('sel-' + pos).value = id;
     }
@@ -364,17 +349,29 @@
 
     function toggleFullscreen(pos) { 
         const box = document.getElementById('box-' + pos);
-        // Toggle alleen fullscreen binnen de webcam-grid container
         box.classList.toggle('full-slot'); 
     }
 
-    function verversSysteem() {
+    function verversKaarten() {
         const t = new Date().getTime();
+        const nowStr = new Date().toLocaleTimeString('nl-NL');
+        
         document.getElementById('knmi-1').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/northseamap.png?t=" + t;
+        document.getElementById('lbl-knmi-1').setAttribute('data-refresh', 'Refreshed: ' + nowStr);
+        
         document.getElementById('knmi-2').src = "https://cdn.knmi.nl/knmi/map/page/weer/waarschuwingen_verwachtingen/kust-en-noordzee/waarschuwing_kust_0.gif?t=" + t;
+        document.getElementById('lbl-knmi-2').setAttribute('data-refresh', 'Refreshed: ' + nowStr);
+        
         document.getElementById('radar-img').src = "https://api.buienradar.nl/image/1.0/RadarMapNL?w=350&h=350&random=" + t;
-        [1,2,3,4].forEach(p => { if(activeStreams[p] && activeStreams[p].type === 'rss') fetchRSS(p); });
-        document.getElementById('last-update-all').innerText = new Date().toLocaleTimeString('nl-NL', { hour12: false });
+        document.getElementById('lbl-radar').setAttribute('data-refresh', 'Refreshed: ' + nowStr);
+        
+        document.getElementById('last-update-all').innerText = nowStr;
+    }
+
+    function verversNieuws() {
+        [1,2,3,4].forEach(p => { 
+            if(activeStreams[p] && activeStreams[p].type === 'rss') fetchRSS(p); 
+        });
     }
 
     function hardReset() {
@@ -388,9 +385,11 @@
             const item = [...sourceData.systems, ...sourceData.webcams].find(x => x.id === id);
             setCamera(p, id, item.name, item.type, false);
         }
-        lastRefreshMinute = -1; 
+        lastRefresh5Min = -1; 
+        lastRefresh15Min = -1;
         lastRotateMinute = -1;
-        verversSysteem();
+        verversKaarten();
+        verversNieuws();
     }
 
     document.addEventListener('DOMContentLoaded', () => { 
