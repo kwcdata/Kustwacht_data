@@ -265,10 +265,12 @@
         const container = document.getElementById('cont-' + pos);
         const boxLabel = document.getElementById('box-' + pos).querySelector('.label-header');
         const rssUrl = "https://feeds.nos.nl/nosnieuwsalgemeen";
+        const t = new Date().getTime(); // Cache-buster tijdstempel
+
         const proxyUrls = [
-            `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}&t=${new Date().getTime()}`,
-            `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`,
-            `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(rssUrl)}`
+            `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}&t=${t}`,
+            `https://corsproxy.io/?${encodeURIComponent(rssUrl + '?t=' + t)}`,
+            `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(rssUrl + '?t=' + t)}`
         ];
 
         const cachedNews = localStorage.getItem('kwc_news_cache');
