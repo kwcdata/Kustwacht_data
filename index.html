@@ -64,7 +64,6 @@
         .label-header select { background: transparent !important; border: none !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 14px !important; cursor: pointer; flex-grow: 1; outline: none; color: #000 !important; appearance: none; }
         .label-header select option, .label-header select optgroup { background-color: #161b22 !important; color: #ffffff !important; }
 
-        /* Tooltip style voor laatste refresh */
         .label-header:hover::after, .static-label:hover::after {
             content: attr(data-refresh);
             position: absolute;
@@ -172,19 +171,25 @@
             {id: 'news_file', name: 'NIEUWSFEED (NOS)', type: 'rss'}
         ],
         webcams: [
-            {id: 'A5kXiKzbBFs', name: 'Scheveningen Blvd', type: 'yt'},
-            {id: 'q0-DDh1zdY4', name: 'Zandvoort Blvd', type: 'yt'},
+            {id: 'Z2SiE-MSfVY', name: 'Bergen aan Zee', type: 'yt'},
             {id: 'KjK02QIm4ZI', name: 'Brouwersdam', type: 'yt'},
-            {id: 'mI1Os7TFdGc', name: 'Egmond aan Zee', type: 'yt'},
-            {id: 'jDF264Bg1_c', name: 'Hoek v Holland Blvd', type: 'yt'},
-            {id: 'mnxV4iit7S4', name: 'Kijkduin Blvd', type: 'yt'},
-            {id: 'Ud7I4jprFN0', name: 'Maasvlakte', type: 'yt'},
-            {id: '_pGIJmXxAHk', name: 'Nieuwe Waterweg', type: 'yt'},
-            {id: 'dtFG_mcfWjQ', name: 'Noordwijk Blvd', type: 'yt'},
-            {id: 'L76VKII_Z7k', name: 'Noordwijk Vuurtoren', type: 'yt'},
-            {id: 'csMnwbjV5vg', name: 'Rockanje', type: 'yt'},
-            {id: 'DaG5JReOYEw', name: 'Scheveningen Noord', type: 'yt'},
-            {id: 't3qbzZHOTyg', name: 'Wassenaarse Slag', type: 'yt'}
+            {id: 'zgOgIbmiTU0', name: 'Egmond: aan Zee Nautilus', type: 'yt'},
+            {id: 'mI1Os7TFdGc', name: 'Egmond aan Zee: Boulevard', type: 'yt'},
+            {id: 'jDF264Bg1_c', name: 'Hoek van Holland: Boulevard', type: 'yt'},
+            {id: 'mnxV4iit7S4', name: 'Kijkduin: Boulevard', type: 'yt'},
+            {id: 'Ud7I4jprFN0', name: 'Maasvlakte: Rotterdamse Reddingsbrigade', type: 'yt'},
+            {id: '6U7h7V0v_zM', name: 'Nieuwe Waterweg', type: 'yt'},
+            {id: 'dtFG_mcfWjQ', name: 'Noordwijk aan Zee: Boulevard', type: 'yt'},
+            {id: 'L76VKII_Z7k', name: 'Noordwijk aan Zee: Vuurtoren', type: 'yt'},
+            {id: 'csMnwbjV5vg', name: 'Rockanje: Reddingsbrigade Rockanje', type: 'yt'},
+            {id: 'XB2T9RjIM-g', name: 'Scheveningen: Aloha Beachclub', type: 'yt'},
+            {id: 'A5kXiKzbBFs', name: 'Scheveningen: Boulevard', type: 'yt'},
+            {id: 'DaG5JReOYEw', name: 'Scheveningen: Noord', type: 'yt'},
+            {id: 'fXL2w_ZBQp8', name: 'Ter Heijde', type: 'yt'},
+            {id: 'Gq8dWezdEX8', name: 'Texel: Kaap Noord (Paal 33)', type: 'yt'},
+            {id: 'Hq2Qbcuph4w', name: 'Texel: Paal 17 De Koog', type: 'yt'},
+            {id: 't3qbzZHOTyg', name: 'Wassenaarse Slag', type: 'yt'},
+            {id: 'q0-DDh1zdY4', name: 'Zandvoort: Boulevard', type: 'yt'}
         ]
     };
 
@@ -228,13 +233,11 @@
             updateRotateDisplay();
         }
 
-        // Kaarten verversen elke 5 hele minuten
         if (mins % 5 === 0 && lastRefresh5Min !== mins) {
             verversKaarten();
             lastRefresh5Min = mins;
         }
 
-        // Nieuws verversen elke 15 hele minuten
         if (mins % 15 === 0 && lastRefresh15Min !== mins) {
             verversNieuws();
             lastRefresh15Min = mins;
@@ -265,7 +268,7 @@
         const container = document.getElementById('cont-' + pos);
         const boxLabel = document.getElementById('box-' + pos).querySelector('.label-header');
         const rssUrl = "https://feeds.nos.nl/nosnieuwsalgemeen";
-        const t = new Date().getTime(); // Cache-buster tijdstempel
+        const t = new Date().getTime();
 
         const proxyUrls = [
             `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}&t=${t}`,
