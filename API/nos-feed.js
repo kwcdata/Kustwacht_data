@@ -31,4 +31,4 @@ export default async function handler(req, res) {
     // We sturen een nette 504 status zodat je HTML weet dat hij de back-up moet gebruiken
     return res.status(504).send('<error>Timeout of blokkade</error>');
   }
-}
+} 
