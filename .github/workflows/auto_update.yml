@@ -41,4 +41,4 @@ jobs:
           
           # We committen ALTIJD omdat last_run.txt sowieso veranderd is
           git commit -m "Automatische nieuws update: $(date)"
-          git push
+          git push 
