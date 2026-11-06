@@ -162,6 +162,7 @@
         ]
     };
 
+    const WINDY_ID = 'https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=°C&metricWind=kt&zoom=7&overlay=wind&product=ecmwf&level=surface&lat=52.958&lon=4.759';
     const defaults = { 1: sourceData.systems[0].id, 2: 'news_file', 3: sourceData.webcams[0].id, 4: sourceData.webcams[1].id };
     let activeStreams = { 1: null, 2: null, 3: null, 4: null };
     let webcamPairIndex = 0;
@@ -259,6 +260,17 @@
     }
 
     function rotateWebcams() {
+        // Vak 2 (rechtsboven): wissel tussen NOS Nieuws en Windy (Noordzee)
+        if (!userLockedSlots[2]) {
+            const nextId = (activeStreams[2]?.id === 'news_file') ? WINDY_ID : 'news_file';
+            const nextItem = sourceData.systems.find(s => s.id === nextId);
+            if (nextItem) {
+                setCamera(2, nextItem.id, nextItem.name, nextItem.type, false);
+                document.getElementById('sel-2').value = nextItem.id;
+            }
+        }
+
+        // Vak 3 en 4 (onder): roteer webcams
         webcamPairIndex = (webcamPairIndex + 2) % sourceData.webcams.length;
         const cam3 = sourceData.webcams[webcamPairIndex];
         const cam4 = sourceData.webcams[(webcamPairIndex + 1) % sourceData.webcams.length];
@@ -303,7 +315,7 @@
         
         const cacheKey = 'kwc_news_cache_zulu_' + activeId;
         const cachedNews = localStorage.getItem(cacheKey);
-        if (cachedNews && container.innerHTML === "") { 
+        if (cachedNews) { 
             container.innerHTML = cachedNews; 
         }
 
