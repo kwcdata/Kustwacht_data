@@ -272,6 +272,17 @@
         }
     }
 
+    function formatZuluTime(pubDateStr) {
+        if (!pubDateStr) return '';
+        // Zorg dat datums zonder tijdzone (zoals bij rss2json vaak YYYY-MM-DD HH:MM:SS) als UTC worden geparsed
+        const normalizedStr = (!pubDateStr.includes('GMT') && !pubDateStr.includes('+') && !pubDateStr.endsWith('Z')) 
+            ? pubDateStr.replace(' ', 'T') + 'Z' 
+            : pubDateStr;
+        const dateObj = new Date(normalizedStr);
+        if (isNaN(dateObj.getTime())) return '';
+        return dateObj.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + 'Z';
+    }
+
     async function fetchRSS(pos) {
         const container = document.getElementById('cont-' + pos);
         const boxLabel = document.getElementById('box-' + pos).querySelector('.label-header');
@@ -290,7 +301,7 @@
             `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}&t=${t}`
         ];
         
-        const cacheKey = 'kwc_news_cache_' + activeId;
+        const cacheKey = 'kwc_news_cache_zulu_' + activeId;
         const cachedNews = localStorage.getItem(cacheKey);
         if (cachedNews && container.innerHTML === "") { 
             container.innerHTML = cachedNews; 
@@ -316,8 +327,7 @@
                             const title = item.title || "Geen titel";
                             const link = item.link || "#";
                             const cleanDesc = (item.description || "").replace(/<[^>]*>?/gm, '').trim();
-                            const dateObj = new Date(item.pubDate);
-                            const time = isNaN(dateObj.getTime()) ? '' : dateObj.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam' });
+                            const time = formatZuluTime(item.pubDate);
                             html += `<div class="news-article"><div class="news-header"><span class="news-date">${time}</span><a href="${link}" target="_blank" class="news-title">${title}</a></div><div class="news-snippet">${cleanDesc}</div></div>`;
                         });
                         loaded = true;
@@ -333,8 +343,7 @@
                             const title = item.querySelector("title")?.textContent || "Geen titel";
                             const link = item.querySelector("link")?.textContent || "#";
                             const cleanDesc = (item.querySelector("description")?.textContent || "").replace(/<[^>]*>?/gm, '').trim();
-                            const dateObj = new Date(item.querySelector("pubDate")?.textContent || "");
-                            const time = isNaN(dateObj.getTime()) ? '' : dateObj.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam' });
+                            const time = formatZuluTime(item.querySelector("pubDate")?.textContent || "");
                             html += `<div class="news-article"><div class="news-header"><span class="news-date">${time}</span><a href="${link}" target="_blank" class="news-title">${title}</a></div><div class="news-snippet">${cleanDesc}</div></div>`;
                         });
                         loaded = true;
@@ -346,7 +355,7 @@
                 html += '</div>';
                 localStorage.setItem(cacheKey, html);
                 container.innerHTML = html;
-                const nowStr = new Date().toLocaleTimeString('nl-NL', { timeZone: 'Europe/Amsterdam' });
+                const nowStr = new Date().toLocaleTimeString('nl-NL', { timeZone: 'UTC' }) + 'Z';
                 
                 const bron = url.includes('rss2json') ? 'RSS2JSON' : (url.startsWith('/api') ? 'Vercel' : 'Backup');
                 boxLabel.setAttribute('data-refresh', `Laatste refresh (${bron}): ` + nowStr);
