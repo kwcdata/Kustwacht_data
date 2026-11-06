@@ -32,24 +32,16 @@
         .fetch-time { font-size: 14px; color: #c9d1d9; font-weight: bold; }
         .countdown-display { font-size: 11px; color: var(--brand-color); }
 
-        .nav-bar { background: var(--bg-dark); border-bottom: 1px solid var(--border-color); display: flex; padding: 0 10px; z-index: 1000; align-items: center; justify-content: space-between; flex-shrink: 0; height: 32px; }
-        .nav-links-wrapper { display: flex; align-items: center; flex-grow: 1; height: 100%; }
-        .nav-group { position: relative; padding: 0 8px; cursor: pointer; font-size: 10px; font-weight: bold; color: #c9d1d9; text-transform: uppercase; white-space: nowrap; height: 100%; display: flex; align-items: center; }
-        .nav-group:hover { background: #30363d; color: var(--brand-color); }
-        
-        .dropdown { display: none; position: absolute; top: 100%; left: 0; background: #161b22; border: 1px solid var(--border-color); min-width: 220px; max-width: 300px; box-shadow: 0 8px 16px rgba(0,0,0,0.8); z-index: 2000; max-height: 80vh; overflow-y: auto; overflow-x: hidden; }
-        .nav-group:hover .dropdown { display: block; }
-        .dropdown a, .dropdown button { color: #c9d1d9; padding: 8px 12px; text-decoration: none; display: block; font-size: 11px; border-bottom: 1px solid var(--border-color); width: 100%; text-align: left; background: #161b22; border: none; cursor: pointer; white-space: normal; line-height: 1.4; font-family: inherit; font-weight: bold; }
-        .dropdown a:hover, .dropdown button:hover { background: var(--brand-color); color: #000; }
-
-        .nav-controls { display: flex; align-items: center; gap: 10px; height: 100%; }
-        .rotate-wrapper { display: flex; align-items: center; gap: 5px; background: #21262d; border-radius: 3px; border: 1px solid var(--border-color); padding: 0 5px; height: 24px; }
+        /* Header Controls for Rotate & Reset */
+        .header-controls { display: flex; align-items: center; gap: 10px; border-left: 1px solid var(--border-color); padding-left: 15px; height: 100%; }
+        .rotate-wrapper { display: flex; align-items: center; gap: 5px; background: #21262d; border-radius: 3px; border: 1px solid var(--border-color); padding: 0 6px; height: 26px; }
         .rotate-timer { font-family: 'Courier New', monospace; font-size: 12px; color: var(--brand-color); font-weight: bold; min-width: 20px; text-align: center; }
-        .rotate-btn { background: transparent; border: none; color: var(--text-main); cursor: pointer; font-size: 9px; font-weight: bold; text-transform: uppercase; padding: 0 5px; outline: none; }
+        .rotate-btn { background: transparent; border: none; color: var(--text-main); cursor: pointer; font-size: 10px; font-weight: bold; text-transform: uppercase; padding: 0 4px; outline: none; }
         .rotate-btn.active { color: var(--brand-color); }
-        .reset-nav { padding: 2px 8px; background: #21262d; color: #c9d1d9; border: 1px solid var(--border-color); cursor: pointer; font-size: 9px; font-weight: bold; text-transform: uppercase; border-radius: 3px; }
+        .reset-nav { padding: 4px 10px; background: #21262d; color: #c9d1d9; border: 1px solid var(--border-color); cursor: pointer; font-size: 10px; font-weight: bold; text-transform: uppercase; border-radius: 3px; height: 26px; display: flex; align-items: center; }
+        .reset-nav:hover { background: #30363d; color: var(--brand-color); }
 
-        .monitor-layout { display: grid; grid-template-columns: 1fr 360px; grid-gap: 8px; padding: 8px; flex-grow: 1; height: calc(100vh - 82px); box-sizing: border-box; }
+        .monitor-layout { display: grid; grid-template-columns: 1fr 360px; grid-gap: 8px; padding: 8px; flex-grow: 1; height: calc(100vh - 50px); box-sizing: border-box; }
         
         .webcam-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; grid-gap: 8px; height: 100%; min-height: 0; position: relative; }
         .cam-box { display: flex; flex-direction: column; background: #0d1117; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; min-height: 0; position: relative; }
@@ -111,20 +103,16 @@
                     <span id="refresh-countdown" class="countdown-display">Volgende Sync: --:--</span>
                 </div>
             </div>
+
+            <div class="header-controls">
+                <div class="rotate-wrapper">
+                    <span id="rotate-timer" class="rotate-timer">60</span>
+                    <button id="rotate-btn" class="rotate-btn active" onclick="toggleRotation()">Auto-Rotate</button>
+                </div>
+                <button class="reset-nav" onclick="hardReset()">Herstel Standaard</button>
+            </div>
         </div>
     </header>
-
-    <nav class="nav-bar">
-        <div class="nav-links-wrapper" id="nav-bar-links"></div>
-        <div class="nav-controls">
-            <div class="rotate-wrapper">
-                <span id="rotate-timer" class="rotate-timer">60</span>
-                <button id="rotate-btn" class="rotate-btn active" onclick="toggleRotation()">Auto-Rotate</button>
-            </div>
-            <div class="nav-group" style="color:var(--brand-color)">VLOOT TRACKING ▾<div class="dropdown" id="fleet-dropdown"></div></div>
-            <button class="reset-nav" onclick="hardReset()">Herstel Standaard</button>
-        </div>
-    </nav>
 
     <div class="monitor-layout">
         <div class="webcam-grid">
@@ -142,24 +130,6 @@
 </div>
 
 <script>
-    const aircraft = [ { reg: "PH-SAR", icao: "486449" }, { reg: "PH-RSQ", icao: "48644A" }, { reg: "PH-NCG", icao: "48644B" }, { reg: "C-GCFK", icao: "C04A7D" }, { reg: "C-FCGE", icao: "C005E9" } ];
-    
-    const bookmarkGroups = [
-        { title: "SAR", links: [ { name: "Amver (surpic)", url: "http://www.amver.com/Forms/SurpicRequest" }, { name: "LCMS", url: "https://mijn.lcms.nl/gebruikersbeheer/#/login" }, { name: "ISAR Bristow", url: "https://isar.im/" }, { name: "CECIS Log In", url: "https://webgate.ec.europa.eu/CECIS/login.jsp" }, { name: "P2kflex", url: "https://expert.p2kflex.nl/index.php?regio=403%3B404%3B&audio=&volume=75&include=knrm%3Bkustwacht%3Bredding%3Bwater%3Bgrip" }, { name: "Winnies.livep2000.nl", url: "https://winnies.livep2000.nl/" }, { name: "P2000.page", url: "https://p2000.page/" }, { name: "112MELDINGEN.NL", url: "http://112meldingen.nl/index.php" }, { name: "CAPCode database", url: "http://www.capcode.nl/capsite/index.php" }, { name: "Global SAR Hub", url: "https://www.globalsarhub.com/sea-sar.html" }, { name: "International Cospas-Sarsat", url: "https://cospas-sarsat.int/en/" }, { name: "LADR", url: "https://ladr.eurocontrol.int/ops/frontend" } ] },
-        { title: "KNRM/KNBRD", links: [ { name: "Strandveilig", url: "https://strandveilig.nl/beschikbaar/#/login" }, { name: "KNRM helpt", url: "https://www.knrmhelpt.nl/index.html?home" }, { name: "Radio Medische Dienst", url: "https://rmd.businessfundamentals.nl/auth/signin?ReturnUrl=%2fdossiers" }, { name: "Pre-Com", url: "https://www.pre-com.nl/PreCom/Account/Login" }, { name: "GIS KNRM", url: "https://www.arcgis.com/apps/mapviewer/index.html?webmap=04162a3c264d462e96e4ec508519ce95" }, { name: "Portal.lifeguardtracking.nl", url: "https://portal.lifeguardtracking.nl/" } ] },
-        { title: "Overheid", links: [ { name: "RWsOS Viewer", url: "https://rwsos.rws.nl/viewer/map/noordzee/waterkwantiteit" }, { name: "Waterberichtgeving", url: "https://waterberichtgeving.rws.nl/owb/home" }, { name: "KNMI extranet", url: "https://mijn.knmi.nl" }, { name: "Waddendata.nl", url: "https://waddendata.nl/" }, { name: "RWS Waterinfo", url: "https://waterinfo.rws.nl/#!/kaart/waterhoogte-t-o-v-nap/" }, { name: "GeoWeb", url: "https://maps.rijkswaterstaat.nl/geoweb55/index.html?viewer=NMA" }, { name: "Noordzeeloket", url: "https://www.noordzeeloket.nl/" }, { name: "Onderwaterobjecten RWS", url: "https://onderwaterobjecten.rws.nl/" }, { name: "Weerdata Kustwacht", url: "https://weerdatakustwacht.wordpress.com/" } ] },
-        { title: "Scheepvaart", links: [ { name: "EMSA Portal", url: "https://portal.emsa.europa.eu/home" }, { name: "ERICards", url: "http://www.ericards.net/" }, { name: "Rainwat", url: "http://www.rainwat.bipt.be/" }, { name: "Lloyds Seasearcher", url: "https://www.seasearcher.com/" }, { name: "NATO ISMERLO", url: "https://ismerlo.org/accounts/login/" }, { name: "Nautical calculator", url: "https://www.madinstro.net/" }, { name: "Navtex", url: "http://navtex.lv/" }, { name: "Kabels Noordzee", url: "https://kis-orca.org/map/" } ] },
-        { title: "Scheepvaart DB", links: [ { name: "Sketchy.boats", url: "https://sketchy.boats/" }, { name: "406 MHz Registration", url: "https://www.406registration.com" }, { name: "RescueNET", url: "https://msds.portal.inmarsat.com/msds/" }, { name: "Beacon Decode", url: "https://cospas-sarsat.int/en/beacons-pro/beacon-message-decode-program-txsep/beacon-message-decode-program" }, { name: "Ship Station List", url: "https://www.itu.int/mmsapp/ShipStation/list" }, { name: "MMSI MID Codes", url: "https://www.vtexplorer.com/mmsi-mid-codes-en/" }, { name: "NOGEPA RAS", url: "http://ras.nogepa.nl/login.php" } ] },
-        { title: "AIS", links: [ { name: "VIIA", url: "https://viia-p.kustwacht.nl/" }, { name: "Waterkaart.net", url: "https://waterkaart.net/" }, { name: "AMS (AIS RWS)", url: "https://ais-ams.rws.rijksweb.nl/ams/" }, { name: "Maritime Control", url: "https://bfa.kustwacht.nl/" }, { name: "Madesmart", url: "https://tracker.madesmart.nl/" } ] },
-        { title: "Plannen", links: [ { name: "IBP Noordzee", url: "https://noordzeeloket.nl/functies-gebruik/artikel-baseline-0/" }, { name: "IBP SAMIJ", url: "https://ibpsamij.calamiteiten.online/templates/" }, { name: "Handboek incident", url: "https://nipv.nl/wp-content/uploads/2025/12/20251203-NIPV-Handboek-incidentbestrijding-op-het-water.pdf" } ] },
-        { title: "Luchtvaart", links: [ { name: "LVNL AIS", url: "https://www.lvnl.nl/informatie-voor-luchtvarenden/publicaties-voor-luchtvarenden" }, { name: "SkyVector", url: "https://skyvector.com/" }, { name: "Aireon Alert", url: "https://aireonalert.iaa.ie/alert-login" }, { name: "METAR-TAF.com", url: "https://metar-taf.com/" }, { name: "E6BX Calculator", url: "https://e6bx.com/" }, { name: "Aviation Glossary", url: "https://www.pilotscafe.com/glossary/" }, { name: "EHAMCDM Mobile", url: "https://mobile.ehamcdm.nl/" } ] },
-        { title: "Luchtvaart DB", links: [ { name: "406 MHz Registration", url: "https://www.406registration.com/" }, { name: "Beacon Decode", url: "https://cospas-sarsat.int/en/beacons-pro/beacon-message-decode-program-txsep/beacon-message-decode-program" }, { name: "Ballonregister", url: "https://www.ballonregister.nl/" }, { name: "Airframes", url: "https://www.airframes.org/" }, { name: "Airline Codes", url: "https://airlinecodes.info/" } ] },
-        { title: "Tracking", links: [ { name: "FlightAware", url: "https://www.flightaware.com/" }, { name: "Casper Tracking", url: "https://kustwacht-flighttracking.casper.aero/index.php" }, { name: "ADS-B Exchange", url: "https://globe.adsbexchange.com/" }, { name: "Flightradar24", url: "https://www.flightradar24.com/" } ] },
-        { title: "Taal/Rekenen", links: [ { name: "Spelling.nu", url: "https://www.spelling.nu/" }, { name: "Vertalen.nu", url: "http://www.vertalen.nu/vervoegen/" }, { name: "NATO Translator", url: "https://cryptii.com/pipes/nato-phonetic-alphabet" }, { name: "Web 2.0 Calc", url: "https://web2.0calc.com/" } ] },
-        { title: "Navigatie", links: [ { name: "GPS Converter", url: "http://www.gpscoordinaten.nl/converteer-gps-coordinaten.php" }, { name: "Hectometerpaal", url: "http://www.hmpaal.nl/" }, { name: "Time Zone Map", url: "https://www.timeanddate.com/time/map/" }, { name: "Apple Maps Beta", url: "https://beta.maps.apple.com/" }, { name: "Remove Paywalls", url: "https://removepaywalls.com/" } ] },
-        { title: "Beheer", links: [ { name: "GitHub Edit", url: "https://github.com/kwcdata/Kustwacht_data/edit/main/index.html" } ] }
-    ];
-
     const sourceData = {
         systems: [
             {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000 (Kustwacht)', type: 'web'},
@@ -306,7 +276,6 @@
         const container = document.getElementById('cont-' + pos);
         const boxLabel = document.getElementById('box-' + pos).querySelector('.label-header');
         
-        // Bepaal de RSS-URL op basis van de gekozen feed
         const activeId = activeStreams[pos]?.id || 'news_file';
         let rssUrl = "https://feeds.nos.nl/nosnieuwsalgemeen";
         if (activeId === 'news_anp') {
@@ -315,22 +284,18 @@
         
         const t = new Date().getTime();
         
-        // Lijst met URL's: Eerst de eigen Vercel API (met feed parameter), daarna openbare back-ups
         const endpoints = [
-            `/api/nos-feed?t=${t}&feed=${encodeURIComponent(rssUrl)}`,
-            `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}&t=${t}`,
-            `https://corsproxy.io/?${encodeURIComponent(rssUrl + '?t=' + t)}`
+            `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`,
+            `/api/nos-feed?t=${t}`,
+            `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}&t=${t}`
         ];
         
         const cacheKey = 'kwc_news_cache_' + activeId;
         const cachedNews = localStorage.getItem(cacheKey);
-        if (cachedNews) { 
+        if (cachedNews && container.innerHTML === "") { 
             container.innerHTML = cachedNews; 
-        } else {
-            container.innerHTML = '<div style="padding:15px; color:#8b949e; font-size:14px;">Nieuwsberichtgeving laden...</div>';
         }
 
-        // Loop door de endpoints heen tot er één succesvol antwoord geeft
         for (let url of endpoints) {
             try {
                 const controller = new AbortController();
@@ -341,39 +306,49 @@
                 
                 if (!response.ok) continue; 
                 
-                let xmlString;
-                if (url.includes('allorigins')) {
+                let html = '<div class="news-container">';
+                let loaded = false;
+
+                if (url.includes('rss2json')) {
                     const data = await response.json();
-                    xmlString = data.contents;
+                    if (data.status === 'ok' && data.items && data.items.length > 0) {
+                        data.items.slice(0, 15).forEach(item => {
+                            const title = item.title || "Geen titel";
+                            const link = item.link || "#";
+                            const cleanDesc = (item.description || "").replace(/<[^>]*>?/gm, '').trim();
+                            const dateObj = new Date(item.pubDate);
+                            const time = isNaN(dateObj.getTime()) ? '' : dateObj.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam' });
+                            html += `<div class="news-article"><div class="news-header"><span class="news-date">${time}</span><a href="${link}" target="_blank" class="news-title">${title}</a></div><div class="news-snippet">${cleanDesc}</div></div>`;
+                        });
+                        loaded = true;
+                    }
                 } else {
-                    xmlString = await response.text();
+                    let xmlString = url.includes('allorigins') ? (await response.json()).contents : await response.text();
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+                    const items = xmlDoc.querySelectorAll("item");
+                    
+                    if (items.length > 0) {
+                        Array.from(items).slice(0, 15).forEach(item => {
+                            const title = item.querySelector("title")?.textContent || "Geen titel";
+                            const link = item.querySelector("link")?.textContent || "#";
+                            const cleanDesc = (item.querySelector("description")?.textContent || "").replace(/<[^>]*>?/gm, '').trim();
+                            const dateObj = new Date(item.querySelector("pubDate")?.textContent || "");
+                            const time = isNaN(dateObj.getTime()) ? '' : dateObj.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam' });
+                            html += `<div class="news-article"><div class="news-header"><span class="news-date">${time}</span><a href="${link}" target="_blank" class="news-title">${title}</a></div><div class="news-snippet">${cleanDesc}</div></div>`;
+                        });
+                        loaded = true;
+                    }
                 }
                 
-                // Controleren of geldige XML is ontvangen
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(xmlString, "text/xml");
-                const items = xmlDoc.querySelectorAll("item");
+                if (!loaded) continue;
                 
-                if (items.length === 0) continue;
-                
-                let html = '<div class="news-container">';
-                Array.from(items).slice(0, 15).forEach(item => {
-                    const title = item.querySelector("title")?.textContent || "Geen titel";
-                    const link = item.querySelector("link")?.textContent || "#";
-                    const rawDesc = item.querySelector("description")?.textContent || "";
-                    const cleanDesc = rawDesc.replace(/<[^>]*>?/gm, '').trim();
-                    const pubDate = item.querySelector("pubDate")?.textContent || "";
-                    const dateObj = new Date(pubDate);
-                    const time = isNaN(dateObj.getTime()) ? '' : dateObj.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam' });
-                    html += `<div class="news-article"><div class="news-header"><span class="news-date">${time}</span><a href="${link}" target="_blank" class="news-title">${title}</a></div><div class="news-snippet">${cleanDesc}</div></div>`;
-                });
                 html += '</div>';
-                
                 localStorage.setItem(cacheKey, html);
                 container.innerHTML = html;
                 const nowStr = new Date().toLocaleTimeString('nl-NL', { timeZone: 'Europe/Amsterdam' });
                 
-                const bron = url.startsWith('/api') ? 'Vercel' : (url.includes('allorigins') ? 'Backup-1' : 'Backup-2');
+                const bron = url.includes('rss2json') ? 'RSS2JSON' : (url.startsWith('/api') ? 'Vercel' : 'Backup');
                 boxLabel.setAttribute('data-refresh', `Laatste refresh (${bron}): ` + nowStr);
                 return;
             } catch (e) { 
@@ -442,8 +417,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => { 
-        document.getElementById('nav-bar-links').innerHTML = bookmarkGroups.map(g => `<div class="nav-group">${g.title} ▾<div class="dropdown">${g.links.map(l => `<a href="${l.url}" target="_blank">${l.name}</a>`).join('')}</div></div>`).join('');
-        document.getElementById('fleet-dropdown').innerHTML = aircraft.map(p => `<button onclick="setCamera(2, 'https://globe.adsbexchange.com/?icao=${p.icao}&zoom=11', 'Track: ${p.reg}', 'web', true)">Track: ${p.reg}</button>`).join('');
         for (let i = 1; i <= 4; i++) {
             const sel = document.getElementById('sel-' + i);
             const g1 = document.createElement('optgroup'); g1.label = "SYSTEMEN";
