@@ -164,7 +164,8 @@
         systems: [
             {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000 (Kustwacht)', type: 'web'},
             {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange', type: 'web'},
-            {id: 'news_file', name: 'NIEUWSFEED (NOS)', type: 'rss'}
+            {id: 'news_file', name: 'NIEUWSFEED (NOS)', type: 'rss'},
+            {id: 'news_anp', name: 'NIEUWSFEED (ANP / NU.nl)', type: 'rss'}
         ],
         webcams: [
             {id: 'Z2SiE-MSfVY', name: 'Bergen aan Zee', type: 'yt'},
@@ -304,26 +305,35 @@
     async function fetchRSS(pos) {
         const container = document.getElementById('cont-' + pos);
         const boxLabel = document.getElementById('box-' + pos).querySelector('.label-header');
-        const rssUrl = "https://feeds.nos.nl/nosnieuwsalgemeen";
+        
+        // Bepaal de RSS-URL op basis van de gekozen feed
+        const activeId = activeStreams[pos]?.id || 'news_file';
+        let rssUrl = "https://feeds.nos.nl/nosnieuwsalgemeen";
+        if (activeId === 'news_anp') {
+            rssUrl = "https://www.nu.nl/rss/Algemeen";
+        }
+        
         const t = new Date().getTime();
         
-        // Lijst met URL's: Eerst onze Vercel API, daarna de oude betrouwbare back-ups
+        // Lijst met URL's: Eerst de eigen Vercel API (met feed parameter), daarna openbare back-ups
         const endpoints = [
-            `/api/nos-feed?t=${t}`,
+            `/api/nos-feed?t=${t}&feed=${encodeURIComponent(rssUrl)}`,
             `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}&t=${t}`,
             `https://corsproxy.io/?${encodeURIComponent(rssUrl + '?t=' + t)}`
         ];
         
-        const cachedNews = localStorage.getItem('kwc_news_cache');
-        if (cachedNews && (container.innerHTML === "" || container.innerText.includes("laden"))) { 
+        const cacheKey = 'kwc_news_cache_' + activeId;
+        const cachedNews = localStorage.getItem(cacheKey);
+        if (cachedNews) { 
             container.innerHTML = cachedNews; 
+        } else {
+            container.innerHTML = '<div style="padding:15px; color:#8b949e; font-size:14px;">Nieuwsberichtgeving laden...</div>';
         }
 
-        // We lopen door de lijst heen. Als Vercel faalt of te lang duurt, pakt hij direct de volgende
+        // Loop door de endpoints heen tot er één succesvol antwoord geeft
         for (let url of endpoints) {
             try {
                 const controller = new AbortController();
-                // We geven elke poging maximaal 4 seconden om te laden, anders hup naar de volgende
                 const timeoutId = setTimeout(() => controller.abort(), 4000);
                 
                 const response = await fetch(url, { signal: controller.signal });
@@ -339,12 +349,12 @@
                     xmlString = await response.text();
                 }
                 
-                // Controleren of we geldige XML hebben ontvangen
+                // Controleren of geldige XML is ontvangen
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlString, "text/xml");
                 const items = xmlDoc.querySelectorAll("item");
                 
-                if (items.length === 0) continue; // Niet geldig? Probeer volgende proxy.
+                if (items.length === 0) continue;
                 
                 let html = '<div class="news-container">';
                 Array.from(items).slice(0, 15).forEach(item => {
@@ -354,19 +364,18 @@
                     const cleanDesc = rawDesc.replace(/<[^>]*>?/gm, '').trim();
                     const pubDate = item.querySelector("pubDate")?.textContent || "";
                     const dateObj = new Date(pubDate);
-                    const time = dateObj.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam' });
+                    const time = isNaN(dateObj.getTime()) ? '' : dateObj.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam' });
                     html += `<div class="news-article"><div class="news-header"><span class="news-date">${time}</span><a href="${link}" target="_blank" class="news-title">${title}</a></div><div class="news-snippet">${cleanDesc}</div></div>`;
                 });
                 html += '</div>';
                 
-                localStorage.setItem('kwc_news_cache', html);
+                localStorage.setItem(cacheKey, html);
                 container.innerHTML = html;
                 const nowStr = new Date().toLocaleTimeString('nl-NL', { timeZone: 'Europe/Amsterdam' });
                 
-                // Laat subtiel zien welke bron gebruikt is
                 const bron = url.startsWith('/api') ? 'Vercel' : (url.includes('allorigins') ? 'Backup-1' : 'Backup-2');
                 boxLabel.setAttribute('data-refresh', `Laatste refresh (${bron}): ` + nowStr);
-                return; // Succes! Stop de loop.
+                return;
             } catch (e) { 
                 console.warn(`Bron ${url} mislukt of time-out, probeer volgende...`, e); 
             }
