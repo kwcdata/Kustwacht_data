@@ -134,6 +134,7 @@
         systems: [
             {id: 'https://m.p2kflex.nl/index.php?regio=401%3B403%3B404%3B406%3B&audio=none&volume=75&include=water%3Blvo%3Bredding%3Bgrip%3Bscheepvaart&exclude=none&capcode=none&city=&geo=0&colors=%23F00%2C%23FF0%2C%2300F%2C%233D9%2C%233D9%2C%23F90%2C18%2C15%2C15%2C0%2C0%2C0%2C0%2C0%2C0', name: 'P2000 (Kustwacht)', type: 'web'},
             {id: 'https://globe.adsbexchange.com/?lat=52.955&lon=4.760&zoom=8', name: 'ADS-B Exchange', type: 'web'},
+            {id: 'https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=°C&metricWind=kt&zoom=7&overlay=wind&product=ecmwf&level=surface&lat=52.958&lon=4.759', name: 'Windy (Noordzee)', type: 'web'},
             {id: 'news_file', name: 'NIEUWSFEED (NOS)', type: 'rss'},
             {id: 'news_anp', name: 'NIEUWSFEED (ANP / NU.nl)', type: 'rss'}
         ],
@@ -274,7 +275,6 @@
 
     function formatZuluTime(pubDateStr) {
         if (!pubDateStr) return '';
-        // Zorg dat datums zonder tijdzone (zoals bij rss2json vaak YYYY-MM-DD HH:MM:SS) als UTC worden geparsed
         const normalizedStr = (!pubDateStr.includes('GMT') && !pubDateStr.includes('+') && !pubDateStr.endsWith('Z')) 
             ? pubDateStr.replace(' ', 'T') + 'Z' 
             : pubDateStr;
